@@ -1,6 +1,9 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("com.google.devtools.ksp")
+    id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -54,9 +57,8 @@ dependencies {
     implementation(libs.lifecycle.runtime.ktx)
     implementation(enforcedPlatform(libs.compose.bom))
     implementation(libs.bundles.compose)
-
+    implementation(libs.hilt.android)
+    kapt(libs.hiltCompiler)
     testImplementation(libs.junit)
 
-    debugImplementation("androidx.compose.ui:ui-tooling")
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
 }

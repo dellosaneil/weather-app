@@ -1,6 +1,10 @@
+import org.jetbrains.kotlin.kapt3.base.Kapt.kapt
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -36,6 +40,9 @@ android {
 }
 
 dependencies {
-
     implementation(libs.bundles.network)
+    testImplementation(libs.junit)
+
+    implementation(libs.hilt.android)
+    kapt(libs.hiltCompiler)
 }

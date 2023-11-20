@@ -7,6 +7,7 @@ junit = "4.13.2"
 retrofit = "2.9.0"
 okhttp = "4.11.0"
 gson = "2.10.1"
+hilt = "2.47"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -21,9 +22,8 @@ compose-ui-material3 = { group = "androidx.compose.ui", name = "ui-graphics" }
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
-
-[plugins]
-
+hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
+hiltCompiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
 
 
 [bundles]
@@ -40,3 +40,5 @@ network = [
     "okhttp",
     "gson"
 ]
+
+
