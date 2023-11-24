@@ -41,6 +41,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.4"
@@ -59,6 +60,7 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.bundles.compose)
     implementation(libs.compose.destination.core)
+    implementation(libs.timber)
     ksp(libs.compose.destination.ksp)
     kapt(libs.hiltCompiler)
 

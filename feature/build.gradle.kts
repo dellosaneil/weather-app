@@ -3,6 +3,8 @@ plugins {
     id("com.android.library")
     id("com.google.devtools.ksp")
     alias(libs.plugins.org.jetbrains.kotlin.android)
+    id("com.google.dagger.hilt.android")
+    id("kotlin-kapt")
 }
 
 android {
@@ -56,6 +58,10 @@ dependencies {
     implementation(libs.lifecycle.runtime.ktx)
     implementation(platform(libs.compose.bom))
     implementation(libs.bundles.compose)
+    implementation(libs.timber)
     implementation(libs.compose.destination.core)
     ksp(libs.compose.destination.ksp)
+    implementation(libs.hilt.navigation.compose)
+    implementation(libs.hilt.android)
+    kapt(libs.hiltCompiler)
 }
