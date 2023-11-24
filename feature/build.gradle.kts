@@ -1,21 +1,17 @@
+@Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
+    id("com.android.library")
     id("com.google.devtools.ksp")
-    id("kotlin-kapt")
-    id("com.google.dagger.hilt.android")
+    alias(libs.plugins.org.jetbrains.kotlin.android)
 }
 
 android {
-    namespace = "com.thelazybattley.weather"
+    namespace = "com.dellosaneil.feature"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.thelazybattley.weather"
-        minSdk = 30
-        targetSdk = 33
-        versionCode = 1
-        versionName = "1.0"
+        minSdk = 26
+        targetSdk = 34
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -53,13 +49,13 @@ android {
 }
 
 dependencies {
-    implementation(project(":feature"))
+
+    implementation(project(":domain"))
+
     implementation(libs.core.ktx)
     implementation(libs.lifecycle.runtime.ktx)
-    implementation(libs.hilt.android)
+    implementation(platform(libs.compose.bom))
     implementation(libs.bundles.compose)
     implementation(libs.compose.destination.core)
     ksp(libs.compose.destination.ksp)
-    kapt(libs.hiltCompiler)
-
 }

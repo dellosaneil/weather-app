@@ -1,17 +1,15 @@
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
+    alias(libs.plugins.org.jetbrains.kotlin.android)
     id("com.android.library")
-    id("org.jetbrains.kotlin.android")
-    id("kotlin-kapt")
-    id("com.google.devtools.ksp")
-    id("com.google.dagger.hilt.android")
 }
 
 android {
-    namespace = "com.thelazybattley.data"
+    namespace = "com.dellosaneil.domain"
     compileSdk = 34
 
     defaultConfig {
-        minSdk = 28
+        minSdk = 26
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -35,11 +33,6 @@ android {
 }
 
 dependencies {
+    implementation(project(":data"))
     implementation(libs.bundles.network)
-    testImplementation(libs.junit)
-    implementation(libs.compose.destination.core)
-
-    ksp(libs.compose.destination.ksp)
-    implementation(libs.hilt.android)
-    kapt(libs.hiltCompiler)
 }
