@@ -19,6 +19,8 @@ compose-destinations = "1.9.55"
 timber = "5.0.1"
 hilt-navigation-compose = "1.1.0"
 converter-gson = "2.9.0"
+glide-compose = "1.0.0-beta01"
+ui-text-google-fonts = "1.5.4"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -48,6 +50,8 @@ compose-destination-core = { group = "io.github.raamcosta.compose-destinations",
 compose-destination-ksp = { group = "io.github.raamcosta.compose-destinations", name = "ksp", version.ref = "compose-destinations" }
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hilt-navigation-compose" }
+glide-compose = { group = "com.github.bumptech.glide", name = "compose", version.ref = "glide-compose" }
+ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts", version.ref = "ui-text-google-fonts" }
 
 
 [bundles]

@@ -63,5 +63,6 @@ dependencies {
     implementation(libs.timber)
     ksp(libs.compose.destination.ksp)
     kapt(libs.hiltCompiler)
+    implementation(libs.ui.text.google.fonts)
 
 }

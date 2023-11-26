@@ -20,7 +20,8 @@ val CurrentWeatherDataResponse.toSchema
             tempC = current.tempC,
             windKph = current.windKph,
             condition = CurrentWeatherConditionSchema(
-                code = current.condition.code,
+                icon = current.condition.icon,
+                text = current.condition.text,
             )
         ),
         location = CurrentWeatherLocationSchema(
