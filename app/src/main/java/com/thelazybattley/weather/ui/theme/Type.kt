@@ -24,7 +24,6 @@ val fontFamily = FontFamily(
     )
 )
 
-// Set of Material typography styles to start with
 val Typography = Typography(
     bodySmall = TextStyle(
         fontFamily = fontFamily,

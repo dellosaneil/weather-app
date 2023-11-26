@@ -15,7 +15,7 @@ android {
     defaultConfig {
         val properties = Properties()
         properties.load(project.rootProject.file("local.properties").inputStream())
-        minSdk = 28
+        minSdk = 26
         buildConfigField("String", "API_KEY", properties.getProperty("API_KEY"))
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -46,7 +46,6 @@ android {
 dependencies {
     implementation(libs.bundles.network)
     testImplementation(libs.junit)
-    implementation(libs.compose.destination.core)
 
     ksp(libs.compose.destination.ksp)
     implementation(libs.hilt.android)

@@ -26,7 +26,7 @@ val CurrentWeatherDataSchema.toData
         ),
         location = CurrentWeatherLocation(
             country = location.country,
-            localtimeEpoch = location.localtimeEpoch,
+            localTimeMillis = location.localtimeEpoch * 1000L,
             name = location.name,
             region = location.region,
             tzId = location.tzId

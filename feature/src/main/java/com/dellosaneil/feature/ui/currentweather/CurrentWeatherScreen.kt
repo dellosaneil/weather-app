@@ -3,8 +3,8 @@ package com.dellosaneil.feature.ui.currentweather
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -12,12 +12,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
+import com.dellosaneil.feature.model.currentweather.CurrentWeatherData
+import com.dellosaneil.feature.util.Colors
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -39,36 +37,47 @@ fun CurrentWeatherScreen(
     )
 }
 
-@OptIn(ExperimentalGlideComposeApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Screen(
     viewState: CurrentWeatherViewState,
     events: CurrentWeatherEvents?,
     navigator: DestinationsNavigator?,
-    callbacks : CurrentWeatherCallbacks,
+    callbacks: CurrentWeatherCallbacks,
 ) {
     LaunchedEffect(Unit) {
         callbacks.fetchCurrentWeather(city = "canada")
     }
 
-    Column(
-        modifier = Modifier
-            .background(
-                brush = Brush.linearGradient(
-                    colors = listOf(Color(0xff484B5B), Color(0xff2C2D35))
-                )
-            )
-            .fillMaxSize()
+    Surface(
+        modifier = Modifier.fillMaxSize()
     ) {
-        GlideImage(
-            model = viewState.currentWeatherData?.current?.condition?.icon,
-            contentDescription = "",
-            modifier = Modifier.size(200.dp),
-        )
-        Text(
-            text = "${viewState.currentWeatherData?.current?.tempC}°",
-            style = MaterialTheme.typography.displayLarge
-        )
+        Column(
+            modifier = Modifier
+                .background(
+                    brush = Brush.linearGradient(
+                        colors = listOf(Colors.Trout, Colors.Shark)
+                    )
+                )
+                .fillMaxSize()
+        ) {
+            when {
+                viewState.isLoading -> {
+
+                }
+
+                viewState.throwable != null -> {
+                    Text(text = viewState.throwable.message ?: "")
+                }
+
+                viewState.currentWeatherData != null -> {
+                    CurrentWeatherSummary(
+                        currentWeather = viewState.currentWeatherData,
+                        columnScope = this
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -76,14 +85,16 @@ private fun Screen(
 @Composable
 private fun Screen() {
     Screen(
-        viewState = CurrentWeatherViewState.initialState(),
+        viewState = CurrentWeatherViewState.initialState().copy(
+            isLoading = false,
+            currentWeatherData = CurrentWeatherData.dummyData()
+        ),
         events = null,
         navigator = null,
-        callbacks = object:CurrentWeatherCallbacks {
+        callbacks = object : CurrentWeatherCallbacks {
             override fun fetchCurrentWeather(city: String) {
                 TODO("Not yet implemented")
             }
-
         }
     )
 }

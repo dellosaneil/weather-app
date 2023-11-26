@@ -19,8 +19,9 @@ compose-destinations = "1.9.55"
 timber = "5.0.1"
 hilt-navigation-compose = "1.1.0"
 converter-gson = "2.9.0"
-glide-compose = "1.0.0-beta01"
+landscapist-glide = "2.2.12"
 ui-text-google-fonts = "1.5.4"
+constraintlayout-compose = "1.0.1"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -30,9 +31,9 @@ activity-compose = { group = "androidx.activity", name = "activity-compose", ver
 compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose-bom" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 compose-ui = { group = "androidx.compose.ui", name = "ui" }
-compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
-compose-ui-tooling-preview = { group = "androidx.compose.material3", name = "material3" }
-compose-ui-material3 = { group = "androidx.compose.ui", name = "ui-graphics" }
+ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+material3 = { group = "androidx.compose.material3", name = "material3" }
+ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
@@ -50,17 +51,20 @@ compose-destination-core = { group = "io.github.raamcosta.compose-destinations",
 compose-destination-ksp = { group = "io.github.raamcosta.compose-destinations", name = "ksp", version.ref = "compose-destinations" }
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hilt-navigation-compose" }
-glide-compose = { group = "com.github.bumptech.glide", name = "compose", version.ref = "glide-compose" }
+landscapist-glide = { group = "com.github.skydoves", name = "landscapist-glide", version.ref = "landscapist-glide" }
 ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts", version.ref = "ui-text-google-fonts" }
+constraintlayout-compose = {group = "androidx.constraintlayout", name = "constraintlayout-compose", version.ref = "constraintlayout-compose"}
 
 
 [bundles]
 compose = [
     "compose-ui",
-    "compose-ui-graphics",
-    "compose-ui-tooling-preview",
-    "compose-ui-material3",
-    "activity-compose"
+    "ui-tooling-preview",
+    "material3",
+    "ui-graphics",
+    "ui-tooling",
+    "activity-compose",
+    "constraintlayout-compose"
 ]
 
 network = [

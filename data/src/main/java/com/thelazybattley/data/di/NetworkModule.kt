@@ -1,5 +1,7 @@
 package com.thelazybattley.data.di
 
+import com.google.gson.FieldNamingPolicy
+import com.google.gson.GsonBuilder
 import com.thelazybattley.data.network.service.WeatherService
 import dagger.Module
 import dagger.Provides
@@ -20,6 +22,10 @@ object NetworkModule {
     fun provideRetrofit(
         authInterceptor: AuthInterceptor
     ) : Retrofit {
+        val gson = GsonBuilder()
+            .setFieldNamingStrategy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+            .create()
+
         val httpClient = OkHttpClient.Builder()
             .connectTimeout(Duration.ofSeconds(15))
             .readTimeout(Duration.ofSeconds(15))
@@ -29,7 +35,7 @@ object NetworkModule {
         return Retrofit.Builder()
             .client(httpClient)
             .baseUrl("https://api.weatherapi.com/v1/")
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
     }
     @Provides
