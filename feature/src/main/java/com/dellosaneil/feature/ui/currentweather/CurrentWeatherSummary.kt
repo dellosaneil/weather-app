@@ -29,7 +29,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dellosaneil.feature.R
 import com.dellosaneil.feature.model.currentweather.CurrentWeatherData
-import com.dellosaneil.feature.ui.common.DashedDivider
 import com.dellosaneil.feature.util.Colors
 import com.dellosaneil.feature.util.DatePattern
 import com.dellosaneil.feature.util.toCelcius
@@ -140,10 +139,6 @@ fun CurrentWeatherSummary(
             }
         }
     }
-    DashedDivider(
-        color = Colors.DustyGray,
-        modifier = Modifier.padding(horizontal = 16.dp)
-    )
 }
 
 @Preview(showBackground = true, device = "id:pixel_2")
