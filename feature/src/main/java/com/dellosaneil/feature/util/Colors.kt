@@ -9,6 +9,8 @@ object Colors {
     val Shark = Color(0xff2C2D35)
     val Tuna = Color(0xff32333E)
     val Abbey = Color(0xff545760)
+    val Alto = Color(0xffD8D8D8)
+    val DustyGray = Color(0xff979797)
 }
 
 

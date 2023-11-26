@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
@@ -28,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dellosaneil.feature.R
 import com.dellosaneil.feature.model.currentweather.CurrentWeatherData
+import com.dellosaneil.feature.ui.common.DashedDivider
 import com.dellosaneil.feature.util.Colors
 import com.dellosaneil.feature.util.DatePattern
 import com.dellosaneil.feature.util.toCelcius
@@ -55,15 +57,18 @@ fun CurrentWeatherSummary(
                 Text(
                     text = currentLocalDate,
                     style = MaterialTheme.typography.bodySmall,
-                    color = Colors.SantasGray
+                    color = Colors.SantasGray,
+                    modifier = Modifier.padding(vertical = 8.dp)
                 )
             },
             modifier = Modifier
                 .align(alignment = Alignment.CenterHorizontally)
                 .padding(top = 8.dp),
             colors = FilterChipDefaults.filterChipColors(
-                containerColor = Colors.Tuna
-            )
+                containerColor = Colors.Tuna,
+            ),
+            shape = RoundedCornerShape(size = 16.dp),
+            border = null
         )
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -135,6 +140,10 @@ fun CurrentWeatherSummary(
             }
         }
     }
+    DashedDivider(
+        color = Colors.DustyGray,
+        modifier = Modifier.padding(horizontal = 16.dp)
+    )
 }
 
 @Preview(showBackground = true, device = "id:pixel_2")
