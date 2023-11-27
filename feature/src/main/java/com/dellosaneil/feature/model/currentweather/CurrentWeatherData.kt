@@ -1,5 +1,7 @@
 package com.dellosaneil.feature.model.currentweather
 
+import com.dellosaneil.feature.util.WeatherIconEnum
+
 data class CurrentWeatherData(
     val currentTimeMillis: Long,
     val main: CurrentWeatherMain,
@@ -26,7 +28,12 @@ data class CurrentWeatherData(
                 sunsetMillis = 1700990257000L,
                 sunriseMillis = 1700947925000L,
             ),
-            weather = listOf(CurrentWeatherWeather(description = "Sunny")),
+            weather = listOf(
+                CurrentWeatherWeather(
+                    description = "Sunny",
+                    weatherIconEnum = WeatherIconEnum.SUNNY
+                )
+            ),
             wind = CurrentWeatherWind(
                 deg = 360,
                 speed = 3.09

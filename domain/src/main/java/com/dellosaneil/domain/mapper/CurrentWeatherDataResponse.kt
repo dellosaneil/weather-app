@@ -25,7 +25,12 @@ val CurrentWeatherDataResponse.toSchema
             sunrise = sys.sunrise,
             sunset = sys.sunset
         ),
-        weather = weather.map { CurrentWeatherSchema(description = it.description) },
+        weather = weather.map {
+            CurrentWeatherSchema(
+                description = it.description,
+                icon = it.icon
+            )
+        },
         wind = CurrentWeatherWindSchema(
             deg = wind.deg,
             speed = wind.speed

@@ -75,8 +75,8 @@ fun CurrentWeatherSummary(
             horizontalArrangement = Arrangement.SpaceAround
         ) {
             GlideImage(
-                imageModel = { R.drawable.sun },
-                previewPlaceholder = R.drawable.img_windy,
+                imageModel = { currentWeather.weather.first().weatherIconEnum.iconRes },
+                previewPlaceholder = R.drawable.img_sunny,
                 modifier = Modifier
                     .width(width = 200.dp),
                 imageOptions = ImageOptions(
