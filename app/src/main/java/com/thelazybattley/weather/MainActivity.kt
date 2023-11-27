@@ -3,7 +3,7 @@ package com.thelazybattley.weather
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.dellosaneil.feature.ui.currentweather.NavGraphs
+import com.dellosaneil.feature.ui.today.NavGraphs
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.thelazybattley.weather.ui.theme.WeatherTheme
 import dagger.hilt.android.AndroidEntryPoint

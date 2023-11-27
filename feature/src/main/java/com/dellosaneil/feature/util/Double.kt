@@ -7,3 +7,6 @@ val Double.toCelcius
 
 val Double.kelvinToCelsius
     get() = ((this - 273.15) * 10).roundToInt() / 10.0
+
+val Double.roundTwoDecimal
+    get() = (this * 100).roundToInt() / 100.0

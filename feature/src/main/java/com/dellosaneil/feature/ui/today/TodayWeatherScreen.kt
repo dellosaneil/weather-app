@@ -1,4 +1,4 @@
-package com.dellosaneil.feature.ui.currentweather
+package com.dellosaneil.feature.ui.today
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -28,7 +28,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 fun CurrentWeatherScreen(
     navigator: DestinationsNavigator
 ) {
-    val viewModel = hiltViewModel<CurrentWeatherViewModel>()
+    val viewModel = hiltViewModel<TodayWeatherViewModel>()
     val viewState by viewModel.state.collectAsState()
     val events by viewModel.events.collectAsState(initial = null)
     Screen(
@@ -44,10 +44,11 @@ private fun Screen(
     viewState: CurrentWeatherViewState,
     events: CurrentWeatherEvents?,
     navigator: DestinationsNavigator?,
-    callbacks: CurrentWeatherCallbacks,
+    callbacks: TodayWeatherCallbacks,
 ) {
     LaunchedEffect(Unit) {
         callbacks.fetchCurrentWeather(longitude = "125.6", latitude = "7.0736")
+        callbacks.fetchHourlyForecast(longitude = "125.6", latitude = "7.0736")
     }
 
     Surface(
@@ -71,7 +72,7 @@ private fun Screen(
                     Text(text = viewState.throwable.message ?: "")
                 }
 
-                viewState.currentWeatherData != null -> {
+                viewState.currentWeatherData != null && viewState.hourlyForecast != null-> {
                     CurrentWeatherSummary(
                         currentWeather = viewState.currentWeatherData,
                         columnScope = this
@@ -79,6 +80,11 @@ private fun Screen(
                     DashedDivider(
                         color = Colors.DustyGray,
                         modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+
+                    TodayWeatherHourlyForecast(
+                        hourlyForecastData = viewState.hourlyForecast,
+                        columnScope = this
                     )
 
                 }
@@ -97,8 +103,12 @@ private fun Screen() {
         ),
         events = null,
         navigator = null,
-        callbacks = object : CurrentWeatherCallbacks {
+        callbacks = object : TodayWeatherCallbacks {
             override fun fetchCurrentWeather(city: String, longitude: String) {
+                TODO("Not yet implemented")
+            }
+
+            override fun fetchHourlyForecast(latitude: String, longitude: String) {
                 TODO("Not yet implemented")
             }
         }

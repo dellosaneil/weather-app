@@ -1,4 +1,4 @@
-package com.dellosaneil.feature.ui.currentweather
+package com.dellosaneil.feature.ui.today
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

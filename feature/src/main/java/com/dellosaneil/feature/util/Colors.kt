@@ -11,6 +11,8 @@ object Colors {
     val Abbey = Color(0xff545760)
     val Alto = Color(0xffD8D8D8)
     val DustyGray = Color(0xff979797)
+    val Transparent = Color(0x00ffffff)
+    val White20 = Color(0x1Affffff)
 }
 
 

@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">feature</string>
     <string name="feels_like">"Feels like"</string>
-    <string name="wind">Wind</string>
+    <string name="wind">Wind:</string>
     <string name="x_km_h">%s km/h</string>
+    <string name="precipitation">Precipitation: </string>
+    <string name="humidity">Humidity:</string>
+    <string name="feels_like_colon">Feels like:</string>
 </resources>

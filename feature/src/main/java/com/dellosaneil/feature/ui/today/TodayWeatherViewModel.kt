@@ -1,36 +1,35 @@
-package com.dellosaneil.feature.ui.currentweather
+package com.dellosaneil.feature.ui.today
 
 import androidx.lifecycle.viewModelScope
 import com.dellosaneil.domain.network.usecase.GetCurrentWeather
+import com.dellosaneil.domain.network.usecase.GetHourlyForecast
 import com.dellosaneil.feature.base.BaseViewModel
 import com.dellosaneil.feature.di.IoDispatcher
 import com.dellosaneil.feature.mapper.toData
 import com.dellosaneil.feature.model.currentweather.CurrentWeatherData
+import com.dellosaneil.feature.model.hourlyforecast.HourlyForecastData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class CurrentWeatherViewModel @Inject constructor(
+class TodayWeatherViewModel @Inject constructor(
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
-    private val getCurrentWeather: GetCurrentWeather
-) : BaseViewModel<CurrentWeatherEvents, CurrentWeatherViewState>(), CurrentWeatherCallbacks {
+    private val getCurrentWeather: GetCurrentWeather,
+    private val getHourlyForecast: GetHourlyForecast
+) : BaseViewModel<CurrentWeatherEvents, CurrentWeatherViewState>(), TodayWeatherCallbacks {
 
     companion object {
         private const val DEBOUNCE_DELAY = 500L
     }
 
-    private var job: Job? = null
-
 
     override fun initialState() = CurrentWeatherViewState.initialState()
 
     override fun fetchCurrentWeather(latitude: String, longitude: String) {
-        job?.cancel()
-        job = viewModelScope.launch(context = dispatcher) {
+        viewModelScope.launch(context = dispatcher) {
             delay(DEBOUNCE_DELAY)
             updateState { state ->
                 state.copy(
@@ -41,10 +40,11 @@ class CurrentWeatherViewModel @Inject constructor(
                 latitude = latitude,
                 longitude = longitude
             ).fold(
-                onSuccess = { data ->
+                onSuccess = { schema ->
                     updateState { state ->
                         state.copy(
-                            currentWeatherData = data.toData
+                            currentWeatherData = schema.toData,
+                            throwable = null
                         )
                     }
                 },
@@ -64,25 +64,47 @@ class CurrentWeatherViewModel @Inject constructor(
         }
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        job?.cancel()
-    }
+    override fun fetchHourlyForecast(latitude: String, longitude: String) {
+        viewModelScope.launch(context = dispatcher) {
+            getHourlyForecast(latitude = latitude, longitude = longitude).fold(
+                onSuccess = { schema ->
+                    updateState { state ->
+                        state.copy(
+                            throwable = null,
+                            hourlyForecast = schema.toData
+                        )
+                    }
+                },
+                onFailure = {
+                    updateState { state ->
+                        state.copy(
+                            throwable = it
+                        )
+                    }
+                }
+            )
+            updateState { state ->
+                state.copy(isLoading = false)
+            }
+        }
 
+    }
 }
 
 sealed class CurrentWeatherEvents
 
 data class CurrentWeatherViewState(
     val isLoading: Boolean,
-    val currentWeatherData: CurrentWeatherData?,
     val throwable: Throwable?,
+    val currentWeatherData: CurrentWeatherData?,
+    val hourlyForecast: HourlyForecastData?
 ) {
     companion object {
         fun initialState() = CurrentWeatherViewState(
             isLoading = true,
             currentWeatherData = null,
-            throwable = null
+            throwable = null,
+            hourlyForecast = null
         )
     }
 }
