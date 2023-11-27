@@ -35,5 +35,5 @@ val HourlyForecastDataSchema.toData
                     )
                 }
             )
-        }
+        }.take(8)
     )
