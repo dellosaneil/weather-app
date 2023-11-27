@@ -1,5 +1,5 @@
 package com.dellosaneil.feature.ui.currentweather
 
 interface CurrentWeatherCallbacks {
-    fun fetchCurrentWeather(city: String)
+    fun fetchCurrentWeather(latitude: String, longitude: String)
 }

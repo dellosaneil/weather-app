@@ -19,7 +19,6 @@ class CurrentWeatherViewModel @Inject constructor(
     private val getCurrentWeather: GetCurrentWeather
 ) : BaseViewModel<CurrentWeatherEvents, CurrentWeatherViewState>(), CurrentWeatherCallbacks {
 
-
     companion object {
         private const val DEBOUNCE_DELAY = 500L
     }
@@ -29,7 +28,7 @@ class CurrentWeatherViewModel @Inject constructor(
 
     override fun initialState() = CurrentWeatherViewState.initialState()
 
-    override fun fetchCurrentWeather(city: String) {
+    override fun fetchCurrentWeather(latitude: String, longitude: String) {
         job?.cancel()
         job = viewModelScope.launch(context = dispatcher) {
             delay(DEBOUNCE_DELAY)
@@ -38,7 +37,10 @@ class CurrentWeatherViewModel @Inject constructor(
                     isLoading = true
                 )
             }
-            getCurrentWeather(city = city).fold(
+            getCurrentWeather(
+                latitude = latitude,
+                longitude = longitude
+            ).fold(
                 onSuccess = { data ->
                     updateState { state ->
                         state.copy(

@@ -1,35 +1,36 @@
 package com.dellosaneil.feature.model.currentweather
 
 data class CurrentWeatherData(
-    val current: CurrentWeatherCurrent,
-    val location: CurrentWeatherLocation
+    val currentTimeMillis: Long,
+    val main: CurrentWeatherMain,
+    val name: String,
+    val sys: CurrentWeatherSys,
+    val weather: List<CurrentWeatherWeather>,
+    val wind: CurrentWeatherWind
 ) {
     companion object {
         fun dummyData() = CurrentWeatherData(
-            current = CurrentWeatherCurrent(
-                cloud = 0,
-                feelslikeC = 32.4,
-                humidity = 45,
-                isDay = true,
-                lastUpdated = "07/10/1995",
-                lastUpdatedEpoch = 1700976823,
-                precipIn = 32.1,
-                precipMm = 22.2,
-                tempC = 43.0,
-                windKph = 32.1,
-                condition = CurrentWeatherCondition(
-                    icon = "https://cdn.weatherapi.com/weather/64x64/night/116.png",
-                    text = "Partly Cloudy"
-                )
+            currentTimeMillis = System.currentTimeMillis(),
+            main = CurrentWeatherMain(
+                feelsLikeC = 32.1,
+                humidity = 3,
+                pressure = 32,
+                tempC = 31.2,
+                tempMaxC = 44.2,
+                tempMinC = 21.0,
             ),
-            location = CurrentWeatherLocation(
-                country = "Canada",
-                name = "Ottawa",
-                region = "Ontario",
-                tzId = "America/Toronto",
-                localTimeMillis = 1700976858000
+            name = "Davao City",
+            sys = CurrentWeatherSys(
+                country = "Philippines",
+                id = 32,
+                sunsetMillis = 1700990257000L,
+                sunriseMillis = 1700947925000L,
+            ),
+            weather = listOf(CurrentWeatherWeather(description = "Sunny")),
+            wind = CurrentWeatherWind(
+                deg = 360,
+                speed = 3.09
             )
         )
     }
 }
-

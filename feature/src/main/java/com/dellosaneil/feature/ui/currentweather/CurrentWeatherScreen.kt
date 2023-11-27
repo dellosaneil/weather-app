@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,7 +39,6 @@ fun CurrentWeatherScreen(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Screen(
     viewState: CurrentWeatherViewState,
@@ -49,7 +47,7 @@ private fun Screen(
     callbacks: CurrentWeatherCallbacks,
 ) {
     LaunchedEffect(Unit) {
-        callbacks.fetchCurrentWeather(city = "canada")
+        callbacks.fetchCurrentWeather(longitude = "125.6", latitude = "7.0736")
     }
 
     Surface(
@@ -100,7 +98,7 @@ private fun Screen() {
         events = null,
         navigator = null,
         callbacks = object : CurrentWeatherCallbacks {
-            override fun fetchCurrentWeather(city: String) {
+            override fun fetchCurrentWeather(city: String, longitude: String) {
                 TODO("Not yet implemented")
             }
         }

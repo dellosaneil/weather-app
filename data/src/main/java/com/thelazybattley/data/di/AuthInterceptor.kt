@@ -10,7 +10,7 @@ class AuthInterceptor @Inject constructor() : Interceptor {
         val original = chain.request()
         val originalUrl = original.url
         val newUrl = originalUrl.newBuilder()
-            .addQueryParameter(name = "key", value = BuildConfig.API_KEY)
+            .addQueryParameter(name = "appid", value = BuildConfig.API_KEY)
             .build()
         val requestBuilder = original.newBuilder()
             .url(url = newUrl)

@@ -34,7 +34,7 @@ object NetworkModule {
 
         return Retrofit.Builder()
             .client(httpClient)
-            .baseUrl("https://api.weatherapi.com/v1/")
+            .baseUrl("https://api.openweathermap.org/data/2.5/")
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
     }

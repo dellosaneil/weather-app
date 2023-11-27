@@ -8,6 +8,9 @@ class GetCurrentWeatherImpl @Inject constructor(
     private val weatherRepository: WeatherRepository
 ) : GetCurrentWeather {
 
-    override suspend fun invoke(city: String) = weatherRepository.getCurrentWeather(city = city)
+    override suspend fun invoke(latitude: String, longitude: String) =
+        weatherRepository.getCurrentWeather(
+            latitude = latitude, longitude = longitude
+        )
 
 }

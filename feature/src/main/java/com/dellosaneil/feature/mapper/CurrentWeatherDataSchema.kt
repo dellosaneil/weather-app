@@ -1,34 +1,35 @@
 package com.dellosaneil.feature.mapper
 
-import com.dellosaneil.domain.network.schema.CurrentWeatherDataSchema
-import com.dellosaneil.feature.model.currentweather.CurrentWeatherCondition
-import com.dellosaneil.feature.model.currentweather.CurrentWeatherCurrent
+import com.dellosaneil.domain.network.schema.current.CurrentWeatherDataSchema
 import com.dellosaneil.feature.model.currentweather.CurrentWeatherData
-import com.dellosaneil.feature.model.currentweather.CurrentWeatherLocation
+import com.dellosaneil.feature.model.currentweather.CurrentWeatherMain
+import com.dellosaneil.feature.model.currentweather.CurrentWeatherSys
+import com.dellosaneil.feature.model.currentweather.CurrentWeatherWeather
+import com.dellosaneil.feature.model.currentweather.CurrentWeatherWind
+import com.dellosaneil.feature.util.epochToMillis
+import com.dellosaneil.feature.util.kelvinToCelsius
 
 val CurrentWeatherDataSchema.toData
     get() = CurrentWeatherData(
-        current = CurrentWeatherCurrent(
-            cloud = current.cloud,
-            feelslikeC = current.feelslikeC,
-            humidity = current.humidity,
-            isDay = current.isDay != 0,
-            lastUpdatedEpoch = current.lastUpdatedEpoch,
-            lastUpdated = current.lastUpdated,
-            precipMm = current.precipMm,
-            precipIn = current.precipIn,
-            windKph = current.windKph,
-            tempC = current.tempC,
-            condition = CurrentWeatherCondition(
-                icon = "https:${current.condition.icon}",
-                text = current.condition.text
-            )
+        currentTimeMillis = dt.epochToMillis,
+        main = CurrentWeatherMain(
+            feelsLikeC = main.feelsLike.kelvinToCelsius,
+            humidity = main.humidity,
+            pressure = main.pressure,
+            tempC = main.temp.kelvinToCelsius,
+            tempMaxC = main.tempMax.kelvinToCelsius,
+            tempMinC = main.tempMin.kelvinToCelsius
         ),
-        location = CurrentWeatherLocation(
-            country = location.country,
-            localTimeMillis = location.localtimeEpoch * 1000L,
-            name = location.name,
-            region = location.region,
-            tzId = location.tzId
+        name = name,
+        sys = CurrentWeatherSys(
+            country = sys.country,
+            id = sys.id,
+            sunriseMillis = sys.sunrise.epochToMillis,
+            sunsetMillis = sys.sunset.epochToMillis
+        ),
+        weather = weather.map { CurrentWeatherWeather(description = it.description) },
+        wind = CurrentWeatherWind(
+            deg = wind.deg,
+            speed = wind.speed
         )
     )

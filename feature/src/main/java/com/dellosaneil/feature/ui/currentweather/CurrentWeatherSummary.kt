@@ -50,7 +50,7 @@ fun CurrentWeatherSummary(
             },
             label = {
                 val currentLocalDate =
-                    currentWeather.location.localTimeMillis.toDateString(
+                    currentWeather.currentTimeMillis.toDateString(
                         pattern = DatePattern.DAY_DATE_MONTH
                     )
                 Text(
@@ -75,7 +75,7 @@ fun CurrentWeatherSummary(
             horizontalArrangement = Arrangement.SpaceAround
         ) {
             GlideImage(
-                imageModel = { currentWeather.current.condition.icon },
+                imageModel = { R.drawable.sun },
                 previewPlaceholder = R.drawable.img_windy,
                 modifier = Modifier
                     .width(width = 200.dp),
@@ -91,7 +91,7 @@ fun CurrentWeatherSummary(
                 verticalArrangement = Arrangement.Center,
             ) {
                 Text(
-                    text = currentWeather.current.tempC.toCelcius,
+                    text = currentWeather.main.tempC.toCelcius,
                     style = MaterialTheme.typography.displayLarge.copy(
                         brush = Brush.horizontalGradient(
                             colors = listOf(
@@ -104,7 +104,7 @@ fun CurrentWeatherSummary(
                     )
                 )
                 Text(
-                    text = currentWeather.current.condition.text,
+                    text = currentWeather.weather.first().description,
                     style = MaterialTheme.typography.bodySmall.copy(
                         color = Colors.White,
                         fontSize = 10.sp,
@@ -129,7 +129,7 @@ fun CurrentWeatherSummary(
                         )
                     ) {
                         append(" ")
-                        append(currentWeather.current.feelslikeC.toCelcius)
+                        append(currentWeather.main.feelsLikeC.toCelcius)
                     }
                 }
 
