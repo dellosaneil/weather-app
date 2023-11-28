@@ -18,6 +18,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.dellosaneil.feature.model.currentweather.CurrentWeatherData
+import com.dellosaneil.feature.model.dailyforecast.DailyForecast
+import com.dellosaneil.feature.model.hourlyforecast.HourlyForecastData
 import com.dellosaneil.feature.ui.common.DashedDivider
 import com.dellosaneil.feature.util.Colors
 import com.ramcosta.composedestinations.annotation.Destination
@@ -81,26 +83,26 @@ private fun Screen(
 
                 viewState.currentWeatherData != null && viewState.hourlyForecast != null -> {
                     CurrentWeatherSummary(
-                        modifier = Modifier.padding(all = 16.dp),
+                        modifier = Modifier.padding(all = 8.dp),
                         currentWeather = viewState.currentWeatherData,
                         columnScope = this
                     )
                     DashedDivider(
                         color = Colors.DustyGray,
-                        modifier = Modifier.padding(horizontal = 16.dp)
+                        modifier = Modifier.padding(horizontal = 8.dp)
                     )
 
                     TodayWeatherHourlyForecast(
-                        modifier = Modifier.padding(all = 16.dp),
+                        modifier = Modifier.padding(all = 8.dp),
                         hourlyForecastData = viewState.hourlyForecast,
                         columnScope = this
                     )
                     TodayWeatherDailyForecast(
-                        modifier = Modifier.padding(all = 16.dp),
+                        modifier = Modifier.padding(all = 8.dp),
                         dailyForecast = viewState.dailyForecast
                     )
                     TodayWeatherDetails(
-                        modifier = Modifier.padding(all = 16.dp),
+                        modifier = Modifier.padding(all = 8.dp),
                         currentWeatherData = viewState.currentWeatherData
                     )
                 }
@@ -115,7 +117,13 @@ private fun Screen() {
     Screen(
         viewState = CurrentWeatherViewState.initialState().copy(
             isLoading = false,
-            currentWeatherData = CurrentWeatherData.dummyData()
+            currentWeatherData = CurrentWeatherData.dummyData(),
+            hourlyForecast = HourlyForecastData.dummyData(),
+            dailyForecast = listOf(
+                DailyForecast.dummyData(),
+                DailyForecast.dummyData(),
+                DailyForecast.dummyData(),
+            )
         ),
         events = null,
         navigator = null,

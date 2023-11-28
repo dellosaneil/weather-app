@@ -1,6 +1,7 @@
 package com.dellosaneil.feature.ui.today
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -21,11 +22,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -37,6 +41,7 @@ import com.dellosaneil.feature.util.Colors
 import com.dellosaneil.feature.util.DatePattern
 import com.dellosaneil.feature.util.toCelcius
 import com.dellosaneil.feature.util.toDateString
+import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
@@ -73,15 +78,15 @@ fun TodayWeatherDailyForecast(
                             .padding(vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        val drawableRes = if (expandedForecast.value == forecast) {
-                            R.drawable.ic_collapse
-                        } else {
-                            R.drawable.ic_expand
-                        }
+                        val rotation by animateFloatAsState(
+                            targetValue = if (expandedForecast.value == forecast) 180f else 0f, label = "rotation"
+                        )
+
                         GlideImage(
-                            imageModel = { drawableRes },
-                            previewPlaceholder = R.drawable.ic_expand,
                             modifier = Modifier
+                                .graphicsLayer {
+                                    rotationX = rotation
+                                }
                                 .padding(end = 16.dp)
                                 .clickable {
                                     expandedForecast.value =
@@ -91,7 +96,9 @@ fun TodayWeatherDailyForecast(
                                             forecast
                                         }
                                 }
-                                .padding(all = 4.dp)
+                                .padding(all = 4.dp),
+                            imageModel = { R.drawable.ic_expand },
+                            previewPlaceholder = R.drawable.ic_expand
                         )
                         Text(
                             text = forecast.day,
@@ -157,7 +164,10 @@ private fun DailyForecastPerHour(forecast: DailyForecastHourly) {
                 GlideImage(
                     imageModel = { forecast.icon.iconRes },
                     modifier = Modifier.size(size = 36.dp),
-                    previewPlaceholder = R.drawable.img_wind
+                    previewPlaceholder = R.drawable.img_wind,
+                    imageOptions = ImageOptions(
+                        contentScale = ContentScale.Fit
+                    )
                 )
                 Spacer(modifier = Modifier)
                 Text(
