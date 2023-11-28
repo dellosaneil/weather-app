@@ -2,7 +2,6 @@ package com.dellosaneil.feature.ui.today
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -29,7 +28,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.Placeholder
@@ -44,6 +42,7 @@ import androidx.compose.ui.unit.sp
 import com.dellosaneil.feature.R
 import com.dellosaneil.feature.model.hourlyforecast.HourlyForecast
 import com.dellosaneil.feature.model.hourlyforecast.HourlyForecastData
+import com.dellosaneil.feature.ui.common.CommonBackground
 import com.dellosaneil.feature.util.Colors
 import com.dellosaneil.feature.util.DatePattern
 import com.dellosaneil.feature.util.toCelcius
@@ -240,18 +239,11 @@ private fun HourlyWeatherForecast(
 @Preview(showBackground = true, device = "id:pixel_2")
 @Composable
 private fun Screen() {
-    Column(
-        modifier = Modifier
-            .background(
-                brush = Brush.linearGradient(
-                    colors = listOf(Colors.Trout, Colors.Shark)
-                )
-            )
-    ) {
+    CommonBackground {
         TodayWeatherHourlyForecast(
             modifier = Modifier.padding(all = 16.dp),
             hourlyForecastData = HourlyForecastData.dummyData(),
-            columnScope = this
+            columnScope = it
         )
     }
 }

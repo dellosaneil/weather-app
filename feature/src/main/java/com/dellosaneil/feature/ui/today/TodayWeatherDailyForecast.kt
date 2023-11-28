@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import com.dellosaneil.feature.R
 import com.dellosaneil.feature.model.dailyforecast.DailyForecast
 import com.dellosaneil.feature.model.dailyforecast.DailyForecastHourly
+import com.dellosaneil.feature.ui.common.CommonBackground
 import com.dellosaneil.feature.util.Colors
 import com.dellosaneil.feature.util.DatePattern
 import com.dellosaneil.feature.util.toCelcius
@@ -79,7 +80,8 @@ fun TodayWeatherDailyForecast(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         val rotation by animateFloatAsState(
-                            targetValue = if (expandedForecast.value == forecast) 180f else 0f, label = "rotation"
+                            targetValue = if (expandedForecast.value == forecast) 180f else 0f,
+                            label = "rotation"
                         )
 
                         GlideImage(
@@ -199,14 +201,7 @@ private fun DailyForecastPerHour(forecast: DailyForecastHourly) {
 @Preview(showBackground = true, device = "id:pixel_2")
 @Composable
 private fun Screen() {
-    Column(
-        modifier = Modifier
-            .background(
-                brush = Brush.linearGradient(
-                    colors = listOf(Colors.Trout, Colors.Shark)
-                )
-            )
-    ) {
+    CommonBackground {
         TodayWeatherDailyForecast(
             modifier = Modifier.padding(all = 16.dp),
             dailyForecast = listOf(
@@ -217,3 +212,4 @@ private fun Screen() {
         )
     }
 }
+

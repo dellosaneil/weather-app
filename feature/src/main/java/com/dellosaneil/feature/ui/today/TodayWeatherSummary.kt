@@ -1,6 +1,5 @@
 package com.dellosaneil.feature.ui.today
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -29,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dellosaneil.feature.R
 import com.dellosaneil.feature.model.currentweather.CurrentWeatherData
+import com.dellosaneil.feature.ui.common.CommonBackground
 import com.dellosaneil.feature.util.Colors
 import com.dellosaneil.feature.util.DatePattern
 import com.dellosaneil.feature.util.toCelcius
@@ -145,19 +145,11 @@ fun CurrentWeatherSummary(
 @Preview(showBackground = true, device = "id:pixel_2")
 @Composable
 private fun Screen() {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                brush = Brush.linearGradient(
-                    colors = listOf(Colors.Trout, Colors.Shark)
-                )
-            )
-    ) {
+    CommonBackground {
         CurrentWeatherSummary(
             modifier = Modifier.padding(all = 16.dp),
             currentWeather = CurrentWeatherData.dummyData(),
-            columnScope = this
+            columnScope = it
         )
     }
 }

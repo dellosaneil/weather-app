@@ -22,7 +22,7 @@ class TodayWeatherViewModel @Inject constructor(
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
     private val getCurrentWeather: GetCurrentWeather,
     private val getHourlyForecast: GetHourlyForecast
-) : BaseViewModel<CurrentWeatherEvents, CurrentWeatherViewState>(), TodayWeatherCallbacks {
+) : BaseViewModel<CurrentWeatherEvents, CurrentWeatherViewState>() {
 
     companion object {
         private const val DEBOUNCE_DELAY = 500L
@@ -36,7 +36,7 @@ class TodayWeatherViewModel @Inject constructor(
 
     override fun initialState() = CurrentWeatherViewState.initialState()
 
-    override fun fetchCurrentWeather(latitude: String, longitude: String) {
+    private fun fetchCurrentWeather(latitude: String, longitude: String) {
         viewModelScope.launch(context = dispatcher) {
             delay(DEBOUNCE_DELAY)
             updateState { state ->
@@ -72,7 +72,7 @@ class TodayWeatherViewModel @Inject constructor(
         }
     }
 
-    override fun fetchHourlyForecast(latitude: String, longitude: String) {
+    private fun fetchHourlyForecast(latitude: String, longitude: String) {
         viewModelScope.launch(context = dispatcher) {
             getHourlyForecast(latitude = latitude, longitude = longitude).fold(
                 onSuccess = { schema ->

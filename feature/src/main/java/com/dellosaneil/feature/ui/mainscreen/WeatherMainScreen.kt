@@ -19,6 +19,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.dellosaneil.feature.R
+import com.dellosaneil.feature.ui.forecast.ForecastWeatherTabScreen
 import com.dellosaneil.feature.ui.today.CurrentWeatherScreen
 import com.dellosaneil.feature.util.Colors
 import com.ramcosta.composedestinations.annotation.Destination
@@ -90,9 +91,7 @@ fun WeatherMainScreen() {
                     }
 
                     WeatherTabs.FORECAST.index -> {
-                        Text(
-                            "Forecast"
-                        )
+                        ForecastWeatherTabScreen()
                     }
 
                     WeatherTabs.PRECIPITATION.index -> {
