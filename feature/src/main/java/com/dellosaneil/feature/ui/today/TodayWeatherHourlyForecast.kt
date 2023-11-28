@@ -76,7 +76,7 @@ fun TodayWeatherHourlyForecast(
                     value = selectedChip.value.probabilityOfRain.toString() + "%",
                     drawableRes = R.drawable.img_rain,
                     id = "rain",
-                    textRes = R.string.precipitation,
+                    textRes = R.string.precipitation_colon,
                     modifier = Modifier.weight(1f)
                 )
                 HourlyWeatherForecast(

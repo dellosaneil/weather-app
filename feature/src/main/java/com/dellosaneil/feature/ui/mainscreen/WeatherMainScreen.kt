@@ -1,5 +1,6 @@
 package com.dellosaneil.feature.ui.mainscreen
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,6 +17,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.dellosaneil.feature.R
 import com.dellosaneil.feature.ui.today.CurrentWeatherScreen
 import com.dellosaneil.feature.util.Colors
 import com.ramcosta.composedestinations.annotation.Destination
@@ -28,16 +31,11 @@ import kotlinx.coroutines.launch
 @Composable
 fun WeatherMainScreen() {
 
-    val pages = listOf(
-        "Today",
-        "Forecast",
-        "Precipitation"
-    )
     val pagerState = rememberPagerState(
         initialPage = 0,
         initialPageOffsetFraction = 0f
     ) {
-        pages.size
+        WeatherTabs.values().size
     }
     val coroutineScope = rememberCoroutineScope()
 
@@ -63,11 +61,11 @@ fun WeatherMainScreen() {
                     }
                 }
             ) {
-                pages.forEachIndexed { index, title ->
+                WeatherTabs.values().forEachIndexed { index, tab ->
                     Tab(
                         text = {
                             Text(
-                                text = title,
+                                text = stringResource(id = tab.textRes),
                                 style = MaterialTheme.typography.bodyMedium.copy(
                                     color = Colors.White
                                 )
@@ -85,21 +83,29 @@ fun WeatherMainScreen() {
             }
             HorizontalPager(
                 state = pagerState
-            ) {
-                when (it) {
-                    0 -> {
+            ) { page ->
+                when (page) {
+                    WeatherTabs.TODAY.index -> {
                         CurrentWeatherScreen()
                     }
 
-                    1 -> {
+                    WeatherTabs.FORECAST.index -> {
                         Text(
-                            "testing"
+                            "Forecast"
                         )
+                    }
+
+                    WeatherTabs.PRECIPITATION.index -> {
+                        Text("Precipitation")
                     }
                 }
             }
         }
     }
+}
 
-
+private enum class WeatherTabs(@StringRes val textRes: Int, val index: Int) {
+    TODAY(textRes = (R.string.today), index = 0),
+    FORECAST(textRes = R.string.forecast, index = 1),
+    PRECIPITATION(textRes = R.string.precipitation, index = 2)
 }

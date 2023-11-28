@@ -10,6 +10,7 @@ import com.dellosaneil.feature.mapper.toData
 import com.dellosaneil.feature.model.currentweather.CurrentWeatherData
 import com.dellosaneil.feature.model.dailyforecast.DailyForecast
 import com.dellosaneil.feature.model.hourlyforecast.HourlyForecastData
+import com.dellosaneil.feature.util.Coordinates
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
@@ -28,8 +29,8 @@ class TodayWeatherViewModel @Inject constructor(
     }
 
     init {
-        fetchCurrentWeather(longitude = "125.6", latitude = "7.0736")
-        fetchHourlyForecast(longitude = "125.6", latitude = "7.0736")
+        fetchCurrentWeather(longitude = Coordinates.LONGITUDE, latitude = Coordinates.LATITUDE)
+        fetchHourlyForecast(longitude = Coordinates.LONGITUDE, latitude = Coordinates.LATITUDE)
 
     }
 

@@ -4,7 +4,8 @@
     <string name="wind_colon">Wind:</string>
     <string name="wind">Wind</string>
     <string name="x_km_h">%s km/h</string>
-    <string name="precipitation">Precipitation: </string>
+    <string name="precipitation_colon">Precipitation: </string>
+    <string name="precipitation">Precipitation</string>
     <string name="humidity_colon">Humidity:</string>
     <string name="feels_like_colon">Feels like:</string>
     <string name="humidity">Humidity</string>
@@ -15,4 +16,6 @@
     <string name="sunset">Sunset</string>
     <string name="sunrise">Sunrise</string>
     <string name="details">Details</string>
+    <string name="today">Today</string>
+    <string name="forecast">Forecast</string>
 </resources>
