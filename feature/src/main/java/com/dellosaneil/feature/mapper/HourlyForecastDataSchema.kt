@@ -45,7 +45,7 @@ val HourlyForecastDataSchema.toData
 val HourlyForecastDataSchema.toDailyForecast
     get() = run {
         val groupedByDate =
-            list.groupBy { it.dt.epochToMillis.toDateString(pattern = DatePattern.DAY) }
+            list.groupBy { it.dt.epochToMillis.toDateString(pattern = DatePattern.DAY_SHORT) }
 
         groupedByDate.map { (day, list) ->
             DailyForecast(

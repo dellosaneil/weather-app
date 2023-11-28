@@ -83,7 +83,8 @@ fun WeatherMainScreen() {
                 }
             }
             HorizontalPager(
-                state = pagerState
+                state = pagerState,
+                userScrollEnabled = false
             ) { page ->
                 when (page) {
                     WeatherTabs.TODAY.index -> {

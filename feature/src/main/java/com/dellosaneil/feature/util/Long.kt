@@ -9,6 +9,7 @@ enum class DatePattern(val pattern: String) {
     DAY_DATE_MONTH(pattern = "EEEE, dd MMM"),
     DATE_MONTH(pattern = "dd MMM"),
     DAY(pattern = "EEEE"),
+    DAY_SHORT(pattern = "EEE"),
     HOUR_MINUTES_MERIDIEM(pattern = "h:mm a")
 }
 
