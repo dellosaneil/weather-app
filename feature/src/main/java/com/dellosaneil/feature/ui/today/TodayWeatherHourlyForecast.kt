@@ -166,7 +166,7 @@ private fun HourlyTimeChips(
                     text = forecast.main.tempC.toCelcius,
                     style = MaterialTheme.typography.bodySmall.copy(
                         color = Colors.White,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.Medium
                     )
                 )
 

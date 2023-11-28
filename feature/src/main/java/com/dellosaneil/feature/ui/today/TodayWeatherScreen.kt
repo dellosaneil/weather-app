@@ -4,6 +4,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -51,16 +53,21 @@ private fun Screen(
         callbacks.fetchHourlyForecast(longitude = "125.6", latitude = "7.0736")
     }
 
+    val scrollState = rememberScrollState()
+
     Surface(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
     ) {
         Column(
             modifier = Modifier
+                .verticalScroll(state = scrollState)
                 .background(
                     brush = Brush.linearGradient(
                         colors = listOf(Colors.Trout, Colors.Shark)
                     )
                 )
+                .padding(bottom = 16.dp)
                 .fillMaxSize()
         ) {
             when {
@@ -72,7 +79,7 @@ private fun Screen(
                     Text(text = viewState.throwable.message ?: "")
                 }
 
-                viewState.currentWeatherData != null && viewState.hourlyForecast != null-> {
+                viewState.currentWeatherData != null && viewState.hourlyForecast != null -> {
                     CurrentWeatherSummary(
                         currentWeather = viewState.currentWeatherData,
                         columnScope = this
@@ -86,7 +93,9 @@ private fun Screen(
                         hourlyForecastData = viewState.hourlyForecast,
                         columnScope = this
                     )
-
+                    TodayWeatherDailyForecast(
+                        dailyForecast = viewState.dailyForecast
+                    )
                 }
             }
         }
@@ -104,7 +113,7 @@ private fun Screen() {
         events = null,
         navigator = null,
         callbacks = object : TodayWeatherCallbacks {
-            override fun fetchCurrentWeather(city: String, longitude: String) {
+            override fun fetchCurrentWeather(latitude: String, longitude: String) {
                 TODO("Not yet implemented")
             }
 

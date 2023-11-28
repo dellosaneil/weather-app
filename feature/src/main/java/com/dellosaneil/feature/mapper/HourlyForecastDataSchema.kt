@@ -1,15 +1,19 @@
 package com.dellosaneil.feature.mapper
 
 import com.dellosaneil.domain.network.schema.hourlyforecast.HourlyForecastDataSchema
+import com.dellosaneil.feature.model.dailyforecast.DailyForecast
+import com.dellosaneil.feature.model.dailyforecast.DailyForecastHourly
 import com.dellosaneil.feature.model.hourlyforecast.HourlyForecast
 import com.dellosaneil.feature.model.hourlyforecast.HourlyForecastData
 import com.dellosaneil.feature.model.hourlyforecast.HourlyForecastMain
 import com.dellosaneil.feature.model.hourlyforecast.HourlyForecastWeather
 import com.dellosaneil.feature.model.hourlyforecast.HourlyForecastWind
+import com.dellosaneil.feature.util.DatePattern
 import com.dellosaneil.feature.util.WeatherIconEnum
 import com.dellosaneil.feature.util.epochToMillis
 import com.dellosaneil.feature.util.kelvinToCelsius
 import com.dellosaneil.feature.util.roundTwoDecimal
+import com.dellosaneil.feature.util.toDateString
 
 val HourlyForecastDataSchema.toData
     get() = HourlyForecastData(
@@ -37,3 +41,25 @@ val HourlyForecastDataSchema.toData
             )
         }.take(8)
     )
+
+val HourlyForecastDataSchema.toDailyForecast
+    get() = run {
+        val groupedByDate =
+            list.groupBy { it.dt.epochToMillis.toDateString(pattern = DatePattern.DAY) }
+
+        groupedByDate.map { (day, list) ->
+            DailyForecast(
+                highestTempC = list.maxOf { it.main.tempMax.kelvinToCelsius },
+                lowestTempC = list.minOf { it.main.tempMin.kelvinToCelsius },
+                icon = WeatherIconEnum.toWeatherIcon(icon = list.first().weather.first().icon),
+                hourly = list.map { forecast ->
+                    DailyForecastHourly(
+                        tempC = forecast.main.temp.kelvinToCelsius,
+                        dateTimeMillis = forecast.dt.epochToMillis,
+                        icon = WeatherIconEnum.toWeatherIcon(icon = forecast.weather.first().icon)
+                    )
+                },
+                day = day
+            )
+        }
+    }

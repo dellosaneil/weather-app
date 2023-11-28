@@ -5,8 +5,10 @@ import com.dellosaneil.domain.network.usecase.GetCurrentWeather
 import com.dellosaneil.domain.network.usecase.GetHourlyForecast
 import com.dellosaneil.feature.base.BaseViewModel
 import com.dellosaneil.feature.di.IoDispatcher
+import com.dellosaneil.feature.mapper.toDailyForecast
 import com.dellosaneil.feature.mapper.toData
 import com.dellosaneil.feature.model.currentweather.CurrentWeatherData
+import com.dellosaneil.feature.model.dailyforecast.DailyForecast
 import com.dellosaneil.feature.model.hourlyforecast.HourlyForecastData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -71,7 +73,8 @@ class TodayWeatherViewModel @Inject constructor(
                     updateState { state ->
                         state.copy(
                             throwable = null,
-                            hourlyForecast = schema.toData
+                            hourlyForecast = schema.toData,
+                            dailyForecast = schema.toDailyForecast
                         )
                     }
                 },
@@ -87,8 +90,8 @@ class TodayWeatherViewModel @Inject constructor(
                 state.copy(isLoading = false)
             }
         }
-
     }
+
 }
 
 sealed class CurrentWeatherEvents
@@ -97,14 +100,16 @@ data class CurrentWeatherViewState(
     val isLoading: Boolean,
     val throwable: Throwable?,
     val currentWeatherData: CurrentWeatherData?,
-    val hourlyForecast: HourlyForecastData?
+    val hourlyForecast: HourlyForecastData?,
+    val dailyForecast : List<DailyForecast>,
 ) {
     companion object {
         fun initialState() = CurrentWeatherViewState(
             isLoading = true,
             currentWeatherData = null,
             throwable = null,
-            hourlyForecast = null
+            hourlyForecast = null,
+            dailyForecast = emptyList()
         )
     }
 }
