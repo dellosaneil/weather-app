@@ -10,7 +10,8 @@ enum class DatePattern(val pattern: String) {
     DATE_MONTH(pattern = "dd MMM"),
     DAY(pattern = "EEEE"),
     DAY_SHORT(pattern = "EEE"),
-    HOUR_MINUTES_MERIDIEM(pattern = "h:mm a")
+    HOUR_MINUTES_MERIDIEM(pattern = "h:mm a"),
+    DATE_MONTH_HOURS_MINUTES_MERIDIEM("dd MMM h:mm a")
 }
 
 fun Long.toDateString(pattern: DatePattern): String {

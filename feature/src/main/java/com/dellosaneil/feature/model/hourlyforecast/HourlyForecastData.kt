@@ -16,7 +16,8 @@ data class HourlyForecastData(
                         humidity = 33,
                         tempC = 32.1,
                         tempMaxC = 33.3,
-                        tempMinC = 11.3
+                        tempMinC = 11.3,
+                        pressure = 32,
                     ),
                     weather = listOf(
                         HourlyForecastWeather(
@@ -26,7 +27,8 @@ data class HourlyForecastData(
                     ),
                     wind = HourlyForecastWind(
                         deg = 32, speed = 43.3
-                    )
+                    ),
+                    visibility = 3232,
                 ),
                 HourlyForecast(
                     dateTimeMillis = 1701183600000L,
@@ -36,7 +38,8 @@ data class HourlyForecastData(
                         humidity = 33,
                         tempC = 32.1,
                         tempMaxC = 33.3,
-                        tempMinC = 11.3
+                        tempMinC = 11.3,
+                        pressure = 32
                     ),
                     weather = listOf(
                         HourlyForecastWeather(
@@ -46,7 +49,8 @@ data class HourlyForecastData(
                     ),
                     wind = HourlyForecastWind(
                         deg = 32, speed = 43.3
-                    )
+                    ),
+                    visibility = 13123
                 )
             )
         )

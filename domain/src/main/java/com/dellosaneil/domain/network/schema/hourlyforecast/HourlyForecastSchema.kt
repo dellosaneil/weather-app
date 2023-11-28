@@ -5,5 +5,6 @@ data class HourlyForecastSchema(
     val main: HourlyForecastMainSchema,
     val pop: Double,
     val weather: List<HourlyForecastWeatherSchema>,
-    val wind: HourlyForecastWindSchema
+    val wind: HourlyForecastWindSchema,
+    val visibility: Int
 )

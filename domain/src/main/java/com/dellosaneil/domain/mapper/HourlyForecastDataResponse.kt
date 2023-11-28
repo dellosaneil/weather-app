@@ -33,8 +33,10 @@ val HourlyForecastDataResponse.toSchema
                     humidity = forecast.main.humidity,
                     temp = forecast.main.temp,
                     tempMax = forecast.main.tempMax,
-                    tempMin = forecast.main.tempMin
-                )
+                    tempMin = forecast.main.tempMin,
+                    pressure = forecast.main.pressure
+                ),
+                visibility = forecast.visibility
             )
         }
     )

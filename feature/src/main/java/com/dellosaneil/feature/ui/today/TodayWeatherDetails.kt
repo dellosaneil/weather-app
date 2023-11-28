@@ -1,11 +1,14 @@
 package com.dellosaneil.feature.ui.today
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
@@ -14,24 +17,27 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.dellosaneil.feature.R
-import com.dellosaneil.feature.model.currentweather.CurrentWeatherData
+import com.dellosaneil.feature.model.hourlyforecast.HourlyForecast
+import com.dellosaneil.feature.model.hourlyforecast.HourlyForecastData
 import com.dellosaneil.feature.ui.common.CommonBackground
 import com.dellosaneil.feature.util.Colors
-import com.dellosaneil.feature.util.DatePattern
 import com.dellosaneil.feature.util.metersToKm
 import com.dellosaneil.feature.util.toCelcius
-import com.dellosaneil.feature.util.toDateString
+import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
 fun TodayWeatherDetails(
     modifier: Modifier,
-    currentWeatherData: CurrentWeatherData
+    selectedWeather: HourlyForecast,
+    sunrise: String,
+    sunset: String
 ) {
     Card(
         modifier = modifier
@@ -61,45 +67,51 @@ fun TodayWeatherDetails(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                GlideImage(
-                    imageModel = {
-                        currentWeatherData.weather.first().weatherIconEnum.iconRes
-                    },
-                    modifier = Modifier
-                        .weight(1f),
-                    previewPlaceholder = R.drawable.img_sunny
-                )
+                Crossfade(
+                    modifier = Modifier.weight(1f),
+                    targetState = selectedWeather.weather.first().weatherIconEnum.iconRes,
+                    label = ""
+                ) {
+                    GlideImage(
+                        imageModel = { it },
+                        previewPlaceholder = R.drawable.img_light_rain,
+                        imageOptions = ImageOptions(
+                            contentScale = ContentScale.Fit
+                        )
+                    )
+                }
+                Spacer(modifier = Modifier.width(16.dp))
                 Column(
                     modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(space = 16.dp)
                 ) {
                     Details(
                         label = stringResource(id = R.string.feels_like),
-                        value = currentWeatherData.main.feelsLikeC.toCelcius
+                        value = selectedWeather.main.feelsLikeC.toCelcius
                     )
 
                     Details(
                         label = stringResource(id = R.string.humidity),
-                        value = "${currentWeatherData.main.humidity}%"
+                        value = "${selectedWeather.main.humidity}%"
                     )
                     Details(
                         label = stringResource(R.string.visibility),
                         value = stringResource(
                             id = R.string.x_km,
-                            currentWeatherData.visibility.metersToKm
+                            selectedWeather.visibility.metersToKm
                         )
                     )
                     Details(
                         label = stringResource(R.string.pressure),
-                        value = stringResource(id = R.string.x_mb, currentWeatherData.main.pressure)
+                        value = stringResource(id = R.string.x_mb, selectedWeather.main.pressure)
                     )
                     Details(
                         label = stringResource(R.string.sunrise),
-                        value = currentWeatherData.sys.sunriseMillis.toDateString(pattern = DatePattern.HOUR_MINUTES_MERIDIEM)
+                        value = sunrise
                     )
                     Details(
                         label = stringResource(R.string.sunset),
-                        value = currentWeatherData.sys.sunsetMillis.toDateString(pattern = DatePattern.HOUR_MINUTES_MERIDIEM)
+                        value = sunset
                     )
                 }
             }
@@ -138,7 +150,9 @@ private fun Screen() {
     CommonBackground {
         TodayWeatherDetails(
             modifier = Modifier.padding(all = 16.dp),
-            currentWeatherData = CurrentWeatherData.dummyData()
+            selectedWeather = HourlyForecastData.dummyData().list.first(),
+            sunset = "10:00am",
+            sunrise = "33:00am"
         )
     }
 }

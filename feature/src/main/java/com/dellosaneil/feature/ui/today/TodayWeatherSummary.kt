@@ -1,5 +1,6 @@
 package com.dellosaneil.feature.ui.today
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -27,7 +28,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dellosaneil.feature.R
-import com.dellosaneil.feature.model.currentweather.CurrentWeatherData
+import com.dellosaneil.feature.model.hourlyforecast.HourlyForecast
+import com.dellosaneil.feature.model.hourlyforecast.HourlyForecastData
 import com.dellosaneil.feature.ui.common.CommonBackground
 import com.dellosaneil.feature.util.Colors
 import com.dellosaneil.feature.util.DatePattern
@@ -40,20 +42,16 @@ import com.skydoves.landscapist.glide.GlideImage
 @Composable
 fun CurrentWeatherSummary(
     modifier : Modifier,
-    currentWeather: CurrentWeatherData,
+    selectedWeather: HourlyForecast,
     columnScope: ColumnScope
 ) {
     columnScope.apply {
         FilterChip(
             selected = false,
-            onClick = {
-
-            },
+            onClick = {},
             label = {
                 val currentLocalDate =
-                    currentWeather.currentTimeMillis.toDateString(
-                        pattern = DatePattern.DAY_DATE_MONTH
-                    )
+                    selectedWeather.dateTimeMillis.toDateString(pattern = DatePattern.DATE_MONTH_HOURS_MINUTES_MERIDIEM)
                 Text(
                     text = currentLocalDate,
                     style = MaterialTheme.typography.bodySmall,
@@ -75,15 +73,20 @@ fun CurrentWeatherSummary(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceAround
         ) {
-            GlideImage(
-                imageModel = { currentWeather.weather.first().weatherIconEnum.iconRes },
-                previewPlaceholder = R.drawable.img_sunny,
-                modifier = Modifier
-                    .width(width = 200.dp),
-                imageOptions = ImageOptions(
-                    contentScale = ContentScale.Fit
+            Crossfade(targetState = selectedWeather.weather.first(), label = "") {
+                GlideImage(
+                    imageModel = { it.weatherIconEnum.iconRes },
+                    previewPlaceholder = R.drawable.img_light_rain,
+                    modifier = Modifier
+                        .width(width = 200.dp),
+                    imageOptions = ImageOptions(
+                        contentScale = ContentScale.Fit
+                    )
                 )
-            )
+            }
+            
+            
+
 
             Column(
                 modifier = Modifier
@@ -92,7 +95,7 @@ fun CurrentWeatherSummary(
                 verticalArrangement = Arrangement.Center,
             ) {
                 Text(
-                    text = currentWeather.main.tempC.toCelcius,
+                    text = selectedWeather.main.tempC.toCelcius,
                     style = MaterialTheme.typography.displayLarge.copy(
                         brush = Brush.horizontalGradient(
                             colors = listOf(
@@ -105,7 +108,7 @@ fun CurrentWeatherSummary(
                     )
                 )
                 Text(
-                    text = currentWeather.weather.first().description,
+                    text = selectedWeather.weather.first().description,
                     style = MaterialTheme.typography.bodySmall.copy(
                         color = Colors.White,
                         fontSize = 10.sp,
@@ -130,7 +133,7 @@ fun CurrentWeatherSummary(
                         )
                     ) {
                         append(" ")
-                        append(currentWeather.main.feelsLikeC.toCelcius)
+                        append(selectedWeather.main.feelsLikeC.toCelcius)
                     }
                 }
 
@@ -148,7 +151,7 @@ private fun Screen() {
     CommonBackground {
         CurrentWeatherSummary(
             modifier = Modifier.padding(all = 16.dp),
-            currentWeather = CurrentWeatherData.dummyData(),
+            selectedWeather = HourlyForecastData.dummyData().list.first(),
             columnScope = it
         )
     }

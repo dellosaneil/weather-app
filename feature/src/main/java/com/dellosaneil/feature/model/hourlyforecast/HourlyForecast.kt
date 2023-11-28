@@ -5,5 +5,6 @@ data class HourlyForecast(
     val main: HourlyForecastMain,
     val probabilityOfRain: Double,
     val weather: List<HourlyForecastWeather>,
-    val wind: HourlyForecastWind
+    val wind: HourlyForecastWind,
+    val visibility: Int
 )

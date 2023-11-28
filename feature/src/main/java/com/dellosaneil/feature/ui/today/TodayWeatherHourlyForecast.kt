@@ -56,7 +56,8 @@ private const val PLACE_HOLDER_SIZE = 24
 fun TodayWeatherHourlyForecast(
     modifier : Modifier,
     hourlyForecastData: HourlyForecastData,
-    columnScope: ColumnScope
+    columnScope: ColumnScope,
+    onFilterClicked :(HourlyForecast) -> Unit
 ) {
     val selectedChip = remember { mutableStateOf(hourlyForecastData.list.first()) }
 
@@ -73,7 +74,7 @@ fun TodayWeatherHourlyForecast(
             ) {
                 HourlyWeatherForecast(
                     value = selectedChip.value.probabilityOfRain.toString() + "%",
-                    drawableRes = R.drawable.img_rain,
+                    drawableRes = R.drawable.img_light_rain,
                     id = "rain",
                     textRes = R.string.precipitation_colon,
                     modifier = Modifier.weight(1f)
@@ -122,6 +123,7 @@ fun TodayWeatherHourlyForecast(
                     forecast = forecast
                 ) {
                     selectedChip.value = forecast
+                    onFilterClicked(selectedChip.value)
                 }
                 Spacer(modifier = Modifier.width(8.dp))
             }
@@ -161,7 +163,7 @@ private fun HourlyTimeChips(
                 )
                 GlideImage(
                     imageModel = { forecast.weather.first().weatherIconEnum.iconRes },
-                    previewPlaceholder = R.drawable.img_rain,
+                    previewPlaceholder = R.drawable.img_sunny,
                     modifier = Modifier.size(20.dp)
                 )
                 Text(
@@ -244,7 +246,9 @@ private fun Screen() {
             modifier = Modifier.padding(all = 16.dp),
             hourlyForecastData = HourlyForecastData.dummyData(),
             columnScope = it
-        )
+        ) {
+
+        }
     }
 }
 

@@ -115,7 +115,7 @@ fun TodayWeatherDailyForecast(
                             modifier = Modifier
                                 .padding(end = 16.dp)
                                 .size(20.dp),
-                            previewPlaceholder = R.drawable.img_rain
+                            previewPlaceholder = R.drawable.img_light_rain
                         )
                         Text(
                             text = forecast.highestTempC.toCelcius,

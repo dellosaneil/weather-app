@@ -10,11 +10,11 @@ enum class WeatherIconEnum(@DrawableRes val iconRes: Int) {
     SCATTERED_CLOUDS(iconRes = R.drawable.img_scattered_clouds),
     BROKEN_CLOUDS(iconRes = R.drawable.img_scattered_clouds),
     SHOWER_RAIN(iconRes = R.drawable.img_shower_rain),
-    RAIN(iconRes = R.drawable.img_rain),
+    RAIN(iconRes = R.drawable.img_light_rain),
     THUNDERSTORM(iconRes = R.drawable.img_thunderstorm),
     SNOW(iconRes = R.drawable.img_snow),
     MIST_SUN(iconRes = R.drawable.img_mist_sun),
-    MIST_MOON(iconRes = R.drawable.img_mist_moon),
+    MIST_MOON(iconRes = R.drawable.ic_expand),
     CLOUDY_MOON(iconRes = R.drawable.img_cloudy_moon),
     SHOWER_RAIN_MOON(iconRes = R.drawable.img_moon_shower_rain);
 

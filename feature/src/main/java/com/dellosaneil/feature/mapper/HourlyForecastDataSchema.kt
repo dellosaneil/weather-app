@@ -17,29 +17,40 @@ import com.dellosaneil.feature.util.toDateString
 
 val HourlyForecastDataSchema.toData
     get() = HourlyForecastData(
-        list = list.map { forecast ->
-            HourlyForecast(
-                dateTimeMillis = forecast.dt.epochToMillis,
-                probabilityOfRain = (forecast.pop * 100.0).roundTwoDecimal,
-                main = HourlyForecastMain(
-                    feelsLikeC = forecast.main.feelsLike.kelvinToCelsius,
-                    humidity = forecast.main.humidity,
-                    tempC = forecast.main.temp.kelvinToCelsius,
-                    tempMinC = forecast.main.tempMin.kelvinToCelsius,
-                    tempMaxC = forecast.main.tempMax.kelvinToCelsius
-                ),
-                wind = HourlyForecastWind(
-                    deg = forecast.wind.deg,
-                    speed = forecast.wind.speed
-                ),
-                weather = forecast.weather.map { weather ->
-                    HourlyForecastWeather(
-                        description = weather.description,
-                        weatherIconEnum = WeatherIconEnum.toWeatherIcon(icon = weather.icon)
+        list = run {
+            val currentDate =
+                list.first().dt.epochToMillis.toDateString(pattern = DatePattern.DATE_MONTH)
+            list
+                .filter {
+                    it.dt.epochToMillis.toDateString(pattern = DatePattern.DATE_MONTH) == currentDate
+                }
+                .map { forecast ->
+
+                    HourlyForecast(
+                        dateTimeMillis = forecast.dt.epochToMillis,
+                        probabilityOfRain = (forecast.pop * 100.0).roundTwoDecimal,
+                        main = HourlyForecastMain(
+                            feelsLikeC = forecast.main.feelsLike.kelvinToCelsius,
+                            humidity = forecast.main.humidity,
+                            tempC = forecast.main.temp.kelvinToCelsius,
+                            tempMinC = forecast.main.tempMin.kelvinToCelsius,
+                            tempMaxC = forecast.main.tempMax.kelvinToCelsius,
+                            pressure = forecast.main.pressure
+                        ),
+                        wind = HourlyForecastWind(
+                            deg = forecast.wind.deg,
+                            speed = forecast.wind.speed
+                        ),
+                        weather = forecast.weather.map { weather ->
+                            HourlyForecastWeather(
+                                description = weather.description,
+                                weatherIconEnum = WeatherIconEnum.toWeatherIcon(icon = weather.icon)
+                            )
+                        },
+                        visibility = forecast.visibility
                     )
                 }
-            )
-        }.take(8)
+        }
     )
 
 val HourlyForecastDataSchema.toDailyForecast

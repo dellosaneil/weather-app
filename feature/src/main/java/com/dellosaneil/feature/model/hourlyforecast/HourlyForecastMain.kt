@@ -5,5 +5,6 @@ data class HourlyForecastMain(
     val humidity: Int,
     val tempC: Double,
     val tempMaxC: Double,
-    val tempMinC: Double
+    val tempMinC: Double,
+    val pressure: Int
 )
