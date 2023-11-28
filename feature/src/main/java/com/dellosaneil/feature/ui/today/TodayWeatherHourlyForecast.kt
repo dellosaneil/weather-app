@@ -154,7 +154,7 @@ private fun HourlyTimeChips(
                     )
                 )
                 Text(
-                    text = forecast.dateTimeMillis.toDateString(pattern = DatePattern.HOUR_MINUTES),
+                    text = forecast.dateTimeMillis.toDateString(pattern = DatePattern.HOUR_MINUTES_MERIDIEM),
                     style = MaterialTheme.typography.bodySmall.copy(color = Colors.White)
                 )
                 GlideImage(
