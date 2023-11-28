@@ -54,6 +54,7 @@ private const val PLACE_HOLDER_SIZE = 24
 
 @Composable
 fun TodayWeatherHourlyForecast(
+    modifier : Modifier,
     hourlyForecastData: HourlyForecastData,
     columnScope: ColumnScope
 ) {
@@ -62,7 +63,7 @@ fun TodayWeatherHourlyForecast(
     columnScope.apply {
         Spacer(modifier = Modifier.height(16.dp))
         Column(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(space = 8.dp)
@@ -80,7 +81,7 @@ fun TodayWeatherHourlyForecast(
                 HourlyWeatherForecast(
                     value = selectedChip.value.main.humidity.toString() + "%",
                     drawableRes = R.drawable.img_humidity,
-                    textRes = R.string.humidity,
+                    textRes = R.string.humidity_colon,
                     id = "humidity",
                     modifier = Modifier.weight(1f)
                 )
@@ -96,7 +97,7 @@ fun TodayWeatherHourlyForecast(
                     ),
                     drawableRes = R.drawable.img_wind,
                     id = "wind",
-                    textRes = R.string.wind,
+                    textRes = R.string.wind_colon,
                     modifier = Modifier.weight(1f)
                 )
                 HourlyWeatherForecast(
@@ -247,6 +248,7 @@ private fun Screen() {
             )
     ) {
         TodayWeatherHourlyForecast(
+            modifier = Modifier.padding(all = 16.dp),
             hourlyForecastData = HourlyForecastData.dummyData(),
             columnScope = this
         )

@@ -34,5 +34,6 @@ val CurrentWeatherDataResponse.toSchema
         wind = CurrentWeatherWindSchema(
             deg = wind.deg,
             speed = wind.speed
-        )
+        ),
+        visibility = visibility
     )

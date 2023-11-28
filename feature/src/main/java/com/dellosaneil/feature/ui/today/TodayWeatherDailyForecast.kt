@@ -41,15 +41,15 @@ import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
 fun TodayWeatherDailyForecast(
+    modifier: Modifier,
     dailyForecast: List<DailyForecast>
 ) {
     val expandedForecast: MutableState<DailyForecast?> =
         remember { mutableStateOf(null) }
 
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+        modifier = modifier
+            .fillMaxWidth(),
         shape = RoundedCornerShape(size = 10.dp)
     ) {
         Column(
@@ -57,10 +57,7 @@ fun TodayWeatherDailyForecast(
                 .fillMaxWidth()
                 .background(
                     brush = Brush.linearGradient(
-                        colors = listOf(
-                            Colors.Shark,
-                            Colors.Tuna
-                        )
+                        listOf(Colors.DarkGray, Colors.DarkBlueGray)
                     )
                 )
                 .padding(all = 16.dp),
@@ -201,6 +198,7 @@ private fun Screen() {
             )
     ) {
         TodayWeatherDailyForecast(
+            modifier = Modifier.padding(all = 16.dp),
             dailyForecast = listOf(
                 DailyForecast.dummyData(),
                 DailyForecast.dummyData().copy(highestTempC = 2.3),

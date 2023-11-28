@@ -39,6 +39,7 @@ import com.skydoves.landscapist.glide.GlideImage
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CurrentWeatherSummary(
+    modifier : Modifier,
     currentWeather: CurrentWeatherData,
     columnScope: ColumnScope
 ) {
@@ -70,7 +71,7 @@ fun CurrentWeatherSummary(
             border = null
         )
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceAround
         ) {
@@ -154,6 +155,7 @@ private fun Screen() {
             )
     ) {
         CurrentWeatherSummary(
+            modifier = Modifier.padding(all = 16.dp),
             currentWeather = CurrentWeatherData.dummyData(),
             columnScope = this
         )

@@ -6,5 +6,6 @@ data class CurrentWeatherDataSchema(
     val name: String,
     val sys: CurrentWeatherSysSchema,
     val weather: List<CurrentWeatherSchema>,
-    val wind: CurrentWeatherWindSchema
+    val wind: CurrentWeatherWindSchema,
+    val visibility: Int
 )

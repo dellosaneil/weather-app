@@ -81,6 +81,7 @@ private fun Screen(
 
                 viewState.currentWeatherData != null && viewState.hourlyForecast != null -> {
                     CurrentWeatherSummary(
+                        modifier = Modifier.padding(all = 16.dp),
                         currentWeather = viewState.currentWeatherData,
                         columnScope = this
                     )
@@ -90,11 +91,17 @@ private fun Screen(
                     )
 
                     TodayWeatherHourlyForecast(
+                        modifier = Modifier.padding(all = 16.dp),
                         hourlyForecastData = viewState.hourlyForecast,
                         columnScope = this
                     )
                     TodayWeatherDailyForecast(
+                        modifier = Modifier.padding(all = 16.dp),
                         dailyForecast = viewState.dailyForecast
+                    )
+                    TodayWeatherDetails(
+                        modifier = Modifier.padding(all = 16.dp),
+                        currentWeatherData = viewState.currentWeatherData
                     )
                 }
             }

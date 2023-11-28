@@ -8,7 +8,8 @@ data class CurrentWeatherData(
     val name: String,
     val sys: CurrentWeatherSys,
     val weather: List<CurrentWeatherWeather>,
-    val wind: CurrentWeatherWind
+    val wind: CurrentWeatherWind,
+    val visibility : Int,
 ) {
     companion object {
         fun dummyData() = CurrentWeatherData(
@@ -37,7 +38,8 @@ data class CurrentWeatherData(
             wind = CurrentWeatherWind(
                 deg = 360,
                 speed = 3.09
-            )
+            ),
+            visibility = 32333
         )
     }
 }

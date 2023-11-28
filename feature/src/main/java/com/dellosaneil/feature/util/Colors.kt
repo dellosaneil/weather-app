@@ -13,6 +13,9 @@ object Colors {
     val DustyGray = Color(0xff979797)
     val Transparent = Color(0x00ffffff)
     val White20 = Color(0x1Affffff)
+    val White50 = Color(0x80ffffff)
+    val DarkGray =Color(0xff232329)
+    val DarkBlueGray= Color(0xff2F313A)
 }
 
 
