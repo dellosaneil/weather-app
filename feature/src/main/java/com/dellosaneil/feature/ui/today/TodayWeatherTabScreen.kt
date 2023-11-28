@@ -9,7 +9,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -23,23 +22,17 @@ import com.dellosaneil.feature.model.hourlyforecast.HourlyForecastData
 import com.dellosaneil.feature.ui.common.DashedDivider
 import com.dellosaneil.feature.util.Colors
 import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.annotation.RootNavGraph
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 @Destination
-@RootNavGraph(start = true)
 @Composable
-fun CurrentWeatherScreen(
-    navigator: DestinationsNavigator
-) {
+fun CurrentWeatherScreen() {
     val viewModel = hiltViewModel<TodayWeatherViewModel>()
     val viewState by viewModel.state.collectAsState()
     val events by viewModel.events.collectAsState(initial = null)
     Screen(
         viewState = viewState,
         events = events,
-        callbacks = viewModel,
-        navigator = navigator,
+        callbacks = viewModel
     )
 }
 
@@ -47,13 +40,8 @@ fun CurrentWeatherScreen(
 private fun Screen(
     viewState: CurrentWeatherViewState,
     events: CurrentWeatherEvents?,
-    navigator: DestinationsNavigator?,
     callbacks: TodayWeatherCallbacks,
 ) {
-    LaunchedEffect(Unit) {
-        callbacks.fetchCurrentWeather(longitude = "125.6", latitude = "7.0736")
-        callbacks.fetchHourlyForecast(longitude = "125.6", latitude = "7.0736")
-    }
 
     val scrollState = rememberScrollState()
 
@@ -126,7 +114,6 @@ private fun Screen() {
             )
         ),
         events = null,
-        navigator = null,
         callbacks = object : TodayWeatherCallbacks {
             override fun fetchCurrentWeather(latitude: String, longitude: String) {
                 TODO("Not yet implemented")

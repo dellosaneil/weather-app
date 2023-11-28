@@ -16,6 +16,7 @@ object Colors {
     val White50 = Color(0x80ffffff)
     val DarkGray =Color(0xff232329)
     val DarkBlueGray= Color(0xff2F313A)
+    val MidGray = Color(0xff595C66)
 }
 
 

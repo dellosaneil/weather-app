@@ -27,6 +27,11 @@ class TodayWeatherViewModel @Inject constructor(
         private const val DEBOUNCE_DELAY = 500L
     }
 
+    init {
+        fetchCurrentWeather(longitude = "125.6", latitude = "7.0736")
+        fetchHourlyForecast(longitude = "125.6", latitude = "7.0736")
+
+    }
 
     override fun initialState() = CurrentWeatherViewState.initialState()
 
