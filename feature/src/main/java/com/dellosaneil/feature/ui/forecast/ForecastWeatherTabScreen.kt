@@ -43,6 +43,13 @@ private fun Screen(
                     modifier = Modifier.padding(top = 8.dp),
                     dailyForecast = viewState.dailyForecast
                 )
+                ForecastWeatherTempGraph(
+                    minTemp = viewState.minTemp,
+                    maxTemp = viewState.maxTemp,
+                    maxTemps = viewState.dailyForecast.map { it.highestTempC },
+                    minTemps = viewState.dailyForecast.map { it.lowestTempC },
+                    dates = viewState.dailyForecast.map { it.day }
+                )
             }
         }
     }

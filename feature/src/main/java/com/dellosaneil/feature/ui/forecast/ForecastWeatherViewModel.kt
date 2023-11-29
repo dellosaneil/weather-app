@@ -25,9 +25,12 @@ class ForecastWeatherViewModel @Inject constructor(
         viewModelScope.launch(context = dispatcher) {
             getHourlyForecast(latitude = LATITUDE, longitude = LONGITUDE).fold(
                 onSuccess = { schema ->
+                    val dailyForecast = schema.toDailyForecast
                     updateState { state ->
                         state.copy(
-                            dailyForecast = schema.toDailyForecast
+                            dailyForecast = dailyForecast,
+                            minTemp = dailyForecast.minOf { it.lowestTempC },
+                            maxTemp = dailyForecast.maxOf { it.highestTempC }
                         )
                     }
                 },
@@ -54,12 +57,16 @@ data class ForecastWeatherState(
     val isLoading: Boolean,
     val throwable: Throwable?,
     val dailyForecast: List<DailyForecast>,
+    val minTemp: Double,
+    val maxTemp: Double
 ) {
     companion object {
         fun initialState() = ForecastWeatherState(
             isLoading = true,
             dailyForecast = emptyList(),
-            throwable = null
+            throwable = null,
+            minTemp = Double.MIN_VALUE,
+            maxTemp = Double.MAX_VALUE
         )
     }
 }
