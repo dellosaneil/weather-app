@@ -1,5 +1,6 @@
 package com.dellosaneil.feature.ui.today
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,7 +39,7 @@ private fun Screen(
     viewState: CurrentWeatherViewState,
     events: CurrentWeatherEvents?
 ) {
-    CommonBackground {
+    CommonBackground(modifier = Modifier.fillMaxSize()) {
         when {
             viewState.isLoading -> {
 

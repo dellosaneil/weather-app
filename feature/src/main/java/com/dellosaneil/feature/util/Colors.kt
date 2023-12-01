@@ -18,6 +18,8 @@ object Colors {
     val DarkBlueGray= Color(0xff2F313A)
     val MidGray = Color(0xff595C66)
     val Manatee = Color(0xff96979C)
+    val RoyalBlue = Color(0xff4169e1)
+    val Crimson = Color(0xffdc143c)
 }
 
 

@@ -1,5 +1,6 @@
 package com.dellosaneil.feature.ui.forecast
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -28,7 +29,7 @@ private fun Screen(
     viewState: ForecastWeatherState,
     event: ForecastWeatherEvents?
 ) {
-    CommonBackground {
+    CommonBackground(modifier = Modifier.fillMaxSize()) {
         when {
             viewState.isLoading -> {
 

@@ -21,7 +21,6 @@ fun CommonBackground(
 ) {
     Surface(
         modifier = modifier
-            .fillMaxSize()
     ) {
         Column(
             modifier = Modifier
