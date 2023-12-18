@@ -1,10 +1,13 @@
 package com.dellosaneil.feature.ui.forecast
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -20,13 +23,20 @@ private const val STROKE_WIDTH = 6f
 fun ForecastWeatherTempGraph(
     minTemp: Double,
     maxTemp: Double,
-    minTemps: List<Double>,
-    maxTemps: List<Double>,
-    dates: List<String>
+    hourlyTemp: List<Double>,
+    hourlyTimeStamp: List<String>
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(all = 16.dp)
+            .border(
+                border = BorderStroke(
+                    width = 2.dp,
+                    color = Colors.DarkGray,
+                ),
+                shape = RoundedCornerShape(size = 16.dp)
+            )
     ) {
         Canvas(
             modifier = Modifier
@@ -35,90 +45,69 @@ fun ForecastWeatherTempGraph(
                 .height(250.dp)
         ) {
             val range = maxTemp - minTemp
-            val widthPerDate = size.width / minTemps.size
+            val widthPerDate = size.width / hourlyTemp.size
 
             var previousXOffset = 0f
-            var previousLowestTempYOffset = 0f
-            var previousHighestTempYOffset = 0f
+            var previousTempYOffset = 0f
 
-            minTemps.zip(maxTemps).forEachIndexed { index, (min, max) ->
+            hourlyTemp.forEachIndexed { index, temp ->
                 val xOffset = widthPerDate * index
 
-                val minTempYOffset = calculateYOffset(
+                val tempYOffset = calculateYOffset(
                     maxTemp = maxTemp.toFloat(),
-                    temp = min.toFloat(),
+                    temp = temp.toFloat(),
                     range = range.toFloat(),
                     height = size.height
                 )
-                val maxTempYOffset = calculateYOffset(
-                    maxTemp = maxTemp.toFloat(),
-                    temp = max.toFloat(),
-                    range = range.toFloat(),
-                    height = size.height
+
+                drawLine(
+                    color = Colors.Abbey,
+                    start = Offset(
+                        x = xOffset,
+                        y = tempYOffset
+                    ),
+                    end = Offset(
+                        y = tempYOffset,
+                        x = size.width
+                    ),
+                    strokeWidth = STROKE_WIDTH
                 )
+
                 drawCircle(
                     color = Colors.RoyalBlue,
                     radius = RADIUS,
                     center = Offset(
                         x = xOffset,
-                        y = minTempYOffset
+                        y = tempYOffset
                     )
                 )
 
-                drawCircle(
-                    color = Colors.Crimson,
-                    radius = RADIUS,
-                    center = Offset(
-                        x = xOffset,
-                        y = maxTempYOffset
-                    )
-                )
-
-                val lowestTempStartOffset = calculateMinTempStartOffset(
+                val tempStartOffset = calculateTempStartOffset(
                     index = index,
                     currentXOffset = xOffset,
-                    currentYOffset = minTempYOffset,
+                    currentYOffset = tempYOffset,
                     previousXOffset = previousXOffset,
-                    previousYOffset = previousLowestTempYOffset
-                )
-
-                val highestTempStartOffset = calculateMinTempStartOffset(
-                    index = index,
-                    currentXOffset = xOffset,
-                    currentYOffset = maxTempYOffset,
-                    previousXOffset = previousXOffset,
-                    previousYOffset = previousHighestTempYOffset
+                    previousYOffset = previousTempYOffset
                 )
 
                 drawLine(
                     color = Colors.RoyalBlue,
-                    start = lowestTempStartOffset,
+                    start = tempStartOffset,
                     end = Offset(
                         x = xOffset,
-                        y = minTempYOffset
+                        y = tempYOffset
                     ),
                     strokeWidth = STROKE_WIDTH
                 )
 
-                drawLine(
-                    color = Colors.Crimson,
-                    start = highestTempStartOffset,
-                    end = Offset(
-                        x = xOffset,
-                        y = maxTempYOffset
-                    ),
-                    strokeWidth = STROKE_WIDTH
-                )
-
-                previousLowestTempYOffset = minTempYOffset
-                previousHighestTempYOffset = maxTempYOffset
+                previousTempYOffset = tempYOffset
                 previousXOffset = xOffset
             }
         }
     }
 }
 
-private fun calculateMinTempStartOffset(
+private fun calculateTempStartOffset(
     index: Int, currentXOffset: Float, currentYOffset: Float,
     previousXOffset: Float, previousYOffset: Float
 ): Offset {
@@ -143,14 +132,13 @@ private fun calculateYOffset(maxTemp: Float, temp: Float, range: Float, height: 
 @Composable
 private fun Preview() {
     val minTemp = 1.0
-    val maxTemp = 3.0
+    val maxTemp = 7.0
 
-    val minTemps = listOf(1, 2, 1, 3, 2, 1).map { it.toDouble() }
-    val maxTemps = listOf(3, 3, 2, 2, 3, 2).map { it.toDouble() }
+    val hourlyTemp = listOf(1, 3, 4, 6, 2, 7).map { it.toDouble() }
     CommonBackground {
         ForecastWeatherTempGraph(
-            minTemp = minTemp, maxTemp = maxTemp, minTemps = minTemps, maxTemps = maxTemps,
-            dates = listOf("Tue", "Wed", "Thurs", "Fri", "Sat", "Sun")
+            minTemp = minTemp, maxTemp = maxTemp, hourlyTemp = hourlyTemp,
+            hourlyTimeStamp = listOf("6:00 am", "7:00 am", "8:00 am", "9:00 am")
         )
     }
 }
