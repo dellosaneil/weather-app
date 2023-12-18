@@ -17,7 +17,7 @@ import javax.inject.Inject
 class ForecastWeatherViewModel @Inject constructor(
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
     private val getHourlyForecast: GetHourlyForecast
-) : BaseViewModel<ForecastWeatherEvents, ForecastWeatherState>() {
+) : BaseViewModel<ForecastWeatherEvents, ForecastWeatherState>(), ForecastWeatherCallbacks {
 
     override fun initialState() = ForecastWeatherState.initialState()
 
@@ -25,12 +25,13 @@ class ForecastWeatherViewModel @Inject constructor(
         viewModelScope.launch(context = dispatcher) {
             getHourlyForecast(latitude = LATITUDE, longitude = LONGITUDE).fold(
                 onSuccess = { schema ->
-                    val dailyForecast = schema.toDailyForecast
+                    val dailyForecast = schema.toDailyForecast.drop(1)
                     updateState { state ->
                         state.copy(
                             dailyForecast = dailyForecast,
                             minTemp = dailyForecast.minOf { it.lowestTempC },
-                            maxTemp = dailyForecast.maxOf { it.highestTempC }
+                            maxTemp = dailyForecast.maxOf { it.highestTempC },
+                            selectedDay = dailyForecast.first()
                         )
                     }
                 },
@@ -47,6 +48,16 @@ class ForecastWeatherViewModel @Inject constructor(
             }
         }
     }
+
+    override fun daySelected(dailyForecast: DailyForecast) {
+        viewModelScope.launch {
+            updateState { state ->
+                state.copy(
+                    selectedDay = dailyForecast
+                )
+            }
+        }
+    }
 }
 
 sealed class ForecastWeatherEvents {
@@ -58,7 +69,8 @@ data class ForecastWeatherState(
     val throwable: Throwable?,
     val dailyForecast: List<DailyForecast>,
     val minTemp: Double,
-    val maxTemp: Double
+    val maxTemp: Double,
+    val selectedDay: DailyForecast?
 ) {
     companion object {
         fun initialState() = ForecastWeatherState(
@@ -66,7 +78,8 @@ data class ForecastWeatherState(
             dailyForecast = emptyList(),
             throwable = null,
             minTemp = Double.MIN_VALUE,
-            maxTemp = Double.MAX_VALUE
+            maxTemp = Double.MAX_VALUE,
+            selectedDay = null
         )
     }
 }

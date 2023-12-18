@@ -54,10 +54,10 @@ private const val PLACE_HOLDER_SIZE = 24
 
 @Composable
 fun TodayWeatherHourlyForecast(
-    modifier : Modifier,
+    modifier: Modifier,
     hourlyForecastData: HourlyForecastData,
     columnScope: ColumnScope,
-    onFilterClicked :(HourlyForecast) -> Unit
+    onFilterClicked: (HourlyForecast) -> Unit
 ) {
     val selectedChip = remember { mutableStateOf(hourlyForecastData.list.first()) }
 

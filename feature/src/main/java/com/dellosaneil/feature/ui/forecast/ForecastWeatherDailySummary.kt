@@ -8,6 +8,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,45 +28,69 @@ import com.dellosaneil.feature.util.toCelcius
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ForecastWeatherDailySummary(
     modifier: Modifier,
-    dailyForecast: List<DailyForecast>
+    dailyForecast: List<DailyForecast>,
+    selectedDailyForecast: DailyForecast,
+    onClick: (DailyForecast) -> Unit
 ) {
     LazyRow(
         modifier = modifier,
         contentPadding = PaddingValues(all = 8.dp)
     ) {
-        items(items = dailyForecast, key = { it.day }) { forecast ->
-            Column(
-                modifier = Modifier.padding(8.dp),
-                verticalArrangement = Arrangement.spacedBy(space = 8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                GlideImage(
-                    imageModel = {
-                        forecast.icon.iconRes
-                    },
-                    modifier = Modifier.size(size = 24.dp),
-                    imageOptions = ImageOptions(
-                        contentScale = ContentScale.Fit
-                    )
-                )
-                Text(
-                    text = forecast.day,
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        color = Colors.Manatee
-                    )
-                )
-                Spacer(modifier = Modifier)
-                Text(
-                    text = forecast.hourly.first().tempC.toCelcius,
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        color = Colors.White,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                )
-            }
+        items(
+            items = dailyForecast, key = { it.day }
+        ) { forecast ->
+            FilterChip(
+                modifier = Modifier.padding(horizontal = 8.dp),
+                selected = selectedDailyForecast == forecast,
+                colors = FilterChipDefaults.filterChipColors(
+                    containerColor = Colors.Tuna,
+                    selectedContainerColor = Colors.White20
+                ),
+                shape = RoundedCornerShape(size = 16.dp),
+                border = FilterChipDefaults.filterChipBorder(
+                    selectedBorderColor = Colors.White,
+                    selectedBorderWidth = 1.dp,
+                    borderColor = Colors.Transparent,
+                    borderWidth = 0.dp
+                ),
+                onClick = {
+                    onClick(forecast)
+                }, label = {
+                    Column(
+                        modifier = Modifier.padding(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(space = 8.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        GlideImage(
+                            imageModel = {
+                                forecast.icon.iconRes
+                            },
+                            modifier = Modifier.size(size = 24.dp),
+                            imageOptions = ImageOptions(
+                                contentScale = ContentScale.Fit
+                            )
+                        )
+                        Text(
+                            text = forecast.day,
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                color = Colors.Manatee
+                            )
+                        )
+                        Spacer(modifier = Modifier)
+                        Text(
+                            text = forecast.hourly.first().tempC.toCelcius,
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                color = Colors.White,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        )
+                    }
+                }
+            )
         }
     }
 }
@@ -80,7 +108,10 @@ private fun Screen() {
                 DailyForecast.dummyData(),
                 DailyForecast.dummyData(),
                 DailyForecast.dummyData(),
-            )
-        )
+            ),
+            selectedDailyForecast = DailyForecast.dummyData()
+        ) {
+
+        }
     }
 }

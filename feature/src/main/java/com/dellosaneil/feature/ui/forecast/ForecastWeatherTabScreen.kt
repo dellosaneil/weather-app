@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.dellosaneil.feature.model.dailyforecast.DailyForecast
 import com.dellosaneil.feature.ui.common.CommonBackground
 import com.dellosaneil.feature.util.DatePattern
 import com.dellosaneil.feature.util.toDateString
@@ -22,14 +23,16 @@ fun ForecastWeatherTabScreen() {
 
     Screen(
         viewState = viewState,
-        event = events
+        event = events,
+        callbacks = viewModel
     )
 }
 
 @Composable
 private fun Screen(
     viewState: ForecastWeatherState,
-    event: ForecastWeatherEvents?
+    event: ForecastWeatherEvents?,
+    callbacks: ForecastWeatherCallbacks
 ) {
     CommonBackground(modifier = Modifier.fillMaxSize()) {
         when {
@@ -41,16 +44,21 @@ private fun Screen(
 
             }
 
-            else -> {
+            viewState.selectedDay != null -> {
                 ForecastWeatherDailySummary(
                     modifier = Modifier.padding(top = 8.dp),
-                    dailyForecast = viewState.dailyForecast
-                )
+                    dailyForecast = viewState.dailyForecast,
+                    selectedDailyForecast = viewState.selectedDay
+                ) {
+                    callbacks.daySelected(dailyForecast = it)
+                }
+
+
                 ForecastWeatherTempGraph(
-                    minTemp = viewState.dailyForecast[1].hourly.minOf { it.tempC },
-                    maxTemp = viewState.dailyForecast[1].hourly.maxOf { it.tempC },
-                    temperatures = viewState.dailyForecast[1].hourly.map { it.tempC }.take(4),
-                    hourlyTimeStamp = viewState.dailyForecast[1].hourly.map {
+                    minTemp = viewState.selectedDay.hourly.minOf { it.tempC },
+                    maxTemp = viewState.selectedDay.hourly.maxOf { it.tempC },
+                    temperatures = viewState.selectedDay.hourly.map { it.tempC }.take(4),
+                    hourlyTimeStamp = viewState.selectedDay.hourly.map {
                         it.dateTimeMillis.toDateString(
                             pattern = DatePattern.HOUR_MINUTES_MERIDIEM
                         )
@@ -64,5 +72,26 @@ private fun Screen(
 @Preview(showBackground = true, device = "id:pixel_2")
 @Composable
 private fun PreviewScreen() {
-    Screen(viewState = ForecastWeatherState.initialState(), event = null)
+    Screen(
+        viewState = ForecastWeatherState.initialState().copy(
+            isLoading = false,
+            dailyForecast = listOf(
+                DailyForecast.dummyData().copy(
+                    day = "Tuesday"
+                ),
+                DailyForecast.dummyData().copy(day = "Wednesday"),
+                DailyForecast.dummyData().copy(day = "Thursday"),
+            ),
+            selectedDay = DailyForecast.dummyData().copy(
+                day = "Tuesday"
+            )
+        ),
+        event = null,
+        callbacks = object : ForecastWeatherCallbacks {
+            override fun daySelected(dailyForecast: DailyForecast) {
+                TODO("Not yet implemented")
+            }
+
+        }
+    )
 }

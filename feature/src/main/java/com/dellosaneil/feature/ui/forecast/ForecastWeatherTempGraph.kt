@@ -3,22 +3,26 @@ package com.dellosaneil.feature.ui.forecast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextMeasurer
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.dellosaneil.feature.R
 import com.dellosaneil.feature.ui.common.CommonBackground
 import com.dellosaneil.feature.util.Colors
 import com.dellosaneil.feature.util.roundTwoDecimal
@@ -38,9 +42,20 @@ fun ForecastWeatherTempGraph(
     temperatures: List<Double>,
     hourlyTimeStamp: List<String>
 ) {
-    Box(
+    val density = LocalDensity.current
+    val textMeasurer = rememberTextMeasurer()
+    val tempStep = (maxTemp - minTemp) / Y_AXIS_STEP_COUNT
+    val graphLabelOffset = density.run {
+        Offset(
+            y = -36.dp.toPx(),
+            x = 0f
+        )
+    }
+    val graphTypography = MaterialTheme.typography.bodyMedium
+    val labelText = stringResource(R.string._3_hourly_temperature_projection_chart)
+
+    Canvas(
         modifier = Modifier
-            .fillMaxWidth()
             .padding(all = 16.dp)
             .border(
                 border = BorderStroke(
@@ -49,56 +64,59 @@ fun ForecastWeatherTempGraph(
                 ),
                 shape = RoundedCornerShape(size = 16.dp)
             )
+            .padding(
+                start = 16.dp,
+                end = 16.dp,
+                bottom = 8.dp,
+                top = 56.dp
+            )
+            .fillMaxWidth()
+            .height(250.dp)
     ) {
-        val textMeasurer = rememberTextMeasurer()
-        val tempStep = (maxTemp - minTemp) / Y_AXIS_STEP_COUNT
-
-
-        Canvas(
-            modifier = Modifier
-                .padding(
-                    horizontal = 16.dp,
-                    vertical = 24.dp
-                )
-                .fillMaxWidth()
-                .height(250.dp)
-        ) {
-            val range = maxTemp - minTemp
-            val graphSize = Size(
-                width = size.width - WIDTH_PADDING,
-                height = size.height - HEIGHT_PADDING
+        val range = maxTemp - minTemp
+        val graphSize = Size(
+            width = size.width - WIDTH_PADDING,
+            height = size.height - HEIGHT_PADDING
+        )
+        val widthPerTimeStamp = graphSize.width / temperatures.size
+        drawText(
+            text = labelText,
+            textMeasurer = textMeasurer,
+            topLeft = graphLabelOffset,
+            style = graphTypography.copy(
+                color = Colors.White
             )
+        )
+        drawYAxis(
+            drawScope = this,
+            textMeasurer = textMeasurer,
+            graphSize = graphSize,
+            minTemp = minTemp,
+            tempStep = tempStep,
+            maxTemp = maxTemp,
+            textStyle = graphTypography
+        )
 
-            val widthPerTimeStamp = graphSize.width / temperatures.size
-            drawYAxis(
-                drawScope = this,
+        plotPoints(
+            size = graphSize,
+            drawScope = this,
+            temperatures = temperatures,
+            maxTemp = maxTemp.toFloat(),
+            range = range.toFloat(),
+            widthPerTimeStamp = widthPerTimeStamp
+        )
+
+        hourlyTimeStamp.forEachIndexed { index, timeStamp ->
+            val xOffset = (widthPerTimeStamp * index)
+            drawText(
+                text = timeStamp,
                 textMeasurer = textMeasurer,
-                graphSize = graphSize,
-                minTemp = minTemp,
-                tempStep = tempStep,
-                maxTemp = maxTemp
+                topLeft = Offset(
+                    x = xOffset,
+                    y = size.height - 50f
+                ),
+                style = graphTypography
             )
-
-            plotPoints(
-                size = graphSize,
-                drawScope = this,
-                temperatures = temperatures,
-                maxTemp = maxTemp.toFloat(),
-                range = range.toFloat(),
-                widthPerTimeStamp = widthPerTimeStamp
-            )
-
-            hourlyTimeStamp.forEachIndexed { index, timeStamp ->
-                val xOffset = (widthPerTimeStamp * index)
-                drawText(
-                    text = timeStamp,
-                    textMeasurer = textMeasurer,
-                    topLeft = Offset(
-                        x = xOffset,
-                        y = size.height - 50f
-                    )
-                )
-            }
         }
     }
 }
@@ -163,7 +181,8 @@ private fun drawYAxis(
     minTemp: Double,
     tempStep: Double,
     maxTemp: Double,
-    graphSize: Size
+    graphSize: Size,
+    textStyle: TextStyle
 ) {
     with(drawScope) {
         repeat(Y_AXIS_STEP_COUNT) { index ->
@@ -179,7 +198,8 @@ private fun drawYAxis(
                 textMeasurer = textMeasurer,
                 topLeft = yAxisOffset,
                 maxLines = 1,
-                overflow = TextOverflow.Visible
+                overflow = TextOverflow.Visible,
+                style = textStyle
             )
             drawLine(
                 color = Colors.Abbey,
@@ -203,7 +223,8 @@ private fun drawYAxis(
                 y = -25f
             ),
             maxLines = 1,
-            overflow = TextOverflow.Visible
+            overflow = TextOverflow.Visible,
+            style = textStyle
         )
         drawLine(
             color = Colors.Abbey,
