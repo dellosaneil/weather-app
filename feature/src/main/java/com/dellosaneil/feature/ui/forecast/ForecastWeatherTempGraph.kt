@@ -11,6 +11,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextOverflow
@@ -60,89 +63,107 @@ fun ForecastWeatherTempGraph(
             val range = maxTemp - minTemp
             val graphWidth = size.width - WIDTH_PADDING
             val graphHeight = size.height - HEIGHT_PADDING
-            val widthPerTimeStamp = graphWidth / hourlyTemp.size
 
-            var previousXOffset = 0f
-            var previousTempYOffset = 0f
+            plotPoints(
+                size = Size(
+                    width = graphWidth,
+                    height = graphHeight,
+                ),
+                drawScope = this,
+                temperatures = hourlyTemp,
+                maxTemp = maxTemp.toFloat(),
+                range = range.toFloat()
+            )
 
-            hourlyTemp.forEachIndexed { index, temp ->
-                val xOffset = widthPerTimeStamp * index
+            drawYAxis(
+                drawScope = this,
+                textMeasurer = textMeasurer,
+                graphHeight = graphHeight,
+                graphWidth = graphWidth,
+                minTemp = minTemp,
+                tempStep = tempStep,
+                maxTemp = maxTemp
+            )
+        }
+    }
+}
 
-                val tempYOffset = calculateTempYOffset(
-                    maxTemp = maxTemp.toFloat(),
-                    temp = temp.toFloat(),
-                    range = range.toFloat(),
-                    height = graphHeight
+private fun plotPoints(
+    size: Size,
+    temperatures: List<Double>,
+    maxTemp: Float,
+    range: Float,
+    drawScope: DrawScope,
+) {
+    var previousOffset = Offset.Zero
+    val widthPerTimeStamp = size.width / temperatures.size
+    temperatures.forEachIndexed { index, temp ->
+
+        val xOffset = (widthPerTimeStamp * index)
+
+        val yOffset = calculateTempYOffset(
+            maxTemp = maxTemp,
+            temp = temp.toFloat(),
+            range = range,
+            height = size.height
+        )
+
+        val tempStartOffset = calculateTempStartOffset(
+            index = index,
+            currentXOffset = xOffset,
+            currentYOffset = yOffset,
+            previousXOffset = previousOffset.x,
+            previousYOffset = previousOffset.y
+        )
+        with(drawScope) {
+            drawCircle(
+                color = Colors.RoyalBlue,
+                radius = RADIUS,
+                center = Offset(
+                    x = xOffset,
+                    y = yOffset
                 )
+            )
 
+            drawLine(
+                color = Colors.RoyalBlue,
+                start = tempStartOffset,
+                end = Offset(
+                    x = xOffset,
+                    y = yOffset
+                ),
+                strokeWidth = STROKE_WIDTH
+            )
+        }
+        previousOffset = Offset(
+            x = xOffset,
+            y = yOffset
+        )
+    }
+}
 
-
-                drawCircle(
-                    color = Colors.RoyalBlue,
-                    radius = RADIUS,
-                    center = Offset(
-                        x = xOffset,
-                        y = tempYOffset
-                    )
-                )
-
-                val tempStartOffset = calculateTempStartOffset(
-                    index = index,
-                    currentXOffset = xOffset,
-                    currentYOffset = tempYOffset,
-                    previousXOffset = previousXOffset,
-                    previousYOffset = previousTempYOffset
-                )
-
-                drawLine(
-                    color = Colors.RoyalBlue,
-                    start = tempStartOffset,
-                    end = Offset(
-                        x = xOffset,
-                        y = tempYOffset
-                    ),
-                    strokeWidth = STROKE_WIDTH
-                )
-
-                previousTempYOffset = tempYOffset
-                previousXOffset = xOffset
-            }
-            repeat(Y_AXIS_STEP_COUNT) { index ->
-                val yAxisLabel = minTemp + (index * tempStep)
-                val yAxisOffset = calculateYAxisOffset(
-                    graphWidth = graphWidth,
-                    graphHeight = graphHeight,
-                    index = index + 1
-                )
-
-                drawText(
-                    text = yAxisLabel.roundTwoDecimal.toCelcius,
-                    textMeasurer = textMeasurer,
-                    topLeft = yAxisOffset,
-                    maxLines = 1,
-                    overflow = TextOverflow.Visible
-                )
-                drawLine(
-                    color = Colors.Abbey,
-                    start = Offset(
-                        x = 0f,
-                        y = yAxisOffset.y  + 25f
-                    ),
-                    end = Offset(
-                        y = yAxisOffset.y + 25f,
-                        x = graphWidth
-                    ),
-                    strokeWidth = 3f
-                )
-            }
+private fun drawYAxis(
+    drawScope: DrawScope,
+    textMeasurer: TextMeasurer,
+    graphHeight: Float,
+    graphWidth: Float,
+    minTemp: Double,
+    tempStep: Double,
+    maxTemp: Double
+) {
+    with(drawScope) {
+        repeat(Y_AXIS_STEP_COUNT) { index ->
+            val yAxisLabel = minTemp + (index * tempStep)
+            val yAxisOffset = calculateYAxisOffset(
+                graphWidth = graphWidth,
+                graphHeight = graphHeight,
+                index = index + 1
+            )
 
             drawText(
-                text = maxTemp.roundTwoDecimal.toCelcius,
+                text = yAxisLabel.roundTwoDecimal.toCelcius,
                 textMeasurer = textMeasurer,
-                topLeft = Offset(
-                    x = graphWidth + 25f,
-                    y = -25f
-                ),
+                topLeft = yAxisOffset,
                 maxLines = 1,
                 overflow = TextOverflow.Visible
             )
@@ -150,15 +171,38 @@ fun ForecastWeatherTempGraph(
                 color = Colors.Abbey,
                 start = Offset(
                     x = 0f,
-                    y = 0f
+                    y = yAxisOffset.y + 25f
                 ),
                 end = Offset(
-                    y = 0f,
+                    y = yAxisOffset.y + 25f,
                     x = graphWidth
                 ),
                 strokeWidth = 3f
             )
         }
+
+        drawText(
+            text = maxTemp.roundTwoDecimal.toCelcius,
+            textMeasurer = textMeasurer,
+            topLeft = Offset(
+                x = graphWidth + 25f,
+                y = -25f
+            ),
+            maxLines = 1,
+            overflow = TextOverflow.Visible
+        )
+        drawLine(
+            color = Colors.Abbey,
+            start = Offset(
+                x = 0f,
+                y = 0f
+            ),
+            end = Offset(
+                y = 0f,
+                x = graphWidth
+            ),
+            strokeWidth = 3f
+        )
     }
 }
 
