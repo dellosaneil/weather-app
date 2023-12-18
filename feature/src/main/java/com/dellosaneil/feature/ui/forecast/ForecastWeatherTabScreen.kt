@@ -11,8 +11,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.dellosaneil.feature.model.dailyforecast.DailyForecast
 import com.dellosaneil.feature.ui.common.CommonBackground
-import com.dellosaneil.feature.util.DatePattern
-import com.dellosaneil.feature.util.toDateString
 
 @Composable
 fun ForecastWeatherTabScreen() {
@@ -55,14 +53,9 @@ private fun Screen(
                 ForecastWeatherTempGraph(
                     minTemp = viewState.selectedDay.lowestTempC,
                     maxTemp = viewState.selectedDay.highestTempC,
-                    temperatures = viewState.selectedDay.hourly.map { it.tempC }.take(4),
-                    hourlyTimeStamp = viewState.selectedDay.hourly.map {
-                        it.dateTimeMillis.toDateString(
-                            pattern = DatePattern.HOUR_MINUTES_MERIDIEM
-                        )
-                    }.take(4)
+                    temperatures = viewState.selectedDay.temperatures,
+                    hourlyTimeStamp = viewState.selectedDay.timeStamp
                 )
-
                 ForecastWeatherDaily(
                     modifier = Modifier.padding(horizontal = 16.dp),
                     dailyForecast = viewState.dailyForecast

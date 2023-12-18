@@ -59,18 +59,25 @@ val HourlyForecastDataSchema.toDailyForecast
             list.groupBy { it.dt.epochToMillis.toDateString(pattern = DatePattern.DAY_SHORT) }
 
         groupedByDate.map { (day, list) ->
+            val hourly = list.map { forecast ->
+                DailyForecastHourly(
+                    tempC = forecast.main.temp.kelvinToCelsius,
+                    dateTimeMillis = forecast.dt.epochToMillis,
+                    icon = WeatherIconEnum.toWeatherIcon(icon = forecast.weather.first().icon)
+                )
+            }
             DailyForecast(
                 highestTempC = list.maxOf { it.main.tempMax.kelvinToCelsius },
                 lowestTempC = list.minOf { it.main.tempMin.kelvinToCelsius },
                 icon = WeatherIconEnum.toWeatherIcon(icon = list.first().weather.first().icon),
-                hourly = list.map { forecast ->
-                    DailyForecastHourly(
-                        tempC = forecast.main.temp.kelvinToCelsius,
-                        dateTimeMillis = forecast.dt.epochToMillis,
-                        icon = WeatherIconEnum.toWeatherIcon(icon = forecast.weather.first().icon)
+                hourly = hourly,
+                day = day,
+                timeStamp = hourly.map {
+                    it.dateTimeMillis.toDateString(
+                        pattern = DatePattern.HOUR_MINUTES_MERIDIEM
                     )
                 },
-                day = day
+                temperatures = hourly.map { it.tempC }
             )
         }
     }

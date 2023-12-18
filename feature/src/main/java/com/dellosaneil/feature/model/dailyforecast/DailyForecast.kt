@@ -8,6 +8,8 @@ data class DailyForecast(
     val icon: WeatherIconEnum,
     val hourly: List<DailyForecastHourly>,
     val day: String,
+    val temperatures: List<Double>,
+    val timeStamp: List<String>
 ) {
     companion object {
         fun dummyData() = DailyForecast(
@@ -31,7 +33,13 @@ data class DailyForecast(
                     dateTimeMillis = 1701075282549L
                 )
             ),
-            day = "Wednesday"
+            day = "Wednesday",
+            temperatures = listOf(
+                33.0,
+                32.3,
+                31.0
+            ),
+            timeStamp = listOf("1:00am", "4:00am", "7:00am")
         )
     }
 }
