@@ -49,12 +49,12 @@ private fun Screen(
                 ForecastWeatherTempGraph(
                     minTemp = viewState.dailyForecast[1].hourly.minOf { it.tempC },
                     maxTemp = viewState.dailyForecast[1].hourly.maxOf { it.tempC },
-                    temperatures = viewState.dailyForecast[1].hourly.map { it.tempC },
+                    temperatures = viewState.dailyForecast[1].hourly.map { it.tempC }.take(4),
                     hourlyTimeStamp = viewState.dailyForecast[1].hourly.map {
                         it.dateTimeMillis.toDateString(
                             pattern = DatePattern.HOUR_MINUTES_MERIDIEM
                         )
-                    }
+                    }.take(4)
                 )
             }
         }

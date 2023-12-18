@@ -70,6 +70,14 @@ fun ForecastWeatherTempGraph(
             )
 
             val widthPerTimeStamp = graphSize.width / temperatures.size
+            drawYAxis(
+                drawScope = this,
+                textMeasurer = textMeasurer,
+                graphSize = graphSize,
+                minTemp = minTemp,
+                tempStep = tempStep,
+                maxTemp = maxTemp
+            )
 
             plotPoints(
                 size = graphSize,
@@ -78,15 +86,6 @@ fun ForecastWeatherTempGraph(
                 maxTemp = maxTemp.toFloat(),
                 range = range.toFloat(),
                 widthPerTimeStamp = widthPerTimeStamp
-            )
-
-            drawYAxis(
-                drawScope = this,
-                textMeasurer = textMeasurer,
-                graphSize = graphSize,
-                minTemp = minTemp,
-                tempStep = tempStep,
-                maxTemp = maxTemp
             )
 
             hourlyTimeStamp.forEachIndexed { index, timeStamp ->
@@ -115,7 +114,7 @@ private fun plotPoints(
     var previousOffset = Offset.Zero
     temperatures.forEachIndexed { index, temp ->
 
-        val xOffset = (widthPerTimeStamp * index)
+        val xOffset = (widthPerTimeStamp * index) + 50f
 
         val yOffset = calculateTempYOffset(
             maxTemp = maxTemp,
@@ -266,9 +265,9 @@ private fun calculateTempYOffset(
 @Composable
 private fun Preview() {
     val minTemp = 1.0
-    val maxTemp = 7.0
+    val maxTemp = 6.0
 
-    val hourlyTemp = listOf(1, 3, 4, 6, 2, 7).map { it.toDouble() }
+    val hourlyTemp = listOf(1, 3, 4, 6).map { it.toDouble() }
     CommonBackground {
         ForecastWeatherTempGraph(
             minTemp = minTemp, maxTemp = maxTemp, temperatures = hourlyTemp,
@@ -276,9 +275,7 @@ private fun Preview() {
                 "6:00 am",
                 "7:00 am",
                 "8:00 am",
-                "9:00 am",
-                "10:00am",
-                "11:00am"
+                "9:00 am"
             )
         )
     }
