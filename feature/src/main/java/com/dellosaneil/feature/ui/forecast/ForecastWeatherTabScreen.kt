@@ -47,10 +47,10 @@ private fun Screen(
                     dailyForecast = viewState.dailyForecast
                 )
                 ForecastWeatherTempGraph(
-                    minTemp = viewState.dailyForecast.first().hourly.minOf { it.tempC },
-                    maxTemp = viewState.dailyForecast.first().hourly.maxOf { it.tempC },
-                    hourlyTemp = viewState.dailyForecast.first().hourly.map { it.tempC },
-                    hourlyTimeStamp = viewState.dailyForecast.first().hourly.map {
+                    minTemp = viewState.dailyForecast[1].hourly.minOf { it.tempC },
+                    maxTemp = viewState.dailyForecast[1].hourly.maxOf { it.tempC },
+                    hourlyTemp = viewState.dailyForecast[1].hourly.map { it.tempC },
+                    hourlyTimeStamp = viewState.dailyForecast[1].hourly.map {
                         it.dateTimeMillis.toDateString(
                             pattern = DatePattern.HOUR_MINUTES_MERIDIEM
                         )
@@ -63,6 +63,6 @@ private fun Screen(
 
 @Preview(showBackground = true, device = "id:pixel_2")
 @Composable
-private fun Screen() {
+private fun PreviewScreen() {
     Screen(viewState = ForecastWeatherState.initialState(), event = null)
 }
