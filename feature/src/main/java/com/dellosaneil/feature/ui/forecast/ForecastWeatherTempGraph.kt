@@ -35,7 +35,7 @@ private const val HEIGHT_PADDING = 50f
 fun ForecastWeatherTempGraph(
     minTemp: Double,
     maxTemp: Double,
-    hourlyTemp: List<Double>,
+    temperatures: List<Double>,
     hourlyTimeStamp: List<String>
 ) {
     Box(
@@ -53,6 +53,7 @@ fun ForecastWeatherTempGraph(
         val textMeasurer = rememberTextMeasurer()
         val tempStep = (maxTemp - minTemp) / Y_AXIS_STEP_COUNT
 
+
         Canvas(
             modifier = Modifier
                 .padding(
@@ -68,12 +69,15 @@ fun ForecastWeatherTempGraph(
                 height = size.height - HEIGHT_PADDING
             )
 
+            val widthPerTimeStamp = graphSize.width / temperatures.size
+
             plotPoints(
                 size = graphSize,
                 drawScope = this,
-                temperatures = hourlyTemp,
+                temperatures = temperatures,
                 maxTemp = maxTemp.toFloat(),
-                range = range.toFloat()
+                range = range.toFloat(),
+                widthPerTimeStamp = widthPerTimeStamp
             )
 
             drawYAxis(
@@ -85,6 +89,17 @@ fun ForecastWeatherTempGraph(
                 maxTemp = maxTemp
             )
 
+            hourlyTimeStamp.forEachIndexed { index, timeStamp ->
+                val xOffset = (widthPerTimeStamp * index)
+                drawText(
+                    text = timeStamp,
+                    textMeasurer = textMeasurer,
+                    topLeft = Offset(
+                        x = xOffset,
+                        y = size.height - 50f
+                    )
+                )
+            }
         }
     }
 }
@@ -95,9 +110,9 @@ private fun plotPoints(
     maxTemp: Float,
     range: Float,
     drawScope: DrawScope,
+    widthPerTimeStamp: Float
 ) {
     var previousOffset = Offset.Zero
-    val widthPerTimeStamp = size.width / temperatures.size
     temperatures.forEachIndexed { index, temp ->
 
         val xOffset = (widthPerTimeStamp * index)
@@ -206,6 +221,7 @@ private fun drawYAxis(
     }
 }
 
+
 private fun calculateYAxisOffset(
     graphWidth: Float,
     graphHeight: Float,
@@ -255,7 +271,7 @@ private fun Preview() {
     val hourlyTemp = listOf(1, 3, 4, 6, 2, 7).map { it.toDouble() }
     CommonBackground {
         ForecastWeatherTempGraph(
-            minTemp = minTemp, maxTemp = maxTemp, hourlyTemp = hourlyTemp,
+            minTemp = minTemp, maxTemp = maxTemp, temperatures = hourlyTemp,
             hourlyTimeStamp = listOf(
                 "6:00 am",
                 "7:00 am",
