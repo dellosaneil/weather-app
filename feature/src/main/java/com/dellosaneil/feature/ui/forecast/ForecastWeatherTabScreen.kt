@@ -52,17 +52,20 @@ private fun Screen(
                 ) {
                     callbacks.daySelected(dailyForecast = it)
                 }
-
-
                 ForecastWeatherTempGraph(
-                    minTemp = viewState.selectedDay.hourly.minOf { it.tempC },
-                    maxTemp = viewState.selectedDay.hourly.maxOf { it.tempC },
+                    minTemp = viewState.selectedDay.lowestTempC,
+                    maxTemp = viewState.selectedDay.highestTempC,
                     temperatures = viewState.selectedDay.hourly.map { it.tempC }.take(4),
                     hourlyTimeStamp = viewState.selectedDay.hourly.map {
                         it.dateTimeMillis.toDateString(
                             pattern = DatePattern.HOUR_MINUTES_MERIDIEM
                         )
                     }.take(4)
+                )
+
+                ForecastWeatherDaily(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    dailyForecast = viewState.dailyForecast
                 )
             }
         }

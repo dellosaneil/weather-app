@@ -45,7 +45,7 @@ fun ForecastWeatherDailySummary(
         ) { forecast ->
             FilterChip(
                 modifier = Modifier.padding(horizontal = 8.dp),
-                selected = selectedDailyForecast == forecast,
+                selected = selectedDailyForecast.day == forecast.day,
                 colors = FilterChipDefaults.filterChipColors(
                     containerColor = Colors.Tuna,
                     selectedContainerColor = Colors.White20

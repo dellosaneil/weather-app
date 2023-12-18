@@ -29,9 +29,11 @@ class ForecastWeatherViewModel @Inject constructor(
                     updateState { state ->
                         state.copy(
                             dailyForecast = dailyForecast,
-                            minTemp = dailyForecast.minOf { it.lowestTempC },
-                            maxTemp = dailyForecast.maxOf { it.highestTempC },
-                            selectedDay = dailyForecast.first()
+                            selectedDay = dailyForecast.first().copy(
+                                highestTempC = dailyForecast.first().hourly.take(4).maxOf { it.tempC },
+                                lowestTempC = dailyForecast.first().hourly.take(4).minOf { it.tempC },
+                                hourly = dailyForecast.first().hourly.take(4),
+                            )
                         )
                     }
                 },
@@ -53,7 +55,11 @@ class ForecastWeatherViewModel @Inject constructor(
         viewModelScope.launch {
             updateState { state ->
                 state.copy(
-                    selectedDay = dailyForecast
+                    selectedDay = dailyForecast.copy(
+                        highestTempC = dailyForecast.hourly.take(4).maxOf { it.tempC },
+                        lowestTempC = dailyForecast.hourly.take(4).minOf { it.tempC },
+                        hourly = dailyForecast.hourly.take(4),
+                    )
                 )
             }
         }
@@ -68,8 +74,6 @@ data class ForecastWeatherState(
     val isLoading: Boolean,
     val throwable: Throwable?,
     val dailyForecast: List<DailyForecast>,
-    val minTemp: Double,
-    val maxTemp: Double,
     val selectedDay: DailyForecast?
 ) {
     companion object {
@@ -77,8 +81,6 @@ data class ForecastWeatherState(
             isLoading = true,
             dailyForecast = emptyList(),
             throwable = null,
-            minTemp = Double.MIN_VALUE,
-            maxTemp = Double.MAX_VALUE,
             selectedDay = null
         )
     }

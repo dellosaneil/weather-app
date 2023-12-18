@@ -58,6 +58,7 @@ private fun Screen(
                     selectedWeather = selectedWeather.value,
                     columnScope = it
                 )
+
                 DashedDivider(
                     color = Colors.DustyGray,
                     modifier = Modifier.padding(horizontal = 8.dp)
@@ -70,15 +71,12 @@ private fun Screen(
                 ) { forecast ->
                     selectedWeather.value = forecast
                 }
+
                 TodayWeatherDetails(
                     modifier = Modifier.padding(all = 8.dp),
                     selectedWeather = selectedWeather.value,
                     sunset = viewState.currentWeatherData.sys.sunsetMillis.toDateString(pattern = DatePattern.HOUR_MINUTES_MERIDIEM),
                     sunrise = viewState.currentWeatherData.sys.sunriseMillis.toDateString(pattern = DatePattern.HOUR_MINUTES_MERIDIEM)
-                )
-                TodayWeatherDailyForecast(
-                    modifier = Modifier.padding(all = 8.dp),
-                    dailyForecast = viewState.dailyForecast
                 )
             }
         }
@@ -87,7 +85,7 @@ private fun Screen(
 
 @Preview(showBackground = true, device = "id:pixel_2")
 @Composable
-private fun Screen() {
+private fun PreviewScreen() {
     Screen(
         viewState = CurrentWeatherViewState.initialState().copy(
             isLoading = false,

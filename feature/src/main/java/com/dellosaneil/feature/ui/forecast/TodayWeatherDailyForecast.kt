@@ -1,4 +1,4 @@
-package com.dellosaneil.feature.ui.today
+package com.dellosaneil.feature.ui.forecast
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
@@ -46,7 +46,7 @@ import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
-fun TodayWeatherDailyForecast(
+fun ForecastWeatherDaily(
     modifier: Modifier,
     dailyForecast: List<DailyForecast>
 ) {
@@ -202,7 +202,7 @@ private fun DailyForecastPerHour(forecast: DailyForecastHourly) {
 @Composable
 private fun Screen() {
     CommonBackground {
-        TodayWeatherDailyForecast(
+        ForecastWeatherDaily(
             modifier = Modifier.padding(all = 16.dp),
             dailyForecast = listOf(
                 DailyForecast.dummyData(),

@@ -56,7 +56,9 @@ fun ForecastWeatherTempGraph(
 
     Canvas(
         modifier = Modifier
-            .padding(all = 16.dp)
+            .padding(
+                all = 16.dp
+            )
             .border(
                 border = BorderStroke(
                     width = 2.dp,
@@ -67,7 +69,7 @@ fun ForecastWeatherTempGraph(
             .padding(
                 start = 16.dp,
                 end = 16.dp,
-                bottom = 8.dp,
+                bottom = 24.dp,
                 top = 56.dp
             )
             .fillMaxWidth()
@@ -113,7 +115,7 @@ fun ForecastWeatherTempGraph(
                 textMeasurer = textMeasurer,
                 topLeft = Offset(
                     x = xOffset,
-                    y = size.height - 50f
+                    y = graphSize.height
                 ),
                 style = graphTypography
             )
