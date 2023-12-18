@@ -27,7 +27,7 @@ import com.dellosaneil.feature.util.toCelcius
 private const val RADIUS = 12f
 private const val STROKE_WIDTH = 6f
 private const val Y_AXIS_STEP_COUNT = 12
-private const val WIDTH_PADDING = 150f
+private const val WIDTH_PADDING = 200f
 private const val HEIGHT_PADDING = 50f
 
 
@@ -53,22 +53,23 @@ fun ForecastWeatherTempGraph(
         val textMeasurer = rememberTextMeasurer()
         val tempStep = (maxTemp - minTemp) / Y_AXIS_STEP_COUNT
 
-
         Canvas(
             modifier = Modifier
-                .padding(all = 24.dp)
+                .padding(
+                    horizontal = 16.dp,
+                    vertical = 24.dp
+                )
                 .fillMaxWidth()
                 .height(250.dp)
         ) {
             val range = maxTemp - minTemp
-            val graphWidth = size.width - WIDTH_PADDING
-            val graphHeight = size.height - HEIGHT_PADDING
+            val graphSize = Size(
+                width = size.width - WIDTH_PADDING,
+                height = size.height - HEIGHT_PADDING
+            )
 
             plotPoints(
-                size = Size(
-                    width = graphWidth,
-                    height = graphHeight,
-                ),
+                size = graphSize,
                 drawScope = this,
                 temperatures = hourlyTemp,
                 maxTemp = maxTemp.toFloat(),
@@ -78,12 +79,12 @@ fun ForecastWeatherTempGraph(
             drawYAxis(
                 drawScope = this,
                 textMeasurer = textMeasurer,
-                graphHeight = graphHeight,
-                graphWidth = graphWidth,
+                graphSize = graphSize,
                 minTemp = minTemp,
                 tempStep = tempStep,
                 maxTemp = maxTemp
             )
+
         }
     }
 }
@@ -145,18 +146,17 @@ private fun plotPoints(
 private fun drawYAxis(
     drawScope: DrawScope,
     textMeasurer: TextMeasurer,
-    graphHeight: Float,
-    graphWidth: Float,
     minTemp: Double,
     tempStep: Double,
-    maxTemp: Double
+    maxTemp: Double,
+    graphSize: Size
 ) {
     with(drawScope) {
         repeat(Y_AXIS_STEP_COUNT) { index ->
             val yAxisLabel = minTemp + (index * tempStep)
             val yAxisOffset = calculateYAxisOffset(
-                graphWidth = graphWidth,
-                graphHeight = graphHeight,
+                graphWidth = graphSize.width,
+                graphHeight = graphSize.height,
                 index = index + 1
             )
 
@@ -175,7 +175,7 @@ private fun drawYAxis(
                 ),
                 end = Offset(
                     y = yAxisOffset.y + 25f,
-                    x = graphWidth
+                    x = graphSize.width
                 ),
                 strokeWidth = 3f
             )
@@ -185,7 +185,7 @@ private fun drawYAxis(
             text = maxTemp.roundTwoDecimal.toCelcius,
             textMeasurer = textMeasurer,
             topLeft = Offset(
-                x = graphWidth + 25f,
+                x = graphSize.width + 25f,
                 y = -25f
             ),
             maxLines = 1,
@@ -199,7 +199,7 @@ private fun drawYAxis(
             ),
             end = Offset(
                 y = 0f,
-                x = graphWidth
+                x = graphSize.width
             ),
             strokeWidth = 3f
         )
