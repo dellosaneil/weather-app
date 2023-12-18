@@ -13,22 +13,27 @@ data class DailyForecast(
 ) {
     companion object {
         fun dummyData() = DailyForecast(
-            highestTempC = 32.2,
-            lowestTempC = 13.4,
+            highestTempC = 33.0,
+            lowestTempC = 26.0,
             icon = WeatherIconEnum.THUNDERSTORM,
             hourly = listOf(
                 DailyForecastHourly(
-                    tempC = 33.6,
+                    tempC = 33.0,
                     icon = WeatherIconEnum.MIST_SUN,
                     dateTimeMillis = 1701075282549L
                 ),
                 DailyForecastHourly(
-                    tempC = 33.6,
+                    tempC = 32.3,
                     icon = WeatherIconEnum.MIST_SUN,
                     dateTimeMillis = 1701075282549L
                 ),
                 DailyForecastHourly(
-                    tempC = 33.6,
+                    tempC = 31.0,
+                    icon = WeatherIconEnum.MIST_SUN,
+                    dateTimeMillis = 1701075282549L
+                ),
+                DailyForecastHourly(
+                    tempC = 26.0,
                     icon = WeatherIconEnum.MIST_SUN,
                     dateTimeMillis = 1701075282549L
                 )
@@ -37,9 +42,10 @@ data class DailyForecast(
             temperatures = listOf(
                 33.0,
                 32.3,
-                31.0
+                31.0,
+                26.0
             ),
-            timeStamp = listOf("1:00am", "4:00am", "7:00am")
+            timeStamp = listOf("1:00am", "4:00am", "7:00am", "10:00am")
         )
     }
 }

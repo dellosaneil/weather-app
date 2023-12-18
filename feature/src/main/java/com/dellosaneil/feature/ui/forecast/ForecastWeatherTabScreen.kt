@@ -51,10 +51,7 @@ private fun Screen(
                     callbacks.daySelected(dailyForecast = it)
                 }
                 ForecastWeatherTempGraph(
-                    minTemp = viewState.selectedDay.lowestTempC,
-                    maxTemp = viewState.selectedDay.highestTempC,
-                    temperatures = viewState.selectedDay.temperatures,
-                    hourlyTimeStamp = viewState.selectedDay.timeStamp
+                    forecast = viewState.selectedDay
                 )
                 ForecastWeatherDaily(
                     modifier = Modifier.padding(horizontal = 16.dp),

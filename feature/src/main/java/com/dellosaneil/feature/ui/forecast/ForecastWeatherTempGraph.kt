@@ -9,6 +9,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -23,6 +26,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.dellosaneil.feature.R
+import com.dellosaneil.feature.model.dailyforecast.DailyForecast
+import com.dellosaneil.feature.model.dailyforecast.DailyForecastHourly
 import com.dellosaneil.feature.ui.common.CommonBackground
 import com.dellosaneil.feature.util.Colors
 import com.dellosaneil.feature.util.roundTwoDecimal
@@ -37,14 +42,17 @@ private const val HEIGHT_PADDING = 50f
 
 @Composable
 fun ForecastWeatherTempGraph(
-    minTemp: Double,
-    maxTemp: Double,
-    temperatures: List<Double>,
-    hourlyTimeStamp: List<String>
+    forecast: DailyForecast
 ) {
+    val showMore = remember { mutableStateOf(false) }
+    val showMoreOffset = remember { mutableStateOf(Offset.Zero) }
+    val showMoreDetails: MutableState<DailyForecastHourly?> = remember {
+        mutableStateOf(null)
+    }
+
     val density = LocalDensity.current
     val textMeasurer = rememberTextMeasurer()
-    val tempStep = (maxTemp - minTemp) / Y_AXIS_STEP_COUNT
+    val tempStep = (forecast.highestTempC - forecast.lowestTempC) / Y_AXIS_STEP_COUNT
     val graphLabelOffset = density.run {
         Offset(
             y = -36.dp.toPx(),
@@ -75,12 +83,12 @@ fun ForecastWeatherTempGraph(
             .fillMaxWidth()
             .height(250.dp)
     ) {
-        val range = maxTemp - minTemp
+        val range = forecast.highestTempC - forecast.lowestTempC
         val graphSize = Size(
             width = size.width - WIDTH_PADDING,
             height = size.height - HEIGHT_PADDING
         )
-        val widthPerTimeStamp = graphSize.width / temperatures.size
+        val widthPerTimeStamp = graphSize.width / forecast.temperatures.size
         drawText(
             text = labelText,
             textMeasurer = textMeasurer,
@@ -93,22 +101,24 @@ fun ForecastWeatherTempGraph(
             drawScope = this,
             textMeasurer = textMeasurer,
             graphSize = graphSize,
-            minTemp = minTemp,
+            minTemp = forecast.lowestTempC,
             tempStep = tempStep,
-            maxTemp = maxTemp,
+            maxTemp = forecast.highestTempC,
             textStyle = graphTypography
         )
 
         plotPoints(
             size = graphSize,
             drawScope = this,
-            temperatures = temperatures,
-            maxTemp = maxTemp.toFloat(),
+            temperatures = forecast.temperatures,
+            maxTemp = forecast.highestTempC.toFloat(),
             range = range.toFloat(),
             widthPerTimeStamp = widthPerTimeStamp
-        )
+        ) {
 
-        hourlyTimeStamp.forEachIndexed { index, timeStamp ->
+        }
+
+        forecast.timeStamp.forEachIndexed { index, timeStamp ->
             val xOffset = (widthPerTimeStamp * index)
             drawText(
                 text = timeStamp,
@@ -129,7 +139,8 @@ private fun plotPoints(
     maxTemp: Float,
     range: Float,
     drawScope: DrawScope,
-    widthPerTimeStamp: Float
+    widthPerTimeStamp: Float,
+    onPointClicked: (Int) -> Unit
 ) {
     var previousOffset = Offset.Zero
     temperatures.forEachIndexed { index, temp ->
@@ -287,19 +298,9 @@ private fun calculateTempYOffset(
 @Preview(showBackground = true, device = "id:pixel_2")
 @Composable
 private fun Preview() {
-    val minTemp = 1.0
-    val maxTemp = 6.0
-
-    val hourlyTemp = listOf(1, 3, 4, 6).map { it.toDouble() }
     CommonBackground {
         ForecastWeatherTempGraph(
-            minTemp = minTemp, maxTemp = maxTemp, temperatures = hourlyTemp,
-            hourlyTimeStamp = listOf(
-                "6:00 am",
-                "7:00 am",
-                "8:00 am",
-                "9:00 am"
-            )
+            forecast = DailyForecast.dummyData()
         )
     }
 }
