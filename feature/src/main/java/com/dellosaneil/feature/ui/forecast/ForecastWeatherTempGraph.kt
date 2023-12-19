@@ -19,6 +19,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,6 +32,7 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextMeasurer
@@ -83,6 +86,7 @@ fun ForecastWeatherTempGraph(
     val pointRects = remember {
         mutableStateListOf<Rect>()
     }
+    val distancePerPoint = remember { mutableFloatStateOf(0f) }
     Box {
         Canvas(
             modifier = Modifier
@@ -128,7 +132,7 @@ fun ForecastWeatherTempGraph(
                 width = size.width - WIDTH_PADDING,
                 height = size.height - HEIGHT_PADDING
             )
-            val widthPerTimeStamp = graphSize.width / forecast.temperatures.size
+            distancePerPoint.floatValue = graphSize.width / forecast.temperatures.size
             drawText(
                 text = labelText,
                 textMeasurer = textMeasurer,
@@ -140,10 +144,9 @@ fun ForecastWeatherTempGraph(
             drawYAxis(
                 drawScope = this,
                 textMeasurer = textMeasurer,
-                graphSize = graphSize,
                 minTemp = forecast.lowestTempC,
                 tempStep = tempStep,
-                maxTemp = forecast.highestTempC,
+                graphSize = graphSize,
                 textStyle = graphTypography
             )
 
@@ -153,12 +156,12 @@ fun ForecastWeatherTempGraph(
                 maxTemp = forecast.highestTempC.toFloat(),
                 range = range.toFloat(),
                 drawScope = this,
-                widthPerTimeStamp = widthPerTimeStamp,
+                widthPerTimeStamp = distancePerPoint.floatValue,
                 rect = pointRects
             )
 
             forecast.timeStamp.forEachIndexed { index, timeStamp ->
-                val xOffset = (widthPerTimeStamp * index)
+                val xOffset = (distancePerPoint.floatValue * index)
                 drawText(
                     text = timeStamp,
                     textMeasurer = textMeasurer,
@@ -166,20 +169,26 @@ fun ForecastWeatherTempGraph(
                         x = xOffset,
                         y = graphSize.height
                     ),
-                    style = graphTypography
+                    style = graphTypography.copy(
+                        color = Colors.StormGray
+                    )
                 )
             }
         }
         if (showMore.value) {
+            val height = remember { mutableIntStateOf(0) }
             ShowMoreDetails(
                 modifier = Modifier
+                    .onSizeChanged {
+                        height.intValue = it.height
+                    }
                     .offset {
                         IntOffset(
-                            x = showMoreOffset.value.x.toInt(),
-                            y = showMoreOffset.value.y.toInt()
+                            x = showMoreOffset.value.x.toInt() + (distancePerPoint.floatValue / 2f).toInt(),
+                            y = showMoreOffset.value.y.toInt() - (height.intValue / 2f).toInt()
                         )
                     },
-                hourly = showMoreDetails.value!!
+                details = showMoreDetails.value!!
             )
         }
     }
@@ -188,7 +197,7 @@ fun ForecastWeatherTempGraph(
 @Composable
 private fun ShowMoreDetails(
     modifier: Modifier,
-    hourly: DailyForecastHourly,
+    details: DailyForecastHourly,
 ) {
     Column(
         modifier = modifier
@@ -203,14 +212,14 @@ private fun ShowMoreDetails(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = hourly.dateTimeMillis.toDateString(pattern = DatePattern.HOUR_MINUTES_MERIDIEM),
+            text = details.dateTimeMillis.toDateString(pattern = DatePattern.HOUR_MINUTES_MERIDIEM),
             style = MaterialTheme.typography.bodyMedium.copy(
                 color = Colors.White
             )
         )
         GlideImage(
             imageModel = {
-                hourly.icon.iconRes
+                details.icon.iconRes
             },
             previewPlaceholder = R.drawable.img_light_rain,
             modifier = Modifier.size(
@@ -218,7 +227,7 @@ private fun ShowMoreDetails(
             ),
         )
         Text(
-            text = hourly.tempC.toCelcius,
+            text = details.tempC.toCelcius,
             style = MaterialTheme.typography.bodyMedium.copy(
                 color = Colors.White
             )
@@ -296,12 +305,11 @@ private fun drawYAxis(
     textMeasurer: TextMeasurer,
     minTemp: Double,
     tempStep: Double,
-    maxTemp: Double,
     graphSize: Size,
     textStyle: TextStyle
 ) {
     with(drawScope) {
-        repeat(Y_AXIS_STEP_COUNT) { index ->
+        repeat(Y_AXIS_STEP_COUNT + 1) { index ->
             val yAxisLabel = minTemp + (index * tempStep)
             val yAxisOffset = calculateYAxisOffset(
                 graphWidth = graphSize.width,
@@ -315,7 +323,9 @@ private fun drawYAxis(
                 topLeft = yAxisOffset,
                 maxLines = 1,
                 overflow = TextOverflow.Visible,
-                style = textStyle
+                style = textStyle.copy(
+                    color = Colors.StormGray
+                )
             )
             drawLine(
                 color = Colors.Abbey,
@@ -330,30 +340,6 @@ private fun drawYAxis(
                 strokeWidth = 3f
             )
         }
-
-        drawText(
-            text = maxTemp.roundTwoDecimal.toCelcius,
-            textMeasurer = textMeasurer,
-            topLeft = Offset(
-                x = graphSize.width + 25f,
-                y = -25f
-            ),
-            maxLines = 1,
-            overflow = TextOverflow.Visible,
-            style = textStyle
-        )
-        drawLine(
-            color = Colors.Abbey,
-            start = Offset(
-                x = 0f,
-                y = 0f
-            ),
-            end = Offset(
-                y = 0f,
-                x = graphSize.width
-            ),
-            strokeWidth = 3f
-        )
     }
 }
 
@@ -415,7 +401,7 @@ private fun Preview() {
 private fun PreviewShowMore() {
     Box(modifier = Modifier.padding(all = 16.dp)) {
         ShowMoreDetails(
-            hourly = DailyForecastHourly(
+            details = DailyForecastHourly(
                 tempC = 33.0,
                 icon = WeatherIconEnum.MIST_SUN,
                 dateTimeMillis = 1701075282549L
