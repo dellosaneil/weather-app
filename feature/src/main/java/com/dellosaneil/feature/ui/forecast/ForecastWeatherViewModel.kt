@@ -69,7 +69,7 @@ class ForecastWeatherViewModel @Inject constructor(
                                 pattern = DatePattern.HOUR_MINUTES_MERIDIEM
                             )
                         }.take(4),
-                        temperatures = dailyForecast.hourly.map { it.tempC }
+                        temperatures = dailyForecast.hourly.map { it.tempC }.take(4)
                     )
                 )
             }

@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -43,15 +45,20 @@ private fun Screen(
             }
 
             viewState.selectedDay != null -> {
+
+                val showMore = remember { mutableStateOf(false) }
+
                 ForecastWeatherDailySummary(
                     modifier = Modifier.padding(top = 8.dp),
                     dailyForecast = viewState.dailyForecast,
                     selectedDailyForecast = viewState.selectedDay
                 ) {
                     callbacks.daySelected(dailyForecast = it)
+                    showMore.value = false
                 }
                 ForecastWeatherTempGraph(
-                    forecast = viewState.selectedDay
+                    forecast = viewState.selectedDay,
+                    showMore = showMore
                 )
                 ForecastWeatherDaily(
                     modifier = Modifier.padding(horizontal = 16.dp),
