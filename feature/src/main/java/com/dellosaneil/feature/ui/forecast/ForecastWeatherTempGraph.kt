@@ -20,7 +20,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,7 +31,6 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextMeasurer
@@ -109,7 +107,7 @@ fun ForecastWeatherTempGraph(
                 )
                 .fillMaxWidth()
                 .height(250.dp)
-                .pointerInput(Unit) {
+                .pointerInput(key1 = forecast) {
                     detectTapGestures { tapOffset ->
                         var isFound = false
                         for (rect in pointRects) {
@@ -176,16 +174,12 @@ fun ForecastWeatherTempGraph(
             }
         }
         if (showMore.value) {
-            val height = remember { mutableIntStateOf(0) }
             ShowMoreDetails(
                 modifier = Modifier
-                    .onSizeChanged {
-                        height.intValue = it.height
-                    }
                     .offset {
                         IntOffset(
                             x = showMoreOffset.value.x.toInt() + (distancePerPoint.floatValue / 2f).toInt(),
-                            y = showMoreOffset.value.y.toInt() - (height.intValue / 2f).toInt()
+                            y = showMoreOffset.value.y.toInt() - 150
                         )
                     },
                 details = showMoreDetails.value!!
@@ -205,6 +199,10 @@ private fun ShowMoreDetails(
                 shape = RoundedCornerShape(size = 8.dp)
             )
             .background(color = Colors.Tuna)
+            .border(
+                border = BorderStroke(width = 1.dp, color = Colors.White),
+                shape = RoundedCornerShape(size = 8.dp)
+            )
             .padding(
                 all = 8.dp
             ),
@@ -257,39 +255,34 @@ private fun plotPoints(
             height = size.height
         )
 
-        val tempStartOffset = calculateTempStartOffset(
+        val startOffset = calculateTempStartOffset(
             index = index,
             currentXOffset = xOffset,
             currentYOffset = yOffset,
             previousXOffset = previousOffset.x,
             previousYOffset = previousOffset.y
         )
+        val centerOffset = Offset(
+            x = xOffset,
+            y = yOffset
+        )
         with(drawScope) {
             drawCircle(
                 color = Colors.RoyalBlue,
                 radius = RADIUS,
-                center = Offset(
-                    x = xOffset,
-                    y = yOffset
-                )
+                center = centerOffset
             )
             rect.add(
                 Rect(
-                    center = Offset(
-                        x = xOffset,
-                        y = yOffset
-                    ),
+                    center = centerOffset,
                     radius = RADIUS + 25f
                 ),
             )
 
             drawLine(
                 color = Colors.RoyalBlue,
-                start = tempStartOffset,
-                end = Offset(
-                    x = xOffset,
-                    y = yOffset
-                ),
+                start = startOffset,
+                end = centerOffset,
                 strokeWidth = STROKE_WIDTH
             )
         }
