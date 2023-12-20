@@ -20,22 +20,26 @@ data class DailyForecast(
                 DailyForecastHourly(
                     tempC = 33.0,
                     icon = WeatherIconEnum.MIST_SUN,
-                    dateTimeMillis = 1701075282549L
+                    dateTimeMillis = 1701075282549L,
+                    probabilityOfPrecipitation = 32.3
                 ),
                 DailyForecastHourly(
                     tempC = 32.3,
                     icon = WeatherIconEnum.MIST_SUN,
-                    dateTimeMillis = 1701075282549L
+                    dateTimeMillis = 1701075282549L,
+                    probabilityOfPrecipitation = 32.3
                 ),
                 DailyForecastHourly(
                     tempC = 31.0,
                     icon = WeatherIconEnum.MIST_SUN,
-                    dateTimeMillis = 1701075282549L
+                    dateTimeMillis = 1701075282549L,
+                    probabilityOfPrecipitation = 32.3
                 ),
                 DailyForecastHourly(
                     tempC = 26.0,
                     icon = WeatherIconEnum.MIST_SUN,
-                    dateTimeMillis = 1701075282549L
+                    dateTimeMillis = 1701075282549L,
+                    probabilityOfPrecipitation = 32.3
                 )
             ),
             day = "Wednesday",

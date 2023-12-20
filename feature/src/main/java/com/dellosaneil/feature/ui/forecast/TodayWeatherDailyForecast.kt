@@ -68,6 +68,11 @@ fun ForecastWeatherDaily(
                 )
                 .padding(all = 16.dp),
         ) {
+
+            Row (verticalAlignment = Alignment.CenterVertically) {
+
+            }
+
             dailyForecast.forEach { forecast ->
                 Column(
                     modifier = Modifier.fillMaxWidth(),

@@ -10,3 +10,6 @@ val Double.kelvinToCelsius
 
 val Double.roundTwoDecimal
     get() = (this * 100).roundToInt() / 100.0
+
+val Double.showAsPercentage
+    get() = "$this%"

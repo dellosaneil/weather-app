@@ -9,6 +9,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -49,6 +50,7 @@ import com.dellosaneil.feature.util.Colors
 import com.dellosaneil.feature.util.DatePattern
 import com.dellosaneil.feature.util.WeatherIconEnum
 import com.dellosaneil.feature.util.roundTwoDecimal
+import com.dellosaneil.feature.util.showAsPercentage
 import com.dellosaneil.feature.util.toCelcius
 import com.dellosaneil.feature.util.toDateString
 import com.skydoves.landscapist.glide.GlideImage
@@ -230,6 +232,25 @@ private fun ShowMoreDetails(
                 color = Colors.White
             )
         )
+        Row(
+            modifier = Modifier,
+            horizontalArrangement = Arrangement.spacedBy(space = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            GlideImage(
+                imageModel = {
+                    R.drawable.img_light_rain
+                },
+                previewPlaceholder = R.drawable.img_light_rain,
+                modifier = Modifier.size(size = 16.dp)
+            )
+            Text(
+                text = details.probabilityOfPrecipitation.showAsPercentage,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = Colors.White
+                )
+            )
+        }
     }
 }
 
@@ -397,7 +418,8 @@ private fun PreviewShowMore() {
             details = DailyForecastHourly(
                 tempC = 33.0,
                 icon = WeatherIconEnum.MIST_SUN,
-                dateTimeMillis = 1701075282549L
+                dateTimeMillis = 1701075282549L,
+                probabilityOfPrecipitation = 32.3
             ),
             modifier = Modifier
         )

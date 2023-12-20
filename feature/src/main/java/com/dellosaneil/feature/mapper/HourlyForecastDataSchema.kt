@@ -63,7 +63,8 @@ val HourlyForecastDataSchema.toDailyForecast
                 DailyForecastHourly(
                     tempC = forecast.main.temp.kelvinToCelsius,
                     dateTimeMillis = forecast.dt.epochToMillis,
-                    icon = WeatherIconEnum.toWeatherIcon(icon = forecast.weather.first().icon)
+                    icon = WeatherIconEnum.toWeatherIcon(icon = forecast.weather.first().icon),
+                    probabilityOfPrecipitation = (forecast.pop * 100).roundTwoDecimal
                 )
             }
             DailyForecast(
