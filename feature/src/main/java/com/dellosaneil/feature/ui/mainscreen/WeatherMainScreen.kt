@@ -36,13 +36,13 @@ fun WeatherMainScreen() {
         initialPage = 0,
         initialPageOffsetFraction = 0f
     ) {
-        WeatherTabs.values().size
+        WeatherTabs.entries.size
     }
     val coroutineScope = rememberCoroutineScope()
 
-    Scaffold(topBar = {
-        WeatherMainToolbar(location = "Davao City, Philippines")
-    }) {
+    Scaffold(
+        topBar = { WeatherMainToolbar(location = "Davao City, Philippines") }
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -62,7 +62,7 @@ fun WeatherMainScreen() {
                     }
                 }
             ) {
-                WeatherTabs.values().forEachIndexed { index, tab ->
+                WeatherTabs.entries.forEachIndexed { index, tab ->
                     Tab(
                         text = {
                             Text(
@@ -96,7 +96,7 @@ fun WeatherMainScreen() {
                     }
 
                     WeatherTabs.PRECIPITATION.index -> {
-                        Text("Precipitation")
+
                     }
                 }
             }
