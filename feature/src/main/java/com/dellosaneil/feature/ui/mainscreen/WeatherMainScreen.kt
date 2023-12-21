@@ -41,7 +41,13 @@ fun WeatherMainScreen() {
     val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
-        topBar = { WeatherMainToolbar(location = "Davao City, Philippines") }
+        topBar = {
+            WeatherMainToolbar(
+                location = "Davao City, Philippines"
+            ) {
+
+            }
+        }
     ) {
         Column(
             modifier = Modifier
