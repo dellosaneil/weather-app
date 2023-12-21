@@ -40,8 +40,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dellosaneil.feature.R
-import com.dellosaneil.feature.model.hourlyforecast.HourlyForecast
 import com.dellosaneil.feature.model.hourlyforecast.HourlyForecastData
+import com.dellosaneil.feature.model.hourlyforecast.HourlyForecastHourly
 import com.dellosaneil.feature.ui.common.CommonBackground
 import com.dellosaneil.feature.util.Colors
 import com.dellosaneil.feature.util.DatePattern
@@ -55,11 +55,11 @@ private const val PLACE_HOLDER_SIZE = 24
 @Composable
 fun TodayWeatherHourlyForecast(
     modifier: Modifier,
-    hourlyForecastData: HourlyForecastData,
+    hourlyForecast: List<HourlyForecastHourly>,
     columnScope: ColumnScope,
-    onFilterClicked: (HourlyForecast) -> Unit
+    onFilterClicked: (HourlyForecastHourly) -> Unit
 ) {
-    val selectedChip = remember { mutableStateOf(hourlyForecastData.list.first()) }
+    val selectedChip = remember { mutableStateOf(hourlyForecast.first()) }
 
     columnScope.apply {
         Spacer(modifier = Modifier.height(16.dp))
@@ -73,14 +73,14 @@ fun TodayWeatherHourlyForecast(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 HourlyWeatherForecast(
-                    value = selectedChip.value.probabilityOfRain.toString() + "%",
+                    value = selectedChip.value.precipitationProbability.toString() + "%",
                     drawableRes = R.drawable.img_light_rain,
                     id = "rain",
                     textRes = R.string.precipitation_colon,
                     modifier = Modifier.weight(1f)
                 )
                 HourlyWeatherForecast(
-                    value = selectedChip.value.main.humidity.toString() + "%",
+                    value = selectedChip.value.relativeHumidity2m.toString() + "%",
                     drawableRes = R.drawable.img_humidity,
                     textRes = R.string.humidity_colon,
                     id = "humidity",
@@ -94,7 +94,7 @@ fun TodayWeatherHourlyForecast(
                 HourlyWeatherForecast(
                     value = stringResource(
                         id = R.string.x_km_h,
-                        selectedChip.value.wind.speed.toString()
+                        selectedChip.value.windSpeed10m.toString()
                     ),
                     drawableRes = R.drawable.img_wind,
                     id = "wind",
@@ -102,7 +102,7 @@ fun TodayWeatherHourlyForecast(
                     modifier = Modifier.weight(1f)
                 )
                 HourlyWeatherForecast(
-                    value = selectedChip.value.main.feelsLikeC.toCelcius,
+                    value = selectedChip.value.apparentTemperature.toCelcius,
                     drawableRes = R.drawable.img_temperature,
                     textRes = R.string.feels_like_colon,
                     id = "temp",
@@ -115,8 +115,8 @@ fun TodayWeatherHourlyForecast(
             contentPadding = PaddingValues(vertical = 8.dp, horizontal = 16.dp)
         ) {
             items(
-                items = hourlyForecastData.list,
-                key = { it.dateTimeMillis }
+                items = hourlyForecast,
+                key = { it.timeMillis.toDateString(pattern = DatePattern.HOURS) }
             ) { forecast ->
                 HourlyTimeChips(
                     isSelected = selectedChip.value == forecast,
@@ -135,7 +135,7 @@ fun TodayWeatherHourlyForecast(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HourlyTimeChips(
-    forecast: HourlyForecast,
+    forecast: HourlyForecastHourly,
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
@@ -152,28 +152,23 @@ private fun HourlyTimeChips(
                 modifier = Modifier.padding(vertical = 16.dp)
             ) {
                 Text(
-                    text = forecast.dateTimeMillis.toDateString(pattern = DatePattern.DATE_MONTH),
+                    text = forecast.timeMillis.toDateString(pattern = DatePattern.HOUR_MINUTES_MERIDIEM),
                     style = MaterialTheme.typography.bodySmall.copy(
                         color = Colors.White
                     )
                 )
-                Text(
-                    text = forecast.dateTimeMillis.toDateString(pattern = DatePattern.HOUR_MINUTES_MERIDIEM),
-                    style = MaterialTheme.typography.bodySmall.copy(color = Colors.White)
-                )
                 GlideImage(
-                    imageModel = { forecast.weather.first().weatherIconEnum.iconRes },
+                    imageModel = { forecast.weatherCondition.icon },
                     previewPlaceholder = R.drawable.img_sunny,
                     modifier = Modifier.size(20.dp)
                 )
                 Text(
-                    text = forecast.main.tempC.toCelcius,
+                    text = forecast.apparentTemperature.toCelcius,
                     style = MaterialTheme.typography.bodySmall.copy(
                         color = Colors.White,
                         fontWeight = FontWeight.Medium
                     )
                 )
-
             }
         },
         colors = FilterChipDefaults.filterChipColors(
@@ -244,7 +239,7 @@ private fun Screen() {
     CommonBackground {
         TodayWeatherHourlyForecast(
             modifier = Modifier.padding(all = 16.dp),
-            hourlyForecastData = HourlyForecastData.dummyData(),
+            hourlyForecast = HourlyForecastData.dummyData().hourly,
             columnScope = it
         ) {
 

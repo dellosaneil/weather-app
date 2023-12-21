@@ -38,4 +38,5 @@ dependencies {
     implementation(project(":data"))
     implementation(libs.hilt.android)
     kapt(libs.hiltCompiler)
+    implementation(libs.bundles.network)
 }

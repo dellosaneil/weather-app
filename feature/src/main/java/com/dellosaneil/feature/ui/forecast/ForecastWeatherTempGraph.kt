@@ -43,12 +43,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.dellosaneil.feature.R
-import com.dellosaneil.feature.model.dailyforecast.DailyForecast
-import com.dellosaneil.feature.model.dailyforecast.DailyForecastHourly
+import com.dellosaneil.feature.model.dailyforecast.DailyForecastDaily
 import com.dellosaneil.feature.ui.common.CommonBackground
 import com.dellosaneil.feature.util.Colors
 import com.dellosaneil.feature.util.DatePattern
-import com.dellosaneil.feature.util.WeatherIconEnum
 import com.dellosaneil.feature.util.roundTwoDecimal
 import com.dellosaneil.feature.util.showAsPercentage
 import com.dellosaneil.feature.util.toCelcius
@@ -64,17 +62,20 @@ private const val HEIGHT_PADDING = 50f
 
 @Composable
 fun ForecastWeatherTempGraph(
-    forecast: DailyForecast,
+    forecast: List<DailyForecastDaily>,
     showMore: MutableState<Boolean>
 ) {
+    val highestTemp = forecast.maxOf { it.temperature2mMax }
+    val lowestTemp = forecast.minOf { it.temperature2mMin }
     val showMoreOffset = remember { mutableStateOf(Offset.Zero) }
-    val showMoreDetails: MutableState<DailyForecastHourly?> = remember {
+    val showMoreDetails: MutableState<DailyForecastDaily?> = remember {
         mutableStateOf(null)
     }
 
     val density = LocalDensity.current
     val textMeasurer = rememberTextMeasurer()
-    val tempStep = (forecast.highestTempC - forecast.lowestTempC) / Y_AXIS_STEP_COUNT
+    val tempStep =
+        (highestTemp - lowestTemp) / Y_AXIS_STEP_COUNT
     val graphLabelOffset = density.run {
         Offset(
             y = -36.dp.toPx(),
@@ -117,7 +118,7 @@ fun ForecastWeatherTempGraph(
                                 val index = pointRects.indexOfFirst {
                                     it.contains(tapOffset)
                                 }
-                                showMoreDetails.value = forecast.hourly[index]
+                                showMoreDetails.value = forecast[index]
                                 showMoreOffset.value = tapOffset
                                 isFound = true
                                 break
@@ -127,12 +128,12 @@ fun ForecastWeatherTempGraph(
                     }
                 }
         ) {
-            val range = forecast.highestTempC - forecast.lowestTempC
+            val range = highestTemp - lowestTemp
             val graphSize = Size(
                 width = size.width - WIDTH_PADDING,
                 height = size.height - HEIGHT_PADDING
             )
-            distancePerPoint.floatValue = graphSize.width / forecast.temperatures.size
+            distancePerPoint.floatValue = graphSize.width / forecast.size
             drawText(
                 text = labelText,
                 textMeasurer = textMeasurer,
@@ -144,7 +145,7 @@ fun ForecastWeatherTempGraph(
             drawYAxis(
                 drawScope = this,
                 textMeasurer = textMeasurer,
-                minTemp = forecast.lowestTempC,
+                minTemp = lowestTemp,
                 tempStep = tempStep,
                 graphSize = graphSize,
                 textStyle = graphTypography
@@ -152,18 +153,20 @@ fun ForecastWeatherTempGraph(
 
             plotPoints(
                 size = graphSize,
-                temperatures = forecast.temperatures,
-                maxTemp = forecast.highestTempC.toFloat(),
+                temperatures = forecast.map { it.temperature2mMax },
+                maxTemp = highestTemp.toFloat(),
                 range = range.toFloat(),
                 drawScope = this,
                 widthPerTimeStamp = distancePerPoint.floatValue,
                 rect = pointRects
             )
 
-            forecast.timeStamp.forEachIndexed { index, timeStamp ->
+            forecast.forEachIndexed { index, forecast ->
                 val xOffset = (distancePerPoint.floatValue * index)
                 drawText(
-                    text = timeStamp,
+                    text = forecast.timeMillis.toDateString(
+                        pattern = DatePattern.HOUR_MINUTES_MERIDIEM
+                    ),
                     textMeasurer = textMeasurer,
                     topLeft = Offset(
                         x = xOffset,
@@ -193,7 +196,7 @@ fun ForecastWeatherTempGraph(
 @Composable
 private fun ShowMoreDetails(
     modifier: Modifier,
-    details: DailyForecastHourly,
+    details: DailyForecastDaily,
 ) {
     Column(
         modifier = modifier
@@ -212,14 +215,14 @@ private fun ShowMoreDetails(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = details.dateTimeMillis.toDateString(pattern = DatePattern.HOUR_MINUTES_MERIDIEM),
+            text = details.timeMillis.toDateString(pattern = DatePattern.HOUR_MINUTES_MERIDIEM),
             style = MaterialTheme.typography.bodyMedium.copy(
                 color = Colors.White
             )
         )
         GlideImage(
             imageModel = {
-                details.icon.iconRes
+                details.weatherCondition.icon
             },
             previewPlaceholder = R.drawable.img_light_rain,
             modifier = Modifier.size(
@@ -227,7 +230,7 @@ private fun ShowMoreDetails(
             ),
         )
         Text(
-            text = details.tempC.toCelcius,
+            text = details.temperature2mMax.toCelcius,
             style = MaterialTheme.typography.bodyMedium.copy(
                 color = Colors.White
             )
@@ -245,7 +248,7 @@ private fun ShowMoreDetails(
                 modifier = Modifier.size(size = 16.dp)
             )
             Text(
-                text = details.probabilityOfPrecipitation.showAsPercentage,
+                text = details.precipitationProbabilityMax.toDouble().showAsPercentage,
                 style = MaterialTheme.typography.bodyMedium.copy(
                     color = Colors.White
                 )
@@ -404,7 +407,7 @@ private fun calculateTempYOffset(
 private fun Preview() {
     CommonBackground {
         ForecastWeatherTempGraph(
-            forecast = DailyForecast.dummyData(),
+            forecast = listOf(DailyForecastDaily.dummyData()),
             showMore = mutableStateOf(false)
         )
     }
@@ -415,12 +418,7 @@ private fun Preview() {
 private fun PreviewShowMore() {
     Box(modifier = Modifier.padding(all = 16.dp)) {
         ShowMoreDetails(
-            details = DailyForecastHourly(
-                tempC = 33.0,
-                icon = WeatherIconEnum.MIST_SUN,
-                dateTimeMillis = 1701075282549L,
-                probabilityOfPrecipitation = 32.3
-            ),
+            details = DailyForecastDaily.dummyData(),
             modifier = Modifier
         )
     }

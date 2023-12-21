@@ -1,42 +1,24 @@
 package com.dellosaneil.domain.mapper
 
-import com.dellosaneil.domain.network.schema.hourlyforecast.HourlyForecastCitySchema
 import com.dellosaneil.domain.network.schema.hourlyforecast.HourlyForecastDataSchema
-import com.dellosaneil.domain.network.schema.hourlyforecast.HourlyForecastMainSchema
-import com.dellosaneil.domain.network.schema.hourlyforecast.HourlyForecastSchema
-import com.dellosaneil.domain.network.schema.hourlyforecast.HourlyForecastWeatherSchema
-import com.dellosaneil.domain.network.schema.hourlyforecast.HourlyForecastWindSchema
+import com.dellosaneil.domain.network.schema.hourlyforecast.HourlyForecastHourlySchema
 import com.thelazybattley.data.network.response.hourlyforecast.HourlyForecastDataResponse
 
 val HourlyForecastDataResponse.toSchema
     get() = HourlyForecastDataSchema(
-        city = HourlyForecastCitySchema(
-            country = city.country,
-            name = city.name
-        ),
-        list = list.map { forecast ->
-            HourlyForecastSchema(
-                dt = forecast.dt,
-                pop = forecast.pop,
-                weather = forecast.weather.map { weather ->
-                    HourlyForecastWeatherSchema(
-                        description = weather.description,
-                        icon = weather.icon
-                    )
-                },
-                wind = HourlyForecastWindSchema(
-                    deg = forecast.wind.deg,
-                    speed = forecast.wind.speed
-                ),
-                main = HourlyForecastMainSchema(
-                    feelsLike = forecast.main.feelsLike,
-                    humidity = forecast.main.humidity,
-                    temp = forecast.main.temp,
-                    tempMax = forecast.main.tempMax,
-                    tempMin = forecast.main.tempMin,
-                    pressure = forecast.main.pressure
-                ),
-                visibility = forecast.visibility
+        hourly = hourly.run {
+            HourlyForecastHourlySchema(
+                precipitationProbability = precipitationProbability,
+                temperature2m = temperature2m,
+                time = time,
+                weatherCode = weatherCode,
+                surfacePressure = surfacePressure,
+                cloudCover = cloudCover,
+                visibility = visibility,
+                apparentTemperature = apparentTemperature,
+                relativeHumidity2m = relativeHumidity2m,
+                windSpeed10m = windSpeed10m,
+                windDirection10m = windDirection10m
             )
         }
     )

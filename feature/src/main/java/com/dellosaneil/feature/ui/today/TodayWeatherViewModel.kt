@@ -2,18 +2,17 @@ package com.dellosaneil.feature.ui.today
 
 import androidx.lifecycle.viewModelScope
 import com.dellosaneil.domain.network.usecase.GetCurrentWeather
+import com.dellosaneil.domain.network.usecase.GetDailyForecast
 import com.dellosaneil.domain.network.usecase.GetHourlyForecast
 import com.dellosaneil.feature.base.BaseViewModel
 import com.dellosaneil.feature.di.IoDispatcher
-import com.dellosaneil.feature.mapper.toDailyForecast
 import com.dellosaneil.feature.mapper.toData
+import com.dellosaneil.feature.mapper.today
 import com.dellosaneil.feature.model.currentweather.CurrentWeatherData
-import com.dellosaneil.feature.model.dailyforecast.DailyForecast
-import com.dellosaneil.feature.model.hourlyforecast.HourlyForecastData
+import com.dellosaneil.feature.model.dailyforecast.DailyForecastData
 import com.dellosaneil.feature.util.Coordinates
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,24 +20,19 @@ import javax.inject.Inject
 class TodayWeatherViewModel @Inject constructor(
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
     private val getCurrentWeather: GetCurrentWeather,
-    private val getHourlyForecast: GetHourlyForecast
+    private val getHourlyForecast: GetHourlyForecast,
+    private val getDailyForecast: GetDailyForecast
 ) : BaseViewModel<CurrentWeatherEvents, CurrentWeatherViewState>() {
-
-    companion object {
-        private const val DEBOUNCE_DELAY = 500L
-    }
 
     init {
         fetchCurrentWeather(longitude = Coordinates.LONGITUDE, latitude = Coordinates.LATITUDE)
-        fetchHourlyForecast(longitude = Coordinates.LONGITUDE, latitude = Coordinates.LATITUDE)
-
+        fetchDailyForecast(latitude = Coordinates.LATITUDE, longitude = Coordinates.LONGITUDE)
     }
 
     override fun initialState() = CurrentWeatherViewState.initialState()
 
     private fun fetchCurrentWeather(latitude: String, longitude: String) {
         viewModelScope.launch(context = dispatcher) {
-            delay(DEBOUNCE_DELAY)
             updateState { state ->
                 state.copy(
                     isLoading = true
@@ -72,19 +66,23 @@ class TodayWeatherViewModel @Inject constructor(
         }
     }
 
-    private fun fetchHourlyForecast(latitude: String, longitude: String) {
+    private fun fetchDailyForecast(latitude: String, longitude: String) {
         viewModelScope.launch(context = dispatcher) {
-            getHourlyForecast(latitude = latitude, longitude = longitude).fold(
+            val hourly = getHourlyForecast(latitude = latitude, longitude = longitude)
+                .getOrNull() ?: return@launch
+            getDailyForecast(latitude = latitude, longitude = longitude).fold(
                 onSuccess = { schema ->
                     updateState { state ->
                         state.copy(
                             throwable = null,
-                            hourlyForecast = schema.toData,
-                            dailyForecast = schema.toDailyForecast
+                            dailyForecast = schema.toData(
+                                hourlyForecastHourly = hourly.toData.today.hourly
+                            )
                         )
                     }
                 },
                 onFailure = {
+                    it.printStackTrace()
                     updateState { state ->
                         state.copy(
                             throwable = it
@@ -97,7 +95,6 @@ class TodayWeatherViewModel @Inject constructor(
             }
         }
     }
-
 }
 
 sealed class CurrentWeatherEvents
@@ -106,16 +103,14 @@ data class CurrentWeatherViewState(
     val isLoading: Boolean,
     val throwable: Throwable?,
     val currentWeatherData: CurrentWeatherData?,
-    val hourlyForecast: HourlyForecastData?,
-    val dailyForecast : List<DailyForecast>,
+    val dailyForecast: DailyForecastData?,
 ) {
     companion object {
         fun initialState() = CurrentWeatherViewState(
             isLoading = true,
             currentWeatherData = null,
             throwable = null,
-            hourlyForecast = null,
-            dailyForecast = emptyList()
+            dailyForecast = null
         )
     }
 }

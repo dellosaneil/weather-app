@@ -28,8 +28,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dellosaneil.feature.R
-import com.dellosaneil.feature.model.hourlyforecast.HourlyForecast
 import com.dellosaneil.feature.model.hourlyforecast.HourlyForecastData
+import com.dellosaneil.feature.model.hourlyforecast.HourlyForecastHourly
 import com.dellosaneil.feature.ui.common.CommonBackground
 import com.dellosaneil.feature.util.Colors
 import com.dellosaneil.feature.util.DatePattern
@@ -42,18 +42,18 @@ import com.skydoves.landscapist.glide.GlideImage
 @Composable
 fun CurrentWeatherSummary(
     modifier : Modifier,
-    selectedWeather: HourlyForecast,
+    selectedWeather: HourlyForecastHourly,
     columnScope: ColumnScope
 ) {
     columnScope.apply {
         FilterChip(
             selected = false,
-            onClick = {},
+            onClick = {
+
+            },
             label = {
-                val currentLocalDate =
-                    selectedWeather.dateTimeMillis.toDateString(pattern = DatePattern.DATE_MONTH_HOURS_MINUTES_MERIDIEM)
                 Text(
-                    text = currentLocalDate,
+                    text = selectedWeather.timeMillis.toDateString(pattern = DatePattern.DATE_MONTH_HOURS_MINUTES_MERIDIEM),
                     style = MaterialTheme.typography.bodySmall,
                     color = Colors.SantasGray,
                     modifier = Modifier.padding(vertical = 8.dp)
@@ -73,9 +73,9 @@ fun CurrentWeatherSummary(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceAround
         ) {
-            Crossfade(targetState = selectedWeather.weather.first(), label = "") {
+            Crossfade(targetState = selectedWeather.weatherCondition.icon, label = "") {
                 GlideImage(
-                    imageModel = { it.weatherIconEnum.iconRes },
+                    imageModel = { it },
                     previewPlaceholder = R.drawable.img_light_rain,
                     modifier = Modifier
                         .width(width = 200.dp),
@@ -95,7 +95,7 @@ fun CurrentWeatherSummary(
                 verticalArrangement = Arrangement.Center,
             ) {
                 Text(
-                    text = selectedWeather.main.tempC.toCelcius,
+                    text = selectedWeather.temperature2m.toCelcius,
                     style = MaterialTheme.typography.displayLarge.copy(
                         brush = Brush.horizontalGradient(
                             colors = listOf(
@@ -108,7 +108,7 @@ fun CurrentWeatherSummary(
                     )
                 )
                 Text(
-                    text = selectedWeather.weather.first().description,
+                    text = selectedWeather.weatherCondition.description,
                     style = MaterialTheme.typography.bodySmall.copy(
                         color = Colors.White,
                         fontSize = 10.sp,
@@ -133,7 +133,7 @@ fun CurrentWeatherSummary(
                         )
                     ) {
                         append(" ")
-                        append(selectedWeather.main.feelsLikeC.toCelcius)
+                        append(selectedWeather.apparentTemperature.toCelcius)
                     }
                 }
 
@@ -151,7 +151,7 @@ private fun Screen() {
     CommonBackground {
         CurrentWeatherSummary(
             modifier = Modifier.padding(all = 16.dp),
-            selectedWeather = HourlyForecastData.dummyData().list.first(),
+            selectedWeather = HourlyForecastData.dummyData().hourly.first(),
             columnScope = it
         )
     }

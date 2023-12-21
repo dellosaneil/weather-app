@@ -35,8 +35,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dellosaneil.feature.R
-import com.dellosaneil.feature.model.dailyforecast.DailyForecast
-import com.dellosaneil.feature.model.dailyforecast.DailyForecastHourly
+import com.dellosaneil.feature.model.dailyforecast.DailyForecastDaily
+import com.dellosaneil.feature.model.hourlyforecast.HourlyForecastHourly
 import com.dellosaneil.feature.ui.common.CommonBackground
 import com.dellosaneil.feature.util.Colors
 import com.dellosaneil.feature.util.DatePattern
@@ -48,9 +48,9 @@ import com.skydoves.landscapist.glide.GlideImage
 @Composable
 fun ForecastWeatherDaily(
     modifier: Modifier,
-    dailyForecast: List<DailyForecast>
+    dailyForecast: List<DailyForecastDaily>
 ) {
-    val expandedForecast: MutableState<DailyForecast?> =
+    val expandedForecast: MutableState<DailyForecastDaily?> =
         remember { mutableStateOf(null) }
 
     Card(
@@ -108,7 +108,7 @@ fun ForecastWeatherDaily(
                             previewPlaceholder = R.drawable.ic_expand
                         )
                         Text(
-                            text = forecast.day,
+                            text = forecast.timeMillis.toDateString(pattern  = DatePattern.DATE_MONTH),
                             style = MaterialTheme.typography.bodySmall.copy(
                                 color = Colors.White,
                                 fontWeight = FontWeight.Medium
@@ -116,14 +116,14 @@ fun ForecastWeatherDaily(
                             modifier = Modifier.weight(1f)
                         )
                         GlideImage(
-                            imageModel = { forecast.icon.iconRes },
+                            imageModel = { forecast.weatherCondition.icon },
                             modifier = Modifier
                                 .padding(end = 16.dp)
                                 .size(20.dp),
                             previewPlaceholder = R.drawable.img_light_rain
                         )
                         Text(
-                            text = forecast.highestTempC.toCelcius,
+                            text = forecast.temperature2mMax.toCelcius,
                             style = MaterialTheme.typography.bodySmall.copy(
                                 color = Colors.White,
                                 fontWeight = FontWeight.Medium
@@ -131,7 +131,7 @@ fun ForecastWeatherDaily(
                             modifier = Modifier.weight(1f)
                         )
                         Text(
-                            text = forecast.lowestTempC.toCelcius,
+                            text = forecast.temperature2mMin.toCelcius,
                             style = MaterialTheme.typography.bodySmall.copy(
                                 color = Colors.White,
                                 fontWeight = FontWeight.Medium
@@ -145,8 +145,8 @@ fun ForecastWeatherDaily(
                             ),
                             horizontalArrangement = Arrangement.spacedBy(space = 8.dp)
                         ) {
-                            forecast.hourly.forEach { dailyForecast ->
-                                DailyForecastPerHour(forecast = dailyForecast)
+                            forecast.hourlyForecast.forEach {
+                                DailyForecastPerHour(forecast = it)
                             }
                         }
                     }
@@ -158,7 +158,7 @@ fun ForecastWeatherDaily(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun DailyForecastPerHour(forecast: DailyForecastHourly) {
+private fun DailyForecastPerHour(forecast: HourlyForecastHourly) {
     FilterChip(
         selected = false,
         onClick = { },
@@ -169,7 +169,7 @@ private fun DailyForecastPerHour(forecast: DailyForecastHourly) {
                 modifier = Modifier.padding(vertical = 16.dp)
             ) {
                 GlideImage(
-                    imageModel = { forecast.icon.iconRes },
+                    imageModel = { forecast.weatherCondition.icon },
                     modifier = Modifier.size(size = 36.dp),
                     previewPlaceholder = R.drawable.img_wind,
                     imageOptions = ImageOptions(
@@ -178,7 +178,7 @@ private fun DailyForecastPerHour(forecast: DailyForecastHourly) {
                 )
                 Spacer(modifier = Modifier)
                 Text(
-                    text = forecast.tempC.toCelcius,
+                    text = forecast.temperature2m.toCelcius,
                     style = MaterialTheme.typography.bodyMedium.copy(
                         fontWeight = FontWeight.SemiBold,
                         color = Colors.White,
@@ -186,7 +186,7 @@ private fun DailyForecastPerHour(forecast: DailyForecastHourly) {
                     )
                 )
                 Text(
-                    text = forecast.dateTimeMillis.toDateString(pattern = DatePattern.HOUR_MINUTES_MERIDIEM),
+                    text = forecast.timeMillis.toDateString(pattern = DatePattern.DAY),
                     style = MaterialTheme.typography.bodyMedium.copy(
                         color = Colors.White,
                         fontSize = 12.sp
@@ -210,9 +210,9 @@ private fun Screen() {
         ForecastWeatherDaily(
             modifier = Modifier.padding(all = 16.dp),
             dailyForecast = listOf(
-                DailyForecast.dummyData(),
-                DailyForecast.dummyData().copy(highestTempC = 2.3),
-                DailyForecast.dummyData().copy(highestTempC = 32.1),
+                DailyForecastDaily.dummyData(),
+                DailyForecastDaily.dummyData(),
+                DailyForecastDaily.dummyData(),
             )
         )
     }

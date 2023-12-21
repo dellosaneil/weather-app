@@ -23,8 +23,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.dellosaneil.feature.R
-import com.dellosaneil.feature.model.hourlyforecast.HourlyForecast
 import com.dellosaneil.feature.model.hourlyforecast.HourlyForecastData
+import com.dellosaneil.feature.model.hourlyforecast.HourlyForecastHourly
 import com.dellosaneil.feature.ui.common.CommonBackground
 import com.dellosaneil.feature.util.Colors
 import com.dellosaneil.feature.util.metersToKm
@@ -35,9 +35,9 @@ import com.skydoves.landscapist.glide.GlideImage
 @Composable
 fun TodayWeatherDetails(
     modifier: Modifier,
-    selectedWeather: HourlyForecast,
     sunrise: String,
-    sunset: String
+    sunset: String,
+    selectedHour: HourlyForecastHourly
 ) {
     Card(
         modifier = modifier
@@ -69,7 +69,7 @@ fun TodayWeatherDetails(
             ) {
                 Crossfade(
                     modifier = Modifier.weight(1f),
-                    targetState = selectedWeather.weather.first().weatherIconEnum.iconRes,
+                    targetState = selectedHour.weatherCondition.icon,
                     label = ""
                 ) {
                     GlideImage(
@@ -87,23 +87,23 @@ fun TodayWeatherDetails(
                 ) {
                     Details(
                         label = stringResource(id = R.string.feels_like),
-                        value = selectedWeather.main.feelsLikeC.toCelcius
+                        value = selectedHour.temperature2m.toCelcius
                     )
 
                     Details(
                         label = stringResource(id = R.string.humidity),
-                        value = "${selectedWeather.main.humidity}%"
+                        value = "${selectedHour.relativeHumidity2m}%"
                     )
                     Details(
                         label = stringResource(R.string.visibility),
                         value = stringResource(
                             id = R.string.x_km,
-                            selectedWeather.visibility.metersToKm
+                            selectedHour.visibility.metersToKm
                         )
                     )
                     Details(
                         label = stringResource(R.string.pressure),
-                        value = stringResource(id = R.string.x_mb, selectedWeather.main.pressure)
+                        value = stringResource(id = R.string.x_mb, selectedHour.surfacePressure.toInt())
                     )
                     Details(
                         label = stringResource(R.string.sunrise),
@@ -150,7 +150,7 @@ private fun Screen() {
     CommonBackground {
         TodayWeatherDetails(
             modifier = Modifier.padding(all = 16.dp),
-            selectedWeather = HourlyForecastData.dummyData().list.first(),
+            selectedHour = HourlyForecastData.dummyData().hourly.first(),
             sunset = "10:00am",
             sunrise = "33:00am"
         )

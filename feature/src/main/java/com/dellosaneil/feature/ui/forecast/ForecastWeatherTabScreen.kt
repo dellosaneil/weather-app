@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.dellosaneil.feature.model.dailyforecast.DailyForecast
+import com.dellosaneil.feature.model.dailyforecast.DailyForecastDaily
 import com.dellosaneil.feature.ui.common.CommonBackground
 
 @Composable
@@ -57,7 +57,7 @@ private fun Screen(
                     showMore.value = false
                 }
                 ForecastWeatherTempGraph(
-                    forecast = viewState.selectedDay,
+                    forecast = listOf(viewState.selectedDay),
                     showMore = showMore
                 )
                 ForecastWeatherDaily(
@@ -76,19 +76,19 @@ private fun PreviewScreen() {
         viewState = ForecastWeatherState.initialState().copy(
             isLoading = false,
             dailyForecast = listOf(
-                DailyForecast.dummyData().copy(
-                    day = "Tuesday"
+                DailyForecastDaily.dummyData().copy(
+                    timeMillis = 1703156210705
                 ),
-                DailyForecast.dummyData().copy(day = "Wednesday"),
-                DailyForecast.dummyData().copy(day = "Thursday"),
+                DailyForecastDaily.dummyData().copy(timeMillis = 1703156110705),
+                DailyForecastDaily.dummyData().copy(timeMillis = 1703176210705),
             ),
-            selectedDay = DailyForecast.dummyData().copy(
-                day = "Tuesday"
+            selectedDay = DailyForecastDaily.dummyData().copy(
+                timeMillis = 1703153210705
             )
         ),
         event = null,
         callbacks = object : ForecastWeatherCallbacks {
-            override fun daySelected(dailyForecast: DailyForecast) {
+            override fun daySelected(dailyForecast: DailyForecastDaily) {
                 TODO("Not yet implemented")
             }
 

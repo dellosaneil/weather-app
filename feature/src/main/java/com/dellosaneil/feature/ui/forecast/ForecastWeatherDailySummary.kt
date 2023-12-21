@@ -21,10 +21,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.dellosaneil.feature.model.dailyforecast.DailyForecast
+import com.dellosaneil.feature.model.dailyforecast.DailyForecastDaily
 import com.dellosaneil.feature.ui.common.CommonBackground
 import com.dellosaneil.feature.util.Colors
+import com.dellosaneil.feature.util.DatePattern
 import com.dellosaneil.feature.util.toCelcius
+import com.dellosaneil.feature.util.toDateString
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 
@@ -32,20 +34,20 @@ import com.skydoves.landscapist.glide.GlideImage
 @Composable
 fun ForecastWeatherDailySummary(
     modifier: Modifier,
-    dailyForecast: List<DailyForecast>,
-    selectedDailyForecast: DailyForecast,
-    onClick: (DailyForecast) -> Unit
+    dailyForecast: List<DailyForecastDaily>,
+    selectedDailyForecast: DailyForecastDaily,
+    onClick: (DailyForecastDaily) -> Unit
 ) {
     LazyRow(
         modifier = modifier,
         contentPadding = PaddingValues(all = 8.dp)
     ) {
         items(
-            items = dailyForecast, key = { it.day }
+            items = dailyForecast, key = { it.timeMillis }
         ) { forecast ->
             FilterChip(
                 modifier = Modifier.padding(horizontal = 8.dp),
-                selected = selectedDailyForecast.day == forecast.day,
+                selected = selectedDailyForecast.timeMillis == forecast.timeMillis,
                 colors = FilterChipDefaults.filterChipColors(
                     containerColor = Colors.Tuna,
                     selectedContainerColor = Colors.White20
@@ -67,7 +69,7 @@ fun ForecastWeatherDailySummary(
                     ) {
                         GlideImage(
                             imageModel = {
-                                forecast.icon.iconRes
+                                forecast.weatherCondition.icon
                             },
                             modifier = Modifier.size(size = 24.dp),
                             imageOptions = ImageOptions(
@@ -75,14 +77,14 @@ fun ForecastWeatherDailySummary(
                             )
                         )
                         Text(
-                            text = forecast.day,
+                            text = forecast.timeMillis.toDateString(pattern = DatePattern.DAY_DATE_MONTH),
                             style = MaterialTheme.typography.bodyMedium.copy(
                                 color = Colors.Manatee
                             )
                         )
                         Spacer(modifier = Modifier)
                         Text(
-                            text = forecast.hourly.first().tempC.toCelcius,
+                            text = forecast.temperature2mMin.toCelcius,
                             style = MaterialTheme.typography.bodyMedium.copy(
                                 color = Colors.White,
                                 fontWeight = FontWeight.SemiBold
@@ -102,14 +104,9 @@ private fun Screen() {
         ForecastWeatherDailySummary(
             modifier = Modifier,
             dailyForecast = listOf(
-                DailyForecast.dummyData(),
-                DailyForecast.dummyData(),
-                DailyForecast.dummyData(),
-                DailyForecast.dummyData(),
-                DailyForecast.dummyData(),
-                DailyForecast.dummyData(),
+                DailyForecastDaily.dummyData()
             ),
-            selectedDailyForecast = DailyForecast.dummyData()
+            selectedDailyForecast = DailyForecastDaily.dummyData()
         ) {
 
         }

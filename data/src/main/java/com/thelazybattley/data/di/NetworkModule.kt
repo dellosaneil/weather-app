@@ -2,7 +2,7 @@ package com.thelazybattley.data.di
 
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
-import com.thelazybattley.data.network.service.WeatherService
+import com.thelazybattley.data.network.service.OpenMateoService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,28 +19,25 @@ object NetworkModule {
 
     @Singleton
     @Provides
-    fun provideRetrofit(
-        authInterceptor: AuthInterceptor
-    ) : Retrofit {
+    fun provideRetrofit(): Retrofit {
         val gson = GsonBuilder()
-            .setFieldNamingStrategy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+            .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
             .create()
 
         val httpClient = OkHttpClient.Builder()
             .connectTimeout(Duration.ofSeconds(15))
             .readTimeout(Duration.ofSeconds(15))
-            .addInterceptor(authInterceptor)
             .build()
 
         return Retrofit.Builder()
             .client(httpClient)
-            .baseUrl("https://api.openweathermap.org/data/2.5/")
+            .baseUrl("https://api.open-meteo.com/v1/")
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
     }
+
     @Provides
     @Singleton
-    fun provideWeatherService(retrofit: Retrofit) = retrofit.create(WeatherService::class.java)
-
+    fun provideOpenMateoService(retrofit: Retrofit) = retrofit.create(OpenMateoService::class.java)
 
 }

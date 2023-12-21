@@ -13,13 +13,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.dellosaneil.feature.model.currentweather.CurrentWeatherData
-import com.dellosaneil.feature.model.dailyforecast.DailyForecast
-import com.dellosaneil.feature.model.hourlyforecast.HourlyForecastData
+import com.dellosaneil.feature.model.dailyforecast.DailyForecastData
 import com.dellosaneil.feature.ui.common.CommonBackground
 import com.dellosaneil.feature.ui.common.DashedDivider
 import com.dellosaneil.feature.util.Colors
-import com.dellosaneil.feature.util.DatePattern
-import com.dellosaneil.feature.util.toDateString
 import com.ramcosta.composedestinations.annotation.Destination
 
 @Destination
@@ -49,9 +46,9 @@ private fun Screen(
                 Text(text = viewState.throwable.message ?: "")
             }
 
-            viewState.currentWeatherData != null && viewState.hourlyForecast != null -> {
+            viewState.currentWeatherData != null && viewState.dailyForecast != null -> {
                 val selectedWeather =
-                    remember { mutableStateOf(viewState.hourlyForecast.list.first()) }
+                    remember { mutableStateOf(viewState.dailyForecast.daily.first().hourlyForecast.first()) }
 
                 CurrentWeatherSummary(
                     modifier = Modifier.padding(all = 8.dp),
@@ -66,7 +63,7 @@ private fun Screen(
 
                 TodayWeatherHourlyForecast(
                     modifier = Modifier.padding(all = 8.dp),
-                    hourlyForecastData = viewState.hourlyForecast,
+                    hourlyForecast = viewState.dailyForecast.daily.first().hourlyForecast,
                     columnScope = it
                 ) { forecast ->
                     selectedWeather.value = forecast
@@ -74,9 +71,9 @@ private fun Screen(
 
                 TodayWeatherDetails(
                     modifier = Modifier.padding(all = 8.dp),
-                    selectedWeather = selectedWeather.value,
-                    sunset = viewState.currentWeatherData.sys.sunsetMillis.toDateString(pattern = DatePattern.HOUR_MINUTES_MERIDIEM),
-                    sunrise = viewState.currentWeatherData.sys.sunriseMillis.toDateString(pattern = DatePattern.HOUR_MINUTES_MERIDIEM)
+                    selectedHour = selectedWeather.value,
+                    sunset = viewState.dailyForecast.daily.first().sunset,
+                    sunrise = viewState.dailyForecast.daily.first().sunrise
                 )
             }
         }
@@ -90,12 +87,7 @@ private fun PreviewScreen() {
         viewState = CurrentWeatherViewState.initialState().copy(
             isLoading = false,
             currentWeatherData = CurrentWeatherData.dummyData(),
-            hourlyForecast = HourlyForecastData.dummyData(),
-            dailyForecast = listOf(
-                DailyForecast.dummyData(),
-                DailyForecast.dummyData(),
-                DailyForecast.dummyData(),
-            )
+            dailyForecast = DailyForecastData.dummyData()
         ),
         events = null
     )
