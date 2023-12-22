@@ -36,7 +36,7 @@ private fun Screen(
     viewState: CurrentWeatherViewState,
     events: CurrentWeatherEvents?
 ) {
-    CommonBackground(modifier = Modifier.fillMaxSize()) {
+    CommonBackground(modifier = Modifier.fillMaxSize()) { scope ->
         when {
             viewState.isLoading -> {
 
@@ -53,7 +53,7 @@ private fun Screen(
                 CurrentWeatherSummary(
                     modifier = Modifier.padding(all = 8.dp),
                     selectedWeather = selectedWeather.value,
-                    columnScope = it
+                    columnScope = scope
                 )
 
                 DashedDivider(
@@ -64,7 +64,7 @@ private fun Screen(
                 TodayWeatherHourlyForecast(
                     modifier = Modifier.padding(all = 8.dp),
                     hourlyForecast = viewState.dailyForecast.daily.first().hourlyForecast,
-                    columnScope = it
+                    columnScope = scope
                 ) { forecast ->
                     selectedWeather.value = forecast
                 }

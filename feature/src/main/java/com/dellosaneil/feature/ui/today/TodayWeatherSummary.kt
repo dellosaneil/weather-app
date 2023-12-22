@@ -1,6 +1,7 @@
 package com.dellosaneil.feature.ui.today
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -18,7 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -35,13 +36,11 @@ import com.dellosaneil.feature.util.Colors
 import com.dellosaneil.feature.util.DatePattern
 import com.dellosaneil.feature.util.toCelcius
 import com.dellosaneil.feature.util.toDateString
-import com.skydoves.landscapist.ImageOptions
-import com.skydoves.landscapist.glide.GlideImage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CurrentWeatherSummary(
-    modifier : Modifier,
+    modifier: Modifier,
     selectedWeather: HourlyForecastHourly,
     columnScope: ColumnScope
 ) {
@@ -74,19 +73,13 @@ fun CurrentWeatherSummary(
             horizontalArrangement = Arrangement.SpaceAround
         ) {
             Crossfade(targetState = selectedWeather.weatherCondition.icon, label = "") {
-                GlideImage(
-                    imageModel = { it },
-                    previewPlaceholder = R.drawable.img_light_rain,
+                Image(
+                    painter = painterResource(id = it),
                     modifier = Modifier
                         .width(width = 200.dp),
-                    imageOptions = ImageOptions(
-                        contentScale = ContentScale.Fit
-                    )
+                    contentDescription = ""
                 )
             }
-            
-            
-
 
             Column(
                 modifier = Modifier

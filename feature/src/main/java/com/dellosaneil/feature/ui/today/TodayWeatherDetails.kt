@@ -1,6 +1,7 @@
 package com.dellosaneil.feature.ui.today
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,7 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,8 +30,6 @@ import com.dellosaneil.feature.ui.common.CommonBackground
 import com.dellosaneil.feature.util.Colors
 import com.dellosaneil.feature.util.metersToKm
 import com.dellosaneil.feature.util.toCelcius
-import com.skydoves.landscapist.ImageOptions
-import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
 fun TodayWeatherDetails(
@@ -56,7 +55,7 @@ fun TodayWeatherDetails(
             verticalArrangement = Arrangement.spacedBy(space = 16.dp)
         ) {
             Text(
-                text = stringResource(R.string.details),
+                text = stringResource(R.string.more_details),
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontWeight = FontWeight.SemiBold,
                     color = Colors.White
@@ -72,12 +71,9 @@ fun TodayWeatherDetails(
                     targetState = selectedHour.weatherCondition.icon,
                     label = ""
                 ) {
-                    GlideImage(
-                        imageModel = { it },
-                        previewPlaceholder = R.drawable.img_light_rain,
-                        imageOptions = ImageOptions(
-                            contentScale = ContentScale.Fit
-                        )
+                    Image(
+                        painter = painterResource(id = it),
+                        contentDescription = ""
                     )
                 }
                 Spacer(modifier = Modifier.width(16.dp))
@@ -87,7 +83,7 @@ fun TodayWeatherDetails(
                 ) {
                     Details(
                         label = stringResource(id = R.string.feels_like),
-                        value = selectedHour.temperature2m.toCelcius
+                        value = selectedHour.apparentTemperature.toCelcius
                     )
 
                     Details(
@@ -103,7 +99,10 @@ fun TodayWeatherDetails(
                     )
                     Details(
                         label = stringResource(R.string.pressure),
-                        value = stringResource(id = R.string.x_mb, selectedHour.surfacePressure.toInt())
+                        value = stringResource(
+                            id = R.string.x_mb,
+                            selectedHour.surfacePressure.toInt()
+                        )
                     )
                     Details(
                         label = stringResource(R.string.sunrise),
@@ -146,7 +145,6 @@ private fun Details(
 @Preview(showBackground = true, device = "id:pixel_2")
 @Composable
 private fun Screen() {
-
     CommonBackground {
         TodayWeatherDetails(
             modifier = Modifier.padding(all = 16.dp),

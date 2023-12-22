@@ -3,6 +3,7 @@ package com.dellosaneil.feature.ui.forecast
 import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -33,6 +34,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
@@ -51,7 +53,6 @@ import com.dellosaneil.feature.util.roundTwoDecimal
 import com.dellosaneil.feature.util.showAsPercentage
 import com.dellosaneil.feature.util.toCelcius
 import com.dellosaneil.feature.util.toDateString
-import com.skydoves.landscapist.glide.GlideImage
 
 private const val RADIUS = 12f
 private const val STROKE_WIDTH = 6f
@@ -220,14 +221,12 @@ private fun ShowMoreDetails(
                 color = Colors.White
             )
         )
-        GlideImage(
-            imageModel = {
-                details.weatherCondition.icon
-            },
-            previewPlaceholder = R.drawable.img_light_rain,
+        Image(
+            painter = painterResource(id = details.weatherCondition.icon),
             modifier = Modifier.size(
                 size = 36.dp
             ),
+            contentDescription = ""
         )
         Text(
             text = details.temperature2mMax.toCelcius,
@@ -240,12 +239,10 @@ private fun ShowMoreDetails(
             horizontalArrangement = Arrangement.spacedBy(space = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            GlideImage(
-                imageModel = {
-                    R.drawable.img_light_rain
-                },
-                previewPlaceholder = R.drawable.img_light_rain,
-                modifier = Modifier.size(size = 16.dp)
+            Image(
+                painter = painterResource(id = R.drawable.img_light_rain),
+                modifier = Modifier.size(size = 16.dp),
+                contentDescription = ""
             )
             Text(
                 text = details.precipitationProbabilityMax.toDouble().showAsPercentage,

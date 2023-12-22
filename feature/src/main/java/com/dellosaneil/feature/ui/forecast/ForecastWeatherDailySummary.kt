@@ -1,5 +1,6 @@
 package com.dellosaneil.feature.ui.forecast
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -17,7 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -27,8 +28,6 @@ import com.dellosaneil.feature.util.Colors
 import com.dellosaneil.feature.util.DatePattern
 import com.dellosaneil.feature.util.toCelcius
 import com.dellosaneil.feature.util.toDateString
-import com.skydoves.landscapist.ImageOptions
-import com.skydoves.landscapist.glide.GlideImage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,14 +66,10 @@ fun ForecastWeatherDailySummary(
                         verticalArrangement = Arrangement.spacedBy(space = 8.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        GlideImage(
-                            imageModel = {
-                                forecast.weatherCondition.icon
-                            },
+                        Image(
+                            painter = painterResource(id = forecast.weatherCondition.icon),
                             modifier = Modifier.size(size = 24.dp),
-                            imageOptions = ImageOptions(
-                                contentScale = ContentScale.Fit
-                            )
+                            contentDescription = ""
                         )
                         Text(
                             text = forecast.timeMillis.toDateString(pattern = DatePattern.DAY_DATE_MONTH),

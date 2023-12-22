@@ -2,6 +2,7 @@ package com.dellosaneil.feature.ui.forecast
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -18,6 +19,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,7 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -42,8 +44,6 @@ import com.dellosaneil.feature.util.Colors
 import com.dellosaneil.feature.util.DatePattern
 import com.dellosaneil.feature.util.toCelcius
 import com.dellosaneil.feature.util.toDateString
-import com.skydoves.landscapist.ImageOptions
-import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
 fun ForecastWeatherDaily(
@@ -69,7 +69,7 @@ fun ForecastWeatherDaily(
                 .padding(all = 16.dp),
         ) {
 
-            Row (verticalAlignment = Alignment.CenterVertically) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
 
             }
 
@@ -89,7 +89,7 @@ fun ForecastWeatherDaily(
                             label = "rotation"
                         )
 
-                        GlideImage(
+                        Icon(
                             modifier = Modifier
                                 .graphicsLayer {
                                     rotationX = rotation
@@ -104,23 +104,24 @@ fun ForecastWeatherDaily(
                                         }
                                 }
                                 .padding(all = 4.dp),
-                            imageModel = { R.drawable.ic_expand },
-                            previewPlaceholder = R.drawable.ic_expand
+                            painter = painterResource(id = R.drawable.ic_expand),
+                            contentDescription = "",
+                            tint = Colors.White
                         )
                         Text(
-                            text = forecast.timeMillis.toDateString(pattern  = DatePattern.DATE_MONTH),
+                            text = forecast.timeMillis.toDateString(pattern = DatePattern.DATE_MONTH),
                             style = MaterialTheme.typography.bodySmall.copy(
                                 color = Colors.White,
                                 fontWeight = FontWeight.Medium
                             ),
                             modifier = Modifier.weight(1f)
                         )
-                        GlideImage(
-                            imageModel = { forecast.weatherCondition.icon },
+                        Image(
+                            painter = painterResource(id = forecast.weatherCondition.icon),
                             modifier = Modifier
                                 .padding(end = 16.dp)
                                 .size(20.dp),
-                            previewPlaceholder = R.drawable.img_light_rain
+                            contentDescription = ""
                         )
                         Text(
                             text = forecast.temperature2mMax.toCelcius,
@@ -168,13 +169,10 @@ private fun DailyForecastPerHour(forecast: HourlyForecastHourly) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.padding(vertical = 16.dp)
             ) {
-                GlideImage(
-                    imageModel = { forecast.weatherCondition.icon },
+                Image(
+                    painter = painterResource(id = forecast.weatherCondition.icon),
                     modifier = Modifier.size(size = 36.dp),
-                    previewPlaceholder = R.drawable.img_wind,
-                    imageOptions = ImageOptions(
-                        contentScale = ContentScale.Fit
-                    )
+                    contentDescription = "",
                 )
                 Spacer(modifier = Modifier)
                 Text(

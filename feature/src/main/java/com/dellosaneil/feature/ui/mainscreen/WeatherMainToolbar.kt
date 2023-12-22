@@ -1,5 +1,6 @@
 package com.dellosaneil.feature.ui.mainscreen
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
@@ -14,12 +15,12 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.dellosaneil.feature.R
 import com.dellosaneil.feature.util.Colors
-import com.skydoves.landscapist.glide.GlideImage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,18 +42,16 @@ fun WeatherMainToolbar(
             containerColor = Colors.MidGray
         ),
         actions = {
-            GlideImage(
-                imageModel = {
-                    R.drawable.ic_search
-                },
-                previewPlaceholder = R.drawable.img_light_rain,
+            Image(
+                painter = painterResource(id = R.drawable.ic_search),
                 modifier = Modifier
                     .padding(all = 8.dp)
                     .clip(shape = CircleShape)
                     .size(size = 24.dp)
                     .clickable {
                         onSearch()
-                    }
+                    },
+                contentDescription = ""
             )
             Spacer(modifier = Modifier.width(16.dp))
         }

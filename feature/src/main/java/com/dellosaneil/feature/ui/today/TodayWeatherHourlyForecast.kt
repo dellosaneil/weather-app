@@ -2,6 +2,7 @@ package com.dellosaneil.feature.ui.today
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -28,7 +29,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
@@ -47,8 +48,6 @@ import com.dellosaneil.feature.util.Colors
 import com.dellosaneil.feature.util.DatePattern
 import com.dellosaneil.feature.util.toCelcius
 import com.dellosaneil.feature.util.toDateString
-import com.skydoves.landscapist.ImageOptions
-import com.skydoves.landscapist.glide.GlideImage
 
 private const val PLACE_HOLDER_SIZE = 24
 
@@ -70,7 +69,8 @@ fun TodayWeatherHourlyForecast(
             verticalArrangement = Arrangement.spacedBy(space = 8.dp)
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 HourlyWeatherForecast(
                     value = selectedChip.value.precipitationProbability.toString() + "%",
@@ -157,10 +157,10 @@ private fun HourlyTimeChips(
                         color = Colors.White
                     )
                 )
-                GlideImage(
-                    imageModel = { forecast.weatherCondition.icon },
-                    previewPlaceholder = R.drawable.img_sunny,
-                    modifier = Modifier.size(20.dp)
+                Image(
+                    painter = painterResource(id = forecast.weatherCondition.icon),
+                    modifier = Modifier.size(20.dp),
+                    contentDescription = ""
                 )
                 Text(
                     text = forecast.apparentTemperature.toCelcius,
@@ -216,12 +216,9 @@ private fun HourlyWeatherForecast(
                     placeholderVerticalAlign = PlaceholderVerticalAlign.TextCenter
                 )
             ) {
-                GlideImage(
-                    imageModel = { drawableRes },
-                    imageOptions = ImageOptions(
-                        contentScale = ContentScale.Fit
-                    ),
-                    previewPlaceholder = R.drawable.img_temperature
+                Image(
+                    painter = painterResource(id = drawableRes),
+                    contentDescription = ""
                 )
             }
         )
