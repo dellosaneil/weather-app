@@ -60,6 +60,7 @@ private fun Screen(
                     lowestTemp = viewState.selectedDay.temperature2mMin,
                     highestTemp = viewState.selectedDay.temperature2mMax,
                 )
+                ForecastWeatherPrecipitationGraph()
                 ForecastWeatherDaily(
                     modifier = Modifier.padding(horizontal = 16.dp),
                     dailyForecast = viewState.dailyForecast

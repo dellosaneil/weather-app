@@ -21,4 +21,5 @@
     <string name="hourly_temperature_projection_chart">Hourly Temperature Projection Chart</string>
     <string name="cloud_cover">Cloud Cover</string>
     <string name="wind_direction">Wind Direction</string>
+    <string name="hourly_precipitation_graph">Hourly Precipitation Graph</string>
 </resources>
