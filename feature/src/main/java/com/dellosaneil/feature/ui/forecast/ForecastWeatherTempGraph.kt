@@ -10,7 +10,6 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -33,6 +32,7 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -43,6 +43,7 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.dellosaneil.feature.R
 import com.dellosaneil.feature.model.hourlyforecast.HourlyForecastHourly
@@ -50,7 +51,6 @@ import com.dellosaneil.feature.ui.common.CommonBackground
 import com.dellosaneil.feature.util.Colors
 import com.dellosaneil.feature.util.DatePattern
 import com.dellosaneil.feature.util.roundTwoDecimal
-import com.dellosaneil.feature.util.showAsPercentage
 import com.dellosaneil.feature.util.toCelcius
 import com.dellosaneil.feature.util.toDateString
 
@@ -163,12 +163,16 @@ fun ForecastWeatherTempGraph(
             )
         }
         if (showMore.value) {
+            val size = remember { mutableStateOf(IntSize.Zero) }
             ShowMoreDetails(
                 modifier = Modifier
+                    .onGloballyPositioned {
+                        size.value = it.size
+                    }
                     .offset {
                         IntOffset(
-                            x = showMoreOffset.value.x.toInt() + (distancePerPoint.floatValue / 2f).toInt(),
-                            y = showMoreOffset.value.y.toInt() - 150
+                            x = showMoreOffset.value.x.toInt(),
+                            y = showMoreOffset.value.y.toInt() - size.value.height / 2
                         )
                     },
                 details = showMoreDetails.value!!
@@ -217,23 +221,6 @@ private fun ShowMoreDetails(
                 color = Colors.White
             )
         )
-        Row(
-            modifier = Modifier,
-            horizontalArrangement = Arrangement.spacedBy(space = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.img_light_rain),
-                modifier = Modifier.size(size = 16.dp),
-                contentDescription = ""
-            )
-            Text(
-                text = details.precipitationProbability.toDouble().showAsPercentage,
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    color = Colors.White
-                )
-            )
-        }
     }
 }
 
