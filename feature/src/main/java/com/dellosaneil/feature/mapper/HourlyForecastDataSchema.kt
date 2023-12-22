@@ -38,10 +38,15 @@ val HourlyForecastDataSchema.toData
         }
     )
 
+val List<HourlyForecastHourly>.today
+    get() = run {
+        subList(fromIndex = LocalTime.now().hour, toIndex = 24)
+    }
+
 val HourlyForecastData.today
     get() = run {
         val startIndex = LocalTime.now().hour
         copy(
-            hourly = hourly.subList(fromIndex = startIndex, toIndex = 25)
+            hourly = hourly.subList(fromIndex = startIndex, toIndex = 24)
         )
     }

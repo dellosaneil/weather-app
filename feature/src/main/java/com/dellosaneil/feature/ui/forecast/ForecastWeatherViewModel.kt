@@ -6,6 +6,7 @@ import com.dellosaneil.domain.network.usecase.GetHourlyForecast
 import com.dellosaneil.feature.base.BaseViewModel
 import com.dellosaneil.feature.di.IoDispatcher
 import com.dellosaneil.feature.mapper.toData
+import com.dellosaneil.feature.mapper.today
 import com.dellosaneil.feature.model.dailyforecast.DailyForecastDaily
 import com.dellosaneil.feature.util.Coordinates.LATITUDE
 import com.dellosaneil.feature.util.Coordinates.LONGITUDE
@@ -40,7 +41,13 @@ class ForecastWeatherViewModel @Inject constructor(
                 updateState { state ->
                     val forecast = daily.toData(hourlyForecastHourly = hourly.toData.hourly).daily
                     state.copy(
-                        dailyForecast = forecast,
+                        dailyForecast = forecast.mapIndexed { index, item ->
+                            if (index == 0) {
+                                item.copy(hourlyForecast = item.hourlyForecast.today)
+                            } else {
+                                item
+                            }
+                        },
                         selectedDay = forecast.first()
                     )
                 }

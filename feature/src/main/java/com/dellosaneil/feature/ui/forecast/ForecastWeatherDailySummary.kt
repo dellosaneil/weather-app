@@ -72,7 +72,7 @@ fun ForecastWeatherDailySummary(
                             contentDescription = ""
                         )
                         Text(
-                            text = forecast.timeMillis.toDateString(pattern = DatePattern.DAY_DATE_MONTH),
+                            text = forecast.timeMillis.toDateString(pattern = DatePattern.DATE_MONTH),
                             style = MaterialTheme.typography.bodyMedium.copy(
                                 color = Colors.Manatee
                             )

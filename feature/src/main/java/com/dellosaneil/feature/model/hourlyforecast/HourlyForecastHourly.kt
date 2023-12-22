@@ -27,7 +27,7 @@ data class HourlyForecastHourly(
             cloudCover = 32,
             surfacePressure = 22.3,
             windSpeed10m = 32.2,
-            windDirection10m = 33,
+            windDirection10m = 33
         )
     }
 }

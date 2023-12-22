@@ -184,7 +184,7 @@ private fun DailyForecastPerHour(forecast: HourlyForecastHourly) {
                     )
                 )
                 Text(
-                    text = forecast.timeMillis.toDateString(pattern = DatePattern.DAY),
+                    text = forecast.timeMillis.toDateString(pattern = DatePattern.HOUR_MINUTES_MERIDIEM),
                     style = MaterialTheme.typography.bodyMedium.copy(
                         color = Colors.White,
                         fontSize = 12.sp

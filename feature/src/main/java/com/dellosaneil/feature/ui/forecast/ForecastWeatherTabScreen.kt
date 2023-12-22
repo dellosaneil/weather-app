@@ -45,9 +45,7 @@ private fun Screen(
             }
 
             viewState.selectedDay != null -> {
-
                 val showMore = remember { mutableStateOf(false) }
-
                 ForecastWeatherDailySummary(
                     modifier = Modifier.padding(top = 8.dp),
                     dailyForecast = viewState.dailyForecast,
@@ -57,8 +55,10 @@ private fun Screen(
                     showMore.value = false
                 }
                 ForecastWeatherTempGraph(
-                    forecast = listOf(viewState.selectedDay),
-                    showMore = showMore
+                    forecast = viewState.selectedDay.hourlyForecast,
+                    showMore = showMore,
+                    lowestTemp = viewState.selectedDay.temperature2mMin,
+                    highestTemp = viewState.selectedDay.temperature2mMax,
                 )
                 ForecastWeatherDaily(
                     modifier = Modifier.padding(horizontal = 16.dp),

@@ -18,7 +18,7 @@
     <string name="more_details">More Details</string>
     <string name="today">Today</string>
     <string name="forecast">Forecast</string>
-    <string name="_3_hourly_temperature_projection_chart">3-Hourly Temperature Projection Chart</string>
+    <string name="hourly_temperature_projection_chart">Hourly Temperature Projection Chart</string>
     <string name="cloud_cover">Cloud Cover</string>
     <string name="wind_direction">Wind Direction</string>
 </resources>
