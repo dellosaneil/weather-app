@@ -40,6 +40,10 @@ class ForecastWeatherViewModel @Inject constructor(
             try {
                 updateState { state ->
                     val forecast = daily.toData(hourlyForecastHourly = hourly.toData.hourly).daily
+                    val firstForecast = forecast.first()
+                        .copy(
+                            hourlyForecast = forecast.first().hourlyForecast.today
+                        )
                     state.copy(
                         dailyForecast = forecast.mapIndexed { index, item ->
                             if (index == 0) {
@@ -48,7 +52,7 @@ class ForecastWeatherViewModel @Inject constructor(
                                 item
                             }
                         },
-                        selectedDay = forecast.first()
+                        selectedDay = firstForecast
                     )
                 }
 

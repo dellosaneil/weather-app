@@ -250,7 +250,7 @@ private fun plotPoints(
     var previousOffset = Offset.Zero
     temperatures.forEachIndexed { index, temp ->
 
-        val xOffset = (widthPerTimeStamp * index) + 50f
+        val xOffset = (widthPerTimeStamp * index) + 25f
 
         val yOffset = calculateTempYOffset(
             maxTemp = maxTemp,
