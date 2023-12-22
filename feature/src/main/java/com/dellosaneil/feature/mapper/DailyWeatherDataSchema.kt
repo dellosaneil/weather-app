@@ -6,6 +6,7 @@ import com.dellosaneil.feature.model.dailyforecast.DailyForecastDaily
 import com.dellosaneil.feature.model.dailyforecast.DailyForecastData
 import com.dellosaneil.feature.model.hourlyforecast.HourlyForecastHourly
 import com.dellosaneil.feature.util.DatePattern
+import com.dellosaneil.feature.util.epochToMillis
 import com.dellosaneil.feature.util.toDateString
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
@@ -16,15 +17,15 @@ fun DailyForecastDataSchema.toData(
     daily = daily.run {
         val daily = mutableListOf<DailyForecastDaily>()
         repeat(daylightDuration.size) { index ->
-            val millis = time[index] * 1000L
+            val millis = time[index].epochToMillis
             DailyForecastDaily(
                 daylightDuration = daylightDuration[index].seconds.toString(DurationUnit.HOURS),
                 precipitationProbabilityMax = precipitationProbabilityMax[index],
-                sunrise = (sunrise[index] * 1000L).toDateString(pattern = DatePattern.HOUR_MINUTES_MERIDIEM),
-                sunset = (sunset[index] * 1000L).toDateString(pattern = DatePattern.HOUR_MINUTES_MERIDIEM),
+                sunrise = sunrise[index].epochToMillis.toDateString(pattern = DatePattern.HOUR_MINUTES_MERIDIEM),
+                sunset = sunset[index].epochToMillis.toDateString(pattern = DatePattern.HOUR_MINUTES_MERIDIEM),
                 temperature2mMax = temperature2mMax[index],
                 temperature2mMin = temperature2mMin[index],
-                timeMillis = time[index] * 1000L,
+                timeMillis = time[index].epochToMillis,
                 weatherCondition = run {
                     val hour = millis.toDateString(pattern = DatePattern.HOURS).toInt()
                     val isDay = hour in 6..18

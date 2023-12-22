@@ -5,6 +5,7 @@ import com.dellosaneil.feature.model.currentweather.WeatherCondition
 import com.dellosaneil.feature.model.hourlyforecast.HourlyForecastData
 import com.dellosaneil.feature.model.hourlyforecast.HourlyForecastHourly
 import com.dellosaneil.feature.util.DatePattern
+import com.dellosaneil.feature.util.epochToMillis
 import com.dellosaneil.feature.util.toDateString
 import java.time.LocalTime
 
@@ -16,10 +17,10 @@ val HourlyForecastDataSchema.toData
                 HourlyForecastHourly(
                     precipitationProbability = precipitationProbability[index],
                     temperature2m = temperature2m[index],
-                    timeMillis = time[index] * 1000L,
+                    timeMillis = time[index].epochToMillis,
                     weatherCondition = run {
                         val hour =
-                            (time[index] * 1000L).toDateString(pattern = DatePattern.HOURS).toInt()
+                            time[index].epochToMillis.toDateString(pattern = DatePattern.HOURS).toInt()
                         val isDay = hour in 6..18
                         WeatherCondition.toWeatherCondition(id = weatherCode[index], isDay = isDay)
                     },

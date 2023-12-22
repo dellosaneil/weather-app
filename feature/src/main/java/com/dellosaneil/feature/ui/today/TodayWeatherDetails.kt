@@ -29,7 +29,7 @@ import com.dellosaneil.feature.model.hourlyforecast.HourlyForecastHourly
 import com.dellosaneil.feature.ui.common.CommonBackground
 import com.dellosaneil.feature.util.Colors
 import com.dellosaneil.feature.util.metersToKm
-import com.dellosaneil.feature.util.toCelcius
+import com.dellosaneil.feature.util.toPercentage
 
 @Composable
 fun TodayWeatherDetails(
@@ -82,13 +82,13 @@ fun TodayWeatherDetails(
                     verticalArrangement = Arrangement.spacedBy(space = 16.dp)
                 ) {
                     Details(
-                        label = stringResource(id = R.string.feels_like),
-                        value = selectedHour.apparentTemperature.toCelcius
+                        label = stringResource(id = R.string.cloud_cover),
+                        value = selectedHour.cloudCover.toPercentage
                     )
 
                     Details(
-                        label = stringResource(id = R.string.humidity),
-                        value = "${selectedHour.relativeHumidity2m}%"
+                        label = stringResource(id = R.string.wind_direction),
+                        value = "${selectedHour.windDirection10m}°"
                     )
                     Details(
                         label = stringResource(R.string.visibility),

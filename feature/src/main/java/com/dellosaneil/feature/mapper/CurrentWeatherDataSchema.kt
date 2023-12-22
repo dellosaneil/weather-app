@@ -4,6 +4,7 @@ import com.dellosaneil.domain.network.schema.current.CurrentWeatherDataSchema
 import com.dellosaneil.feature.model.currentweather.CurrentWeatherCurrent
 import com.dellosaneil.feature.model.currentweather.CurrentWeatherData
 import com.dellosaneil.feature.model.currentweather.WeatherCondition
+import com.dellosaneil.feature.util.epochToMillis
 
 val CurrentWeatherDataSchema.toData
     get() = CurrentWeatherData(
@@ -13,7 +14,7 @@ val CurrentWeatherDataSchema.toData
                 isDay = isDay == 1,
                 precipitation = precipitation,
                 temperature2m = temperature2m,
-                time = time * 1000L,
+                time = time.epochToMillis,
                 windDirection10m = windDirection10m,
                 windSpeed10m = windSpeed10m,
                 cloudCover = cloudCover,
@@ -23,7 +24,6 @@ val CurrentWeatherDataSchema.toData
                     id = weatherCode,
                     isDay = isDay == 1
                 )
-
             )
         }
     )

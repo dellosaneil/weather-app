@@ -5,3 +5,6 @@ val Int.epochToMillis
 
 val Int.metersToKm
     get() = this / 1000
+
+val Int.toPercentage
+    get() = "$this%"
