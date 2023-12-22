@@ -3,6 +3,7 @@ package com.dellosaneil.feature.ui.forecast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -12,11 +13,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextMeasurer
@@ -33,8 +38,9 @@ import com.dellosaneil.feature.util.roundTwoDecimal
 import com.dellosaneil.feature.util.toPercentage
 
 private const val Y_AXIS_STEP_COUNT = 11
-private const val Y_AXIS_LABEL_STROKE_WIDTH = 3f
-private const val Y_AXIS_QUANTITY_LABEL_WIDTH = 150f
+private const val Y_AXIS_INDICATOR_STROKE_WIDTH = 3f
+private const val QUANTITY_BAR_WIDTH = 150f
+private const val CIRCLE_RADIUS = 8f
 
 @Composable
 fun ForecastWeatherPrecipitationGraph() {
@@ -52,6 +58,9 @@ fun ForecastWeatherPrecipitationGraph() {
             x = 0f
         )
     }
+
+    val xOffset = remember { mutableFloatStateOf(0f) }
+
 
     Row(
         modifier = Modifier
@@ -84,7 +93,6 @@ fun ForecastWeatherPrecipitationGraph() {
                 probabilityAxisSize = probabilityAxisSize
             )
         }
-
         Canvas(
             modifier = Modifier
                 .padding(
@@ -93,6 +101,12 @@ fun ForecastWeatherPrecipitationGraph() {
                 )
                 .weight(1f)
                 .height(250.dp)
+                .pointerInput(Unit) {
+                    detectHorizontalDragGestures { _, dragAmount ->
+                        xOffset.floatValue += dragAmount
+                    }
+                }
+                .clipToBounds(),
         ) {
             drawText(
                 text = graphLabel,
@@ -103,9 +117,13 @@ fun ForecastWeatherPrecipitationGraph() {
                 )
             )
             drawYAxisIndicator(
-                scope = this,
-                textHeight = probabilityAxisSize.value.height.toPx()
+                scope = this
             )
+            translate(left = xOffset.floatValue, top = 0f) {
+                plotProbabilityPoints(
+                    scope = this
+                )
+            }
         }
 
         Canvas(
@@ -113,8 +131,8 @@ fun ForecastWeatherPrecipitationGraph() {
                 .padding(
                     bottom = 24.dp,
                     top = 56.dp,
-                    end = 16.dp,
-                    start = 4.dp
+                    start = 4.dp,
+                    end = 16.dp
                 )
                 .height(250.dp)
                 .width(width = quantityAxisSize.value.width)
@@ -129,14 +147,34 @@ fun ForecastWeatherPrecipitationGraph() {
     }
 }
 
+private fun plotProbabilityPoints(
+    scope: DrawScope
+) {
+    val percentages = listOf(
+        0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100
+    )
+    with(scope) {
+        percentages.forEachIndexed { index, percentage ->
+            drawCircle(
+                color = Colors.RoyalBlue,
+                radius = CIRCLE_RADIUS,
+                center = Offset(
+                    x = (QUANTITY_BAR_WIDTH * index),
+                    y = size.height - (size.height / 100f * percentage)
+                )
+            )
+        }
+    }
+}
+
 private fun drawPrecipitationQuantityYAxis(
     scope: DrawScope,
     textMeasurer: TextMeasurer,
     textStyle: TextStyle,
     quantityAxisSize: MutableState<DpSize>
 ) {
-    val lowestMeasurement = 3.0
-    val highestMeasurement = 11.0
+    val lowestMeasurement = 0.0
+    val highestMeasurement = 9.0
     val step = (highestMeasurement - lowestMeasurement) / Y_AXIS_STEP_COUNT.dec()
 
     val measurements =
@@ -153,8 +191,8 @@ private fun drawPrecipitationQuantityYAxis(
             drawText(
                 textLayoutResult = measuredText,
                 topLeft = Offset(
-                    y = (size.height / (Y_AXIS_STEP_COUNT)) * index,
-                    x = size.width - Y_AXIS_QUANTITY_LABEL_WIDTH
+                    y = (size.height * index / 10f) - measuredText.size.height / 2f,
+                    x = 0f
                 )
             )
             if (quantityAxisSize.value.width.toPx() < measuredText.size.width) {
@@ -169,22 +207,21 @@ private fun drawPrecipitationQuantityYAxis(
 
 private fun drawYAxisIndicator(
     scope: DrawScope,
-    textHeight: Float,
 ) {
     with(scope) {
         repeat(Y_AXIS_STEP_COUNT) {
+            val yOffset = size.height * it / 10f
             drawLine(
                 color = Colors.Abbey,
                 start = Offset(
                     x = 0f,
-                    y = (size.height / Y_AXIS_STEP_COUNT * it) + (textHeight / 2f)
+                    y = yOffset
                 ),
                 end = Offset(
                     x = size.width,
-                    y = (size.height / Y_AXIS_STEP_COUNT * it) + (textHeight / 2f)
+                    y = yOffset
                 ),
-                strokeWidth = Y_AXIS_LABEL_STROKE_WIDTH
-
+                strokeWidth = Y_AXIS_INDICATOR_STROKE_WIDTH
             )
         }
     }
@@ -207,7 +244,10 @@ private fun drawPrecipitationProbabilityYAxis(
             )
             drawText(
                 textLayoutResult = measuredText,
-                topLeft = Offset(y = (size.height / Y_AXIS_STEP_COUNT) * index, x = 0f),
+                topLeft = Offset(
+                    y = (size.height * index / 10f) - measuredText.size.height / 2f,
+                    x = 0f
+                ),
             )
             if (probabilityAxisSize.value.width.toPx() < measuredText.size.width) {
                 probabilityAxisSize.value = DpSize(
@@ -221,7 +261,7 @@ private fun drawPrecipitationProbabilityYAxis(
 
 @Preview(showBackground = true, device = "id:pixel_2")
 @Composable
-private fun Preview() {
+private fun ForecastWeatherPrecipitationGraphPreview() {
     CommonBackground {
         ForecastWeatherPrecipitationGraph()
     }
