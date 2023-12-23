@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.input.pointer.pointerInput
@@ -41,6 +42,7 @@ private const val Y_AXIS_STEP_COUNT = 11
 private const val Y_AXIS_INDICATOR_STROKE_WIDTH = 3f
 private const val QUANTITY_BAR_WIDTH = 150f
 private const val CIRCLE_RADIUS = 8f
+private const val PROBABILITY_STROKE_WIDTH = 6f
 
 @Composable
 fun ForecastWeatherPrecipitationGraph() {
@@ -61,7 +63,7 @@ fun ForecastWeatherPrecipitationGraph() {
 
     val xOffset = remember { mutableFloatStateOf(0f) }
     val lastPointPosition = remember { mutableFloatStateOf(0f) }
-    
+
     Row(
         modifier = Modifier
             .padding(
@@ -124,12 +126,24 @@ fun ForecastWeatherPrecipitationGraph() {
                 scope = this
             )
             translate(left = xOffset.floatValue, top = 0f) {
+                plotQuantityBar(
+                    scope = this
+                )
+
                 plotProbabilityPoints(
                     scope = this
                 ) {
                     lastPointPosition.floatValue = it
                 }
             }
+            drawText(
+                text = graphLabel,
+                textMeasurer = textMeasurer,
+                topLeft = graphLabelOffset,
+                style = textStyle.copy(
+                    color = Colors.White
+                )
+            )
         }
 
         Canvas(
@@ -153,27 +167,64 @@ fun ForecastWeatherPrecipitationGraph() {
     }
 }
 
+fun plotQuantityBar(scope: DrawScope) {
+    val quantity = listOf(0.5, 0.9, 1.8, 2.7, 3.6, 4.5, 5.4, 6.3, 7.2, 8.1, 9.0)
+    val lowest = 0.0
+    val highest = 9.0
+    with(scope) {
+        quantity.forEachIndexed { index, item ->
+            val height = (size.height * (item / (highest - lowest))).toFloat()
+            drawRect(
+                color = Colors.StormGray,
+                size = Size(
+                    width = QUANTITY_BAR_WIDTH,
+                    height = height
+                ),
+                topLeft = Offset(
+                    x = (QUANTITY_BAR_WIDTH * index),
+                    y = size.height - height
+                )
+            )
+        }
+    }
+}
+
 private fun plotProbabilityPoints(
     scope: DrawScope,
     lastPointPosition: (Float) -> Unit
 ) {
+    var previousOffset = Offset.Zero
     val percentages = listOf(
         0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100
     )
     with(scope) {
         percentages.forEachIndexed { index, percentage ->
             val xOffset = (QUANTITY_BAR_WIDTH * index) + (QUANTITY_BAR_WIDTH / 2f)
+            val yOffset = size.height - (size.height / 100f * percentage)
+            val currentOffset = Offset(
+                x = xOffset,
+                y = yOffset
+            )
             drawCircle(
                 color = Colors.RoyalBlue,
                 radius = CIRCLE_RADIUS,
-                center = Offset(
-                    x = xOffset,
-                    y = size.height - (size.height / 100f * percentage)
-                )
+                center = currentOffset
             )
             if (index == percentages.size - 1) {
                 lastPointPosition(xOffset)
             }
+            if (index > 0) {
+                drawLine(
+                    color = Colors.RoyalBlue,
+                    start = previousOffset,
+                    end = currentOffset,
+                    strokeWidth = PROBABILITY_STROKE_WIDTH
+                )
+            }
+            previousOffset = Offset(
+                x = xOffset,
+                y = yOffset
+            )
         }
     }
 }
@@ -250,7 +301,7 @@ private fun drawPrecipitationProbabilityYAxis(
             val measuredText = textMeasurer.measure(
                 text = percentage.toPercentage,
                 style = textStyle.copy(
-                    color = Colors.StormGray
+                    color = Colors.RoyalBlue
                 )
             )
             drawText(
