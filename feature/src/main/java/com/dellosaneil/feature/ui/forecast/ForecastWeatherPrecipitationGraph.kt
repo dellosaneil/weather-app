@@ -39,9 +39,12 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.dellosaneil.feature.R
 import com.dellosaneil.feature.model.dailyforecast.DailyForecastDaily
+import com.dellosaneil.feature.model.hourlyforecast.HourlyForecastHourly
 import com.dellosaneil.feature.ui.common.CommonBackground
 import com.dellosaneil.feature.util.Colors
+import com.dellosaneil.feature.util.DatePattern
 import com.dellosaneil.feature.util.roundTwoDecimal
+import com.dellosaneil.feature.util.toDateString
 import com.dellosaneil.feature.util.toPercentage
 
 private const val Y_AXIS_STEP_COUNT = 11
@@ -91,8 +94,10 @@ fun ForecastWeatherPrecipitationGraph(
             xOffset = xOffset,
             forecast = forecast,
             textMeasurer = textMeasurer,
-            density = density
+            density = density,
+            textStyle = textStyle
         )
+
         YAxisQuantityCanvas(
             axisSize = rightYAxisSize,
             textStyle = textStyle,
@@ -110,7 +115,8 @@ private fun PrecipitationPointsCanvas(
     xOffset: MutableFloatState,
     forecast: DailyForecastDaily,
     textMeasurer: TextMeasurer,
-    density: Density
+    density: Density,
+    textStyle: TextStyle
 ) {
     val labelOffset = density.run {
         Offset(
@@ -121,7 +127,7 @@ private fun PrecipitationPointsCanvas(
     with(rowScope) {
         val measuredText = textMeasurer.measure(
             text = stringResource(id = R.string.hourly_precipitation_graph),
-            style = MaterialTheme.typography.bodyMedium.copy(
+            style = textStyle.copy(
                 color = Colors.White
             ),
         )
@@ -132,9 +138,15 @@ private fun PrecipitationPointsCanvas(
                         textLayoutResult = measuredText,
                         topLeft = labelOffset
                     )
+                    xAxisLabels(
+                        scope = this,
+                        forecasts = forecast.hourlyForecast,
+                        textMeasurer = textMeasurer,
+                        textStyle = textStyle
+                    )
                 }
                 .padding(
-                    bottom = 24.dp,
+                    bottom = 36.dp,
                     top = 56.dp
                 )
                 .weight(1f)
@@ -167,7 +179,34 @@ private fun PrecipitationPointsCanvas(
                 ) {
                     offsetEdge.floatValue = it
                 }
+
+
             }
+        }
+    }
+}
+
+fun xAxisLabels(
+    scope: DrawScope,
+    forecasts: List<HourlyForecastHourly>,
+    textMeasurer: TextMeasurer,
+    textStyle: TextStyle
+) {
+    with(scope) {
+        forecasts.forEachIndexed { index, forecast ->
+            val measuredText = textMeasurer.measure(
+                text = forecast.timeMillis.toDateString(pattern = DatePattern.HOUR_MINUTES_MERIDIEM),
+                style = textStyle.copy(
+                    color = Colors.White
+                )
+            )
+            drawText(
+                textLayoutResult = measuredText,
+                topLeft = Offset(
+                    y = size.height - measuredText.size.height * 1.5f,
+                    x = (QUANTITY_BAR_WIDTH / 2) + (index * QUANTITY_BAR_WIDTH) - measuredText.size.width / 2
+                )
+            )
         }
     }
 }
