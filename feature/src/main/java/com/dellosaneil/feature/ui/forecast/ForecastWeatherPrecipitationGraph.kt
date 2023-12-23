@@ -5,6 +5,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableFloatState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -28,6 +30,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.dellosaneil.feature.model.dailyforecast.DailyForecastDaily
@@ -41,6 +44,7 @@ private const val Y_AXIS_INDICATOR_STROKE_WIDTH = 3f
 private const val QUANTITY_BAR_WIDTH = 150f
 private const val CIRCLE_RADIUS = 8f
 private const val PROBABILITY_STROKE_WIDTH = 6f
+private const val GRAPH_HEIGHT = 250
 
 @Composable
 fun ForecastWeatherPrecipitationGraph(
@@ -69,23 +73,36 @@ fun ForecastWeatherPrecipitationGraph(
                 shape = RoundedCornerShape(size = 16.dp)
             )
     ) {
-        Canvas(
-            modifier = Modifier
-                .padding(
-                    start = 16.dp,
-                    bottom = 24.dp,
-                    top = 56.dp
-                )
-                .height(250.dp)
-                .width(probabilityAxisSize.value.width)
-        ) {
-            drawPrecipitationProbabilityYAxis(
-                scope = this,
-                textMeasurer = textMeasurer,
-                textStyle = textStyle,
-                probabilityAxisSize = probabilityAxisSize
-            )
-        }
+        YAxisPercentageCanvas(
+            width = probabilityAxisSize.value.width,
+            textMeasurer = textMeasurer,
+            textStyle = textStyle,
+            axisSize = probabilityAxisSize
+        )
+        PrecipitationPointsCanvas(
+            rowScope = this,
+            lastPointPosition = lastPointPosition,
+            xOffset = xOffset,
+            forecast = forecast
+        )
+        YAxisQuantityCanvas(
+            axisSize = quantityAxisSize,
+            textStyle = textStyle,
+            textMeasurer = textMeasurer,
+            minQuantity = forecast.minPrecipitationQuantity,
+            maxQuantity = forecast.maxPrecipitationQuantity
+        )
+    }
+}
+
+@Composable
+private fun PrecipitationPointsCanvas(
+    rowScope: RowScope,
+    lastPointPosition: MutableFloatState,
+    xOffset: MutableFloatState,
+    forecast: DailyForecastDaily
+) {
+    with(rowScope) {
         Canvas(
             modifier = Modifier
                 .padding(
@@ -93,7 +110,7 @@ fun ForecastWeatherPrecipitationGraph(
                     top = 56.dp
                 )
                 .weight(1f)
-                .height(250.dp)
+                .height(GRAPH_HEIGHT.dp)
                 .pointerInput(key1 = lastPointPosition.floatValue) {
                     detectHorizontalDragGestures { _, dragAmount ->
                         val newOffset = xOffset.floatValue + dragAmount
@@ -105,7 +122,6 @@ fun ForecastWeatherPrecipitationGraph(
                 }
                 .clipToBounds(),
         ) {
-
             drawYAxisIndicator(
                 scope = this
             )
@@ -125,31 +141,66 @@ fun ForecastWeatherPrecipitationGraph(
                 }
             }
         }
-
-        Canvas(
-            modifier = Modifier
-                .padding(
-                    bottom = 24.dp,
-                    top = 56.dp,
-                    start = 4.dp,
-                    end = 16.dp
-                )
-                .height(250.dp)
-                .width(width = quantityAxisSize.value.width)
-        ) {
-            drawPrecipitationQuantityYAxis(
-                scope = this,
-                textMeasurer = textMeasurer,
-                textStyle = textStyle,
-                quantityAxisSize = quantityAxisSize,
-                lowestQuantity = forecast.minPrecipitationQuantity,
-                highestQuantity = forecast.maxPrecipitationQuantity
-            )
-        }
     }
 }
 
-fun plotQuantityBar(
+@Composable
+private fun YAxisQuantityCanvas(
+    axisSize: MutableState<DpSize>,
+    textStyle: TextStyle,
+    textMeasurer: TextMeasurer,
+    minQuantity: Double,
+    maxQuantity: Double
+) {
+    Canvas(
+        modifier = Modifier
+            .padding(
+                bottom = 24.dp,
+                top = 56.dp,
+                start = 4.dp,
+                end = 16.dp
+            )
+            .height(GRAPH_HEIGHT.dp)
+            .width(width = axisSize.value.width)
+    ) {
+        drawPrecipitationQuantityYAxis(
+            scope = this,
+            textMeasurer = textMeasurer,
+            textStyle = textStyle,
+            quantityAxisSize = axisSize,
+            lowestQuantity = minQuantity,
+            highestQuantity = maxQuantity
+        )
+    }
+}
+
+@Composable
+private fun YAxisPercentageCanvas(
+    width: Dp,
+    textMeasurer: TextMeasurer,
+    textStyle: TextStyle,
+    axisSize: MutableState<DpSize>,
+) {
+    Canvas(
+        modifier = Modifier
+            .padding(
+                start = 16.dp,
+                bottom = 24.dp,
+                top = 56.dp
+            )
+            .height(GRAPH_HEIGHT.dp)
+            .width(width = width)
+    ) {
+        drawPrecipitationProbabilityYAxis(
+            scope = this,
+            textMeasurer = textMeasurer,
+            textStyle = textStyle,
+            probabilityAxisSize = axisSize
+        )
+    }
+}
+
+private fun plotQuantityBar(
     scope: DrawScope,
     quantity: List<Double>,
     lowestQuantity: Double,
