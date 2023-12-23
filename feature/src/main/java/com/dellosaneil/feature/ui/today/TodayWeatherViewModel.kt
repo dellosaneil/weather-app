@@ -68,8 +68,7 @@ class TodayWeatherViewModel @Inject constructor(
 
     private fun fetchDailyForecast(latitude: String, longitude: String) {
         viewModelScope.launch(context = dispatcher) {
-            val hourly = getHourlyForecast(latitude = latitude, longitude = longitude)
-                .getOrNull() ?: return@launch
+            val hourly = getHourlyForecast(latitude = latitude, longitude = longitude).getOrNull() ?: return@launch
             getDailyForecast(latitude = latitude, longitude = longitude).fold(
                 onSuccess = { schema ->
                     updateState { state ->
@@ -82,7 +81,6 @@ class TodayWeatherViewModel @Inject constructor(
                     }
                 },
                 onFailure = {
-                    it.printStackTrace()
                     updateState { state ->
                         state.copy(
                             throwable = it

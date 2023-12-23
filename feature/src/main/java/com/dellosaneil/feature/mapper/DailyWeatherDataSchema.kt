@@ -37,8 +37,8 @@ fun DailyForecastDataSchema.toData(
                     WeatherCondition.toWeatherCondition(id = weatherCode[index], isDay = isDay)
                 },
                 hourlyForecast = filteredHourlyForecast,
-                minPrecipitationQuantity = filteredHourlyForecast.minOf { it.precipitation },
-                maxPrecipitationQuantity = filteredHourlyForecast.maxOf { it.precipitation },
+                minPrecipitationQuantity = filteredHourlyForecast.minOfOrNull { it.precipitation } ?: 0.0,
+                maxPrecipitationQuantity = filteredHourlyForecast.maxOfOrNull { it.precipitation } ?: 0.0,
             ).also {
                 daily.add(it)
             }

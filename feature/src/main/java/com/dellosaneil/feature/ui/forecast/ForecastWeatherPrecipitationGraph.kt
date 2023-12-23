@@ -49,7 +49,7 @@ import com.dellosaneil.feature.util.toPercentage
 
 private const val Y_AXIS_STEP_COUNT = 11
 private const val Y_AXIS_INDICATOR_STROKE_WIDTH = 3f
-private const val QUANTITY_BAR_WIDTH = 150f
+private const val QUANTITY_BAR_WIDTH = 250f
 private const val CIRCLE_RADIUS = 8f
 private const val PROBABILITY_STROKE_WIDTH = 6f
 private const val GRAPH_HEIGHT = 250
@@ -133,17 +133,20 @@ private fun PrecipitationPointsCanvas(
         )
         Canvas(
             modifier = Modifier
+                .clipToBounds()
                 .drawBehind {
                     drawText(
                         textLayoutResult = measuredText,
                         topLeft = labelOffset
                     )
-                    xAxisLabels(
-                        scope = this,
-                        forecasts = forecast.hourlyForecast,
-                        textMeasurer = textMeasurer,
-                        textStyle = textStyle
-                    )
+                    translate(left = xOffset.floatValue, top = 0f) {
+                        xAxisLabels(
+                            scope = this@drawBehind,
+                            forecasts = forecast.hourlyForecast,
+                            textMeasurer = textMeasurer,
+                            textStyle = textStyle
+                        )
+                    }
                 }
                 .padding(
                     bottom = 36.dp,
@@ -179,8 +182,6 @@ private fun PrecipitationPointsCanvas(
                 ) {
                     offsetEdge.floatValue = it
                 }
-
-
             }
         }
     }
@@ -203,7 +204,7 @@ fun xAxisLabels(
             drawText(
                 textLayoutResult = measuredText,
                 topLeft = Offset(
-                    y = size.height - measuredText.size.height * 1.5f,
+                    y = size.height - measuredText.size.height,
                     x = (QUANTITY_BAR_WIDTH / 2) + (index * QUANTITY_BAR_WIDTH) - measuredText.size.width / 2
                 )
             )
@@ -426,7 +427,9 @@ private fun drawPrecipitationProbabilityYAxis(
 private fun ForecastWeatherPrecipitationGraphPreview() {
     CommonBackground {
         ForecastWeatherPrecipitationGraph(
-            forecast = DailyForecastDaily.dummyData()
+            forecast = DailyForecastDaily.dummyData().copy(
+                hourlyForecast = DailyForecastDaily.dummyData().hourlyForecast + DailyForecastDaily.dummyData().hourlyForecast
+            )
         )
     }
 }
