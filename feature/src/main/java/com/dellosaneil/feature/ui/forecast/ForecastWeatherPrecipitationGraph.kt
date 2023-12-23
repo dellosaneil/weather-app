@@ -3,9 +3,10 @@ package com.dellosaneil.feature.ui.forecast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
-import androidx.compose.foundation.gestures.rememberTransformableState
-import androidx.compose.foundation.gestures.transformable
+import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -75,10 +76,6 @@ fun ForecastWeatherPrecipitationGraph(
 
     val barWidth = remember { mutableFloatStateOf(QUANTITY_BAR_WIDTH) }
 
-    val transformableState = rememberTransformableState { zoom, _, _ ->
-        scale.floatValue = (scale.floatValue * zoom).coerceIn(1f, 5f)
-        barWidth.floatValue = QUANTITY_BAR_WIDTH / scale.floatValue
-    }
 
     Row(
         modifier = Modifier
@@ -92,7 +89,7 @@ fun ForecastWeatherPrecipitationGraph(
                     color = Colors.DarkGray,
                 ),
                 shape = RoundedCornerShape(size = 16.dp)
-            ).transformable(state = transformableState)
+            )
     ) {
         YAxisPercentageCanvas(
             width = leftYAxisSize.value.width,
@@ -178,6 +175,18 @@ private fun PrecipitationPointsCanvas(
                         val totalOffset = (newOffset * -1) + size.width
                         if (newOffset < 0 && (offsetEdge.floatValue + barWidth.floatValue / 2f) > totalOffset) {
                             xOffset.floatValue += dragAmount
+                        }
+                    }
+                }
+                .pointerInput(key1 = Unit) {
+                    forEachGesture {
+                        awaitPointerEventScope {
+                            awaitFirstDown()
+                            do {
+                                val event = awaitPointerEvent()
+                                scale.floatValue = (scale.floatValue * event.calculateZoom()).coerceIn(1f, 5f)
+                                barWidth.floatValue = QUANTITY_BAR_WIDTH / scale.floatValue
+                            } while (event.changes.any { it.pressed })
                         }
                     }
                 }
