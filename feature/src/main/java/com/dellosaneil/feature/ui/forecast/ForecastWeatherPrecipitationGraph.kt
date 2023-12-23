@@ -4,6 +4,8 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.rememberTransformableState
+import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -68,6 +70,16 @@ fun ForecastWeatherPrecipitationGraph(
     val xOffset = remember(key1 = forecast) { mutableFloatStateOf(0f) }
     val offsetEdge = remember { mutableFloatStateOf(0f) }
 
+
+    val scale = remember { mutableFloatStateOf(1f) }
+
+    val barWidth = remember { mutableFloatStateOf(QUANTITY_BAR_WIDTH) }
+
+    val transformableState = rememberTransformableState { zoom, _, _ ->
+        scale.floatValue = (scale.floatValue * zoom).coerceIn(1f, 5f)
+        barWidth.floatValue = QUANTITY_BAR_WIDTH / scale.floatValue
+    }
+
     Row(
         modifier = Modifier
             .padding(
@@ -80,7 +92,7 @@ fun ForecastWeatherPrecipitationGraph(
                     color = Colors.DarkGray,
                 ),
                 shape = RoundedCornerShape(size = 16.dp)
-            )
+            ).transformable(state = transformableState)
     ) {
         YAxisPercentageCanvas(
             width = leftYAxisSize.value.width,
@@ -95,7 +107,9 @@ fun ForecastWeatherPrecipitationGraph(
             forecast = forecast,
             textMeasurer = textMeasurer,
             density = density,
-            textStyle = textStyle
+            textStyle = textStyle,
+            scale = scale,
+            barWidth = barWidth
         )
 
         YAxisQuantityCanvas(
@@ -116,7 +130,9 @@ private fun PrecipitationPointsCanvas(
     forecast: DailyForecastDaily,
     textMeasurer: TextMeasurer,
     density: Density,
-    textStyle: TextStyle
+    textStyle: TextStyle,
+    scale: MutableFloatState,
+    barWidth: MutableFloatState
 ) {
     val labelOffset = density.run {
         Offset(
@@ -131,6 +147,7 @@ private fun PrecipitationPointsCanvas(
                 color = Colors.White
             ),
         )
+
         Canvas(
             modifier = Modifier
                 .clipToBounds()
@@ -144,7 +161,8 @@ private fun PrecipitationPointsCanvas(
                             scope = this@drawBehind,
                             forecasts = forecast.hourlyForecast,
                             textMeasurer = textMeasurer,
-                            textStyle = textStyle
+                            textStyle = textStyle,
+                            barWidth = barWidth.floatValue
                         )
                     }
                 }
@@ -158,7 +176,7 @@ private fun PrecipitationPointsCanvas(
                     detectHorizontalDragGestures { _, dragAmount ->
                         val newOffset = xOffset.floatValue + dragAmount
                         val totalOffset = (newOffset * -1) + size.width
-                        if (newOffset < 0 && (offsetEdge.floatValue + QUANTITY_BAR_WIDTH / 2f) > totalOffset) {
+                        if (newOffset < 0 && (offsetEdge.floatValue + barWidth.floatValue / 2f) > totalOffset) {
                             xOffset.floatValue += dragAmount
                         }
                     }
@@ -173,12 +191,14 @@ private fun PrecipitationPointsCanvas(
                     scope = this,
                     quantity = forecast.hourlyForecast.map { it.precipitation },
                     highestQuantity = forecast.maxPrecipitationQuantity,
-                    lowestQuantity = forecast.minPrecipitationQuantity
+                    lowestQuantity = forecast.minPrecipitationQuantity,
+                    barWidth = barWidth.floatValue
                 )
 
                 plotProbabilityPoints(
                     scope = this,
-                    percentages = forecast.hourlyForecast.map { it.precipitationProbability }
+                    percentages = forecast.hourlyForecast.map { it.precipitationProbability },
+                    barWidth = barWidth.floatValue
                 ) {
                     offsetEdge.floatValue = it
                 }
@@ -191,7 +211,7 @@ fun xAxisLabels(
     scope: DrawScope,
     forecasts: List<HourlyForecastHourly>,
     textMeasurer: TextMeasurer,
-    textStyle: TextStyle
+    textStyle: TextStyle, barWidth: Float
 ) {
     with(scope) {
         forecasts.forEachIndexed { index, forecast ->
@@ -205,7 +225,7 @@ fun xAxisLabels(
                 textLayoutResult = measuredText,
                 topLeft = Offset(
                     y = size.height - measuredText.size.height,
-                    x = (QUANTITY_BAR_WIDTH / 2) + (index * QUANTITY_BAR_WIDTH) - measuredText.size.width / 2
+                    x = (barWidth / 2) + (index * barWidth) - measuredText.size.width / 2
                 )
             )
         }
@@ -272,7 +292,7 @@ private fun plotQuantityBar(
     scope: DrawScope,
     quantity: List<Double>,
     lowestQuantity: Double,
-    highestQuantity: Double
+    highestQuantity: Double, barWidth: Float
 ) {
     with(scope) {
         quantity.forEachIndexed { index, item ->
@@ -280,11 +300,11 @@ private fun plotQuantityBar(
             drawRect(
                 color = Colors.StormGray,
                 size = Size(
-                    width = QUANTITY_BAR_WIDTH,
+                    width = barWidth,
                     height = height
                 ),
                 topLeft = Offset(
-                    x = (QUANTITY_BAR_WIDTH * index),
+                    x = (barWidth * index),
                     y = size.height - height
                 )
             )
@@ -294,13 +314,13 @@ private fun plotQuantityBar(
 
 private fun plotProbabilityPoints(
     scope: DrawScope,
-    percentages: List<Int>,
+    percentages: List<Int>, barWidth: Float,
     lastPointPosition: (Float) -> Unit
 ) {
     var previousOffset = Offset.Zero
     with(scope) {
         percentages.forEachIndexed { index, percentage ->
-            val xOffset = (QUANTITY_BAR_WIDTH * index) + (QUANTITY_BAR_WIDTH / 2f)
+            val xOffset = (barWidth * index) + (barWidth / 2f)
             val yOffset = size.height - (size.height / 100f * percentage)
             val currentOffset = Offset(
                 x = xOffset,
