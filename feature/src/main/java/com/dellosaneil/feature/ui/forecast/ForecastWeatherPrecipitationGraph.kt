@@ -60,8 +60,8 @@ fun ForecastWeatherPrecipitationGraph() {
     }
 
     val xOffset = remember { mutableFloatStateOf(0f) }
-
-
+    val lastPointPosition = remember { mutableFloatStateOf(0f) }
+    
     Row(
         modifier = Modifier
             .padding(
@@ -101,9 +101,13 @@ fun ForecastWeatherPrecipitationGraph() {
                 )
                 .weight(1f)
                 .height(250.dp)
-                .pointerInput(Unit) {
+                .pointerInput(key1 = lastPointPosition.floatValue) {
                     detectHorizontalDragGestures { _, dragAmount ->
-                        xOffset.floatValue += dragAmount
+                        val newOffset = xOffset.floatValue + dragAmount
+                        val totalOffset = (newOffset * -1) + size.width
+                        if (newOffset < 0 && (lastPointPosition.floatValue + QUANTITY_BAR_WIDTH / 2f) > totalOffset) {
+                            xOffset.floatValue += dragAmount
+                        }
                     }
                 }
                 .clipToBounds(),
@@ -122,7 +126,9 @@ fun ForecastWeatherPrecipitationGraph() {
             translate(left = xOffset.floatValue, top = 0f) {
                 plotProbabilityPoints(
                     scope = this
-                )
+                ) {
+                    lastPointPosition.floatValue = it
+                }
             }
         }
 
@@ -148,21 +154,26 @@ fun ForecastWeatherPrecipitationGraph() {
 }
 
 private fun plotProbabilityPoints(
-    scope: DrawScope
+    scope: DrawScope,
+    lastPointPosition: (Float) -> Unit
 ) {
     val percentages = listOf(
         0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100
     )
     with(scope) {
         percentages.forEachIndexed { index, percentage ->
+            val xOffset = (QUANTITY_BAR_WIDTH * index) + (QUANTITY_BAR_WIDTH / 2f)
             drawCircle(
                 color = Colors.RoyalBlue,
                 radius = CIRCLE_RADIUS,
                 center = Offset(
-                    x = (QUANTITY_BAR_WIDTH * index),
+                    x = xOffset,
                     y = size.height - (size.height / 100f * percentage)
                 )
             )
+            if (index == percentages.size - 1) {
+                lastPointPosition(xOffset)
+            }
         }
     }
 }
