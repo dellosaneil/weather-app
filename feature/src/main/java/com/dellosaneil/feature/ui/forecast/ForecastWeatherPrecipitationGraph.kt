@@ -53,11 +53,11 @@ fun ForecastWeatherPrecipitationGraph(
     val textMeasurer = rememberTextMeasurer()
     val textStyle = MaterialTheme.typography.bodyMedium
 
-    val quantityAxisSize = remember { mutableStateOf(DpSize.Zero) }
-    val probabilityAxisSize = remember { mutableStateOf(DpSize.Zero) }
+    val rightYAxisSize = remember { mutableStateOf(DpSize.Zero) }
+    val leftYAxisSize = remember { mutableStateOf(DpSize.Zero) }
 
     val xOffset = remember { mutableFloatStateOf(0f) }
-    val lastPointPosition = remember { mutableFloatStateOf(0f) }
+    val offsetEdge = remember { mutableFloatStateOf(0f) }
 
     Row(
         modifier = Modifier
@@ -74,19 +74,19 @@ fun ForecastWeatherPrecipitationGraph(
             )
     ) {
         YAxisPercentageCanvas(
-            width = probabilityAxisSize.value.width,
+            width = leftYAxisSize.value.width,
             textMeasurer = textMeasurer,
             textStyle = textStyle,
-            axisSize = probabilityAxisSize
+            axisSize = leftYAxisSize
         )
         PrecipitationPointsCanvas(
             rowScope = this,
-            lastPointPosition = lastPointPosition,
+            offsetEdge = offsetEdge,
             xOffset = xOffset,
             forecast = forecast
         )
         YAxisQuantityCanvas(
-            axisSize = quantityAxisSize,
+            axisSize = rightYAxisSize,
             textStyle = textStyle,
             textMeasurer = textMeasurer,
             minQuantity = forecast.minPrecipitationQuantity,
@@ -98,7 +98,7 @@ fun ForecastWeatherPrecipitationGraph(
 @Composable
 private fun PrecipitationPointsCanvas(
     rowScope: RowScope,
-    lastPointPosition: MutableFloatState,
+    offsetEdge: MutableFloatState,
     xOffset: MutableFloatState,
     forecast: DailyForecastDaily
 ) {
@@ -111,11 +111,11 @@ private fun PrecipitationPointsCanvas(
                 )
                 .weight(1f)
                 .height(GRAPH_HEIGHT.dp)
-                .pointerInput(key1 = lastPointPosition.floatValue) {
+                .pointerInput(key1 = offsetEdge.floatValue) {
                     detectHorizontalDragGestures { _, dragAmount ->
                         val newOffset = xOffset.floatValue + dragAmount
                         val totalOffset = (newOffset * -1) + size.width
-                        if (newOffset < 0 && (lastPointPosition.floatValue + QUANTITY_BAR_WIDTH / 2f) > totalOffset) {
+                        if (newOffset < 0 && (offsetEdge.floatValue + QUANTITY_BAR_WIDTH / 2f) > totalOffset) {
                             xOffset.floatValue += dragAmount
                         }
                     }
@@ -137,7 +137,7 @@ private fun PrecipitationPointsCanvas(
                     scope = this,
                     percentages = forecast.hourlyForecast.map { it.precipitationProbability }
                 ) {
-                    lastPointPosition.floatValue = it
+                    offsetEdge.floatValue = it
                 }
             }
         }
