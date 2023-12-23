@@ -11,5 +11,6 @@ data class HourlyForecastHourlySchema(
     val apparentTemperature: List<Double>,
     val relativeHumidity2m: List<Int>,
     val windSpeed10m: List<Double>,
-    val windDirection10m: List<Int>
+    val windDirection10m: List<Int>,
+    val precipitation: List<Double>
 )

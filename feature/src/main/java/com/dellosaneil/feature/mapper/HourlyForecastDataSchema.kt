@@ -29,7 +29,8 @@ val HourlyForecastDataSchema.toData
                     relativeHumidity2m = relativeHumidity2m[index],
                     apparentTemperature = apparentTemperature[index],
                     windSpeed10m = windSpeed10m[index],
-                    windDirection10m = windDirection10m[index]
+                    windDirection10m = windDirection10m[index],
+                    precipitation = precipitation[index]
                 ).also {
                     hourly.add(it)
                 }

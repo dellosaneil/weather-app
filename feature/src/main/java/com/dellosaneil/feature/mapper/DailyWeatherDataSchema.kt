@@ -18,6 +18,11 @@ fun DailyForecastDataSchema.toData(
         val daily = mutableListOf<DailyForecastDaily>()
         repeat(daylightDuration.size) { index ->
             val millis = time[index].epochToMillis
+            val filteredHourlyForecast =  hourlyForecastHourly.filter {
+                it.timeMillis.toDateString(pattern = DatePattern.DATE_MONTH) == millis.toDateString(
+                    pattern = DatePattern.DATE_MONTH
+                )
+            }
             DailyForecastDaily(
                 daylightDuration = daylightDuration[index].seconds.toString(DurationUnit.HOURS),
                 precipitationProbabilityMax = precipitationProbabilityMax[index],
@@ -31,11 +36,9 @@ fun DailyForecastDataSchema.toData(
                     val isDay = hour in 6..18
                     WeatherCondition.toWeatherCondition(id = weatherCode[index], isDay = isDay)
                 },
-                hourlyForecast = hourlyForecastHourly.filter {
-                    it.timeMillis.toDateString(pattern = DatePattern.DATE_MONTH) == millis.toDateString(
-                        pattern = DatePattern.DATE_MONTH
-                    )
-                }
+                hourlyForecast = filteredHourlyForecast,
+                minPrecipitationQuantity = filteredHourlyForecast.minOf { it.precipitation },
+                maxPrecipitationQuantity = filteredHourlyForecast.maxOf { it.precipitation },
             ).also {
                 daily.add(it)
             }

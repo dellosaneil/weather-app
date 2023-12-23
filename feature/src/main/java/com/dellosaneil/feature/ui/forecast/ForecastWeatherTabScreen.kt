@@ -60,10 +60,12 @@ private fun Screen(
                     lowestTemp = viewState.selectedDay.temperature2mMin,
                     highestTemp = viewState.selectedDay.temperature2mMax,
                 )
-                ForecastWeatherPrecipitationGraph()
+                ForecastWeatherPrecipitationGraph(
+                    forecast = viewState.selectedDay
+                )
                 ForecastWeatherDaily(
                     modifier = Modifier.padding(horizontal = 16.dp),
-                    dailyForecast = viewState.dailyForecast
+                    dailyForecast = viewState.dailyForecast,
                 )
             }
         }
@@ -92,7 +94,6 @@ private fun PreviewScreen() {
             override fun daySelected(dailyForecast: DailyForecastDaily) {
                 TODO("Not yet implemented")
             }
-
         }
     )
 }

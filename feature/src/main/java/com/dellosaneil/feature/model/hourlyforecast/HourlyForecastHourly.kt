@@ -13,7 +13,8 @@ data class HourlyForecastHourly(
     val cloudCover: Int,
     val surfacePressure: Double,
     val windSpeed10m: Double,
-    val windDirection10m: Int
+    val windDirection10m: Int,
+    val precipitation: Double
 ) {
     companion object {
         fun dummyData() = HourlyForecastHourly(
@@ -27,7 +28,8 @@ data class HourlyForecastHourly(
             cloudCover = 32,
             surfacePressure = 22.3,
             windSpeed10m = 32.2,
-            windDirection10m = 33
+            windDirection10m = 33,
+            precipitation = 3.2
         )
     }
 }

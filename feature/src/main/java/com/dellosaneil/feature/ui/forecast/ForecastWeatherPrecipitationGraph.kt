@@ -23,8 +23,6 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
@@ -32,7 +30,7 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import com.dellosaneil.feature.R
+import com.dellosaneil.feature.model.dailyforecast.DailyForecastDaily
 import com.dellosaneil.feature.ui.common.CommonBackground
 import com.dellosaneil.feature.util.Colors
 import com.dellosaneil.feature.util.roundTwoDecimal
@@ -45,21 +43,14 @@ private const val CIRCLE_RADIUS = 8f
 private const val PROBABILITY_STROKE_WIDTH = 6f
 
 @Composable
-fun ForecastWeatherPrecipitationGraph() {
+fun ForecastWeatherPrecipitationGraph(
+    forecast: DailyForecastDaily
+) {
     val textMeasurer = rememberTextMeasurer()
     val textStyle = MaterialTheme.typography.bodyMedium
-    val localDensity = LocalDensity.current
 
     val quantityAxisSize = remember { mutableStateOf(DpSize.Zero) }
     val probabilityAxisSize = remember { mutableStateOf(DpSize.Zero) }
-
-    val graphLabel = stringResource(R.string.hourly_precipitation_graph)
-    val graphLabelOffset = localDensity.run {
-        Offset(
-            y = -36.dp.toPx(),
-            x = 0f
-        )
-    }
 
     val xOffset = remember { mutableFloatStateOf(0f) }
     val lastPointPosition = remember { mutableFloatStateOf(0f) }
@@ -114,36 +105,25 @@ fun ForecastWeatherPrecipitationGraph() {
                 }
                 .clipToBounds(),
         ) {
-            drawText(
-                text = graphLabel,
-                textMeasurer = textMeasurer,
-                topLeft = graphLabelOffset,
-                style = textStyle.copy(
-                    color = Colors.White
-                )
-            )
+
             drawYAxisIndicator(
                 scope = this
             )
             translate(left = xOffset.floatValue, top = 0f) {
                 plotQuantityBar(
-                    scope = this
+                    scope = this,
+                    quantity = forecast.hourlyForecast.map { it.precipitation },
+                    highestQuantity = forecast.maxPrecipitationQuantity,
+                    lowestQuantity = forecast.minPrecipitationQuantity
                 )
 
                 plotProbabilityPoints(
-                    scope = this
+                    scope = this,
+                    percentages = forecast.hourlyForecast.map { it.precipitationProbability }
                 ) {
                     lastPointPosition.floatValue = it
                 }
             }
-            drawText(
-                text = graphLabel,
-                textMeasurer = textMeasurer,
-                topLeft = graphLabelOffset,
-                style = textStyle.copy(
-                    color = Colors.White
-                )
-            )
         }
 
         Canvas(
@@ -161,19 +141,23 @@ fun ForecastWeatherPrecipitationGraph() {
                 scope = this,
                 textMeasurer = textMeasurer,
                 textStyle = textStyle,
-                quantityAxisSize = quantityAxisSize
+                quantityAxisSize = quantityAxisSize,
+                lowestQuantity = forecast.minPrecipitationQuantity,
+                highestQuantity = forecast.maxPrecipitationQuantity
             )
         }
     }
 }
 
-fun plotQuantityBar(scope: DrawScope) {
-    val quantity = listOf(0.5, 0.9, 1.8, 2.7, 3.6, 4.5, 5.4, 6.3, 7.2, 8.1, 9.0)
-    val lowest = 0.0
-    val highest = 9.0
+fun plotQuantityBar(
+    scope: DrawScope,
+    quantity: List<Double>,
+    lowestQuantity: Double,
+    highestQuantity: Double
+) {
     with(scope) {
         quantity.forEachIndexed { index, item ->
-            val height = (size.height * (item / (highest - lowest))).toFloat()
+            val height = (size.height * (item / (highestQuantity - lowestQuantity))).toFloat()
             drawRect(
                 color = Colors.StormGray,
                 size = Size(
@@ -191,12 +175,10 @@ fun plotQuantityBar(scope: DrawScope) {
 
 private fun plotProbabilityPoints(
     scope: DrawScope,
+    percentages: List<Int>,
     lastPointPosition: (Float) -> Unit
 ) {
     var previousOffset = Offset.Zero
-    val percentages = listOf(
-        0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100
-    )
     with(scope) {
         percentages.forEachIndexed { index, percentage ->
             val xOffset = (QUANTITY_BAR_WIDTH * index) + (QUANTITY_BAR_WIDTH / 2f)
@@ -233,14 +215,14 @@ private fun drawPrecipitationQuantityYAxis(
     scope: DrawScope,
     textMeasurer: TextMeasurer,
     textStyle: TextStyle,
+    lowestQuantity: Double,
+    highestQuantity: Double,
     quantityAxisSize: MutableState<DpSize>
 ) {
-    val lowestMeasurement = 0.0
-    val highestMeasurement = 9.0
-    val step = (highestMeasurement - lowestMeasurement) / Y_AXIS_STEP_COUNT.dec()
+    val step = (highestQuantity - lowestQuantity) / Y_AXIS_STEP_COUNT.dec()
 
     val measurements =
-        (0 until Y_AXIS_STEP_COUNT).map { lowestMeasurement + it * step }.asReversed()
+        (0 until Y_AXIS_STEP_COUNT).map { lowestQuantity + it * step }.asReversed()
 
     with(scope) {
         measurements.forEachIndexed { index, measurement ->
@@ -325,6 +307,8 @@ private fun drawPrecipitationProbabilityYAxis(
 @Composable
 private fun ForecastWeatherPrecipitationGraphPreview() {
     CommonBackground {
-        ForecastWeatherPrecipitationGraph()
+        ForecastWeatherPrecipitationGraph(
+            forecast = DailyForecastDaily.dummyData()
+        )
     }
 }

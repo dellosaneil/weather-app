@@ -55,7 +55,8 @@ enum class WeatherParams {
             APPARENT_TEMPERATURE,
             VISIBILITY,
             CLOUD_COVER,
-            SURFACE_PRESSURE
+            SURFACE_PRESSURE,
+            PRECIPITATION
         ).joinToString(separator = ",")
     }
 

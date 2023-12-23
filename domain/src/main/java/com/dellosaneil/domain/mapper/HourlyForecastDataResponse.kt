@@ -18,7 +18,8 @@ val HourlyForecastDataResponse.toSchema
                 apparentTemperature = apparentTemperature,
                 relativeHumidity2m = relativeHumidity2m,
                 windSpeed10m = windSpeed10m,
-                windDirection10m = windDirection10m
+                windDirection10m = windDirection10m,
+                precipitation = precipitation
             )
         }
     )
