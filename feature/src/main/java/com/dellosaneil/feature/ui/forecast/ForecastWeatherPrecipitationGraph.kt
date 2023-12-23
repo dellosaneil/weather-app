@@ -20,19 +20,24 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import com.dellosaneil.feature.R
 import com.dellosaneil.feature.model.dailyforecast.DailyForecastDaily
 import com.dellosaneil.feature.ui.common.CommonBackground
 import com.dellosaneil.feature.util.Colors
@@ -50,6 +55,7 @@ private const val GRAPH_HEIGHT = 250
 fun ForecastWeatherPrecipitationGraph(
     forecast: DailyForecastDaily
 ) {
+    val density = LocalDensity.current
     val textMeasurer = rememberTextMeasurer()
     val textStyle = MaterialTheme.typography.bodyMedium
 
@@ -83,7 +89,9 @@ fun ForecastWeatherPrecipitationGraph(
             rowScope = this,
             offsetEdge = offsetEdge,
             xOffset = xOffset,
-            forecast = forecast
+            forecast = forecast,
+            textMeasurer = textMeasurer,
+            density = density
         )
         YAxisQuantityCanvas(
             axisSize = rightYAxisSize,
@@ -100,11 +108,31 @@ private fun PrecipitationPointsCanvas(
     rowScope: RowScope,
     offsetEdge: MutableFloatState,
     xOffset: MutableFloatState,
-    forecast: DailyForecastDaily
+    forecast: DailyForecastDaily,
+    textMeasurer: TextMeasurer,
+    density: Density
 ) {
+    val labelOffset = density.run {
+        Offset(
+            y = 20.dp.toPx(),
+            x = 0f
+        )
+    }
     with(rowScope) {
+        val measuredText = textMeasurer.measure(
+            text = stringResource(id = R.string.hourly_precipitation_graph),
+            style = MaterialTheme.typography.bodyMedium.copy(
+                color = Colors.White
+            ),
+        )
         Canvas(
             modifier = Modifier
+                .drawBehind {
+                    drawText(
+                        textLayoutResult = measuredText,
+                        topLeft = labelOffset
+                    )
+                }
                 .padding(
                     bottom = 24.dp,
                     top = 56.dp
