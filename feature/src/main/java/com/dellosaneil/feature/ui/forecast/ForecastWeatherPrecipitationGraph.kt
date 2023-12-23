@@ -65,7 +65,7 @@ fun ForecastWeatherPrecipitationGraph(
     val rightYAxisSize = remember { mutableStateOf(DpSize.Zero) }
     val leftYAxisSize = remember { mutableStateOf(DpSize.Zero) }
 
-    val xOffset = remember { mutableFloatStateOf(0f) }
+    val xOffset = remember(key1 = forecast) { mutableFloatStateOf(0f) }
     val offsetEdge = remember { mutableFloatStateOf(0f) }
 
     Row(
