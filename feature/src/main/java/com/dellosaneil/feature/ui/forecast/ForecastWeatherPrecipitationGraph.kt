@@ -2,27 +2,40 @@ package com.dellosaneil.feature.ui.forecast
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.forEachGesture
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableFloatState
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -32,6 +45,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextMeasurer
@@ -40,6 +54,7 @@ import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.dellosaneil.feature.R
 import com.dellosaneil.feature.model.dailyforecast.DailyForecastDaily
@@ -76,7 +91,13 @@ fun ForecastWeatherPrecipitationGraph(
         mutableStateListOf<Rect>()
     }
 
-    Row(
+    val showMoreDetails = remember { mutableStateOf(false) }
+    val showMoreForecastDetails: MutableState<HourlyForecastHourly?> = remember {
+        mutableStateOf(null)
+    }
+    val showMoreDetailsOffset = remember { mutableStateOf(Offset.Zero) }
+
+    Box(
         modifier = Modifier
             .padding(
                 all = 16.dp
@@ -90,30 +111,112 @@ fun ForecastWeatherPrecipitationGraph(
                 shape = RoundedCornerShape(size = 16.dp)
             )
     ) {
-        YAxisPercentageCanvas(
-            textMeasurer = textMeasurer,
-            textStyle = textStyle,
-            density = density
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            YAxisPercentageCanvas(
+                textMeasurer = textMeasurer,
+                textStyle = textStyle,
+                density = density
+            )
+            PrecipitationPointsCanvas(
+                rowScope = this,
+                offsetEdge = offsetEdge,
+                xOffset = xOffset,
+                forecast = forecast,
+                textMeasurer = textMeasurer,
+                density = density,
+                textStyle = textStyle,
+                scale = scale,
+                barWidth = barWidth,
+                pointRects = pointRects,
+                showMoreDetails = showMoreDetails,
+                showMoreForecastDetails = showMoreForecastDetails,
+                showMoreDetailsOffset = showMoreDetailsOffset
+            )
+
+            YAxisQuantityCanvas(
+                textStyle = textStyle,
+                textMeasurer = textMeasurer,
+                minQuantity = forecast.minPrecipitationQuantity,
+                maxQuantity = forecast.maxPrecipitationQuantity,
+                density = density
+            )
+        }
+
+        if (showMoreDetails.value && showMoreForecastDetails.value != null) {
+            ShowMorePrecipitationDetails(
+                modifier = Modifier.offset {
+                    IntOffset(
+                        x = showMoreDetailsOffset.value.x.toInt(),
+                        y = showMoreDetailsOffset.value.y.toInt()
+                    )
+                },
+                details = showMoreForecastDetails.value!!,
+                textStyle = textStyle
+            )
+        }
+    }
+}
+
+@Composable
+private fun ShowMorePrecipitationDetails(
+    modifier: Modifier,
+    details: HourlyForecastHourly,
+    textStyle: TextStyle,
+) {
+
+    Column(
+        modifier = modifier
+            .clip(
+                shape = RoundedCornerShape(size = 8.dp)
+            )
+            .background(color = Colors.Tuna)
+            .border(
+                border = BorderStroke(width = 1.dp, color = Colors.White),
+                shape = RoundedCornerShape(size = 8.dp)
+            )
+            .padding(
+                all = 8.dp
+            ),
+        verticalArrangement = Arrangement.spacedBy(space = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = details.timeMillis.toDateString(pattern = DatePattern.HOUR_MINUTES_MERIDIEM),
+            style = textStyle.copy(
+                color = Colors.White
+            )
         )
-        PrecipitationPointsCanvas(
-            rowScope = this,
-            offsetEdge = offsetEdge,
-            xOffset = xOffset,
-            forecast = forecast,
-            textMeasurer = textMeasurer,
-            density = density,
-            textStyle = textStyle,
-            scale = scale,
-            barWidth = barWidth,
-            pointRects = pointRects
+        Image(
+            painter = painterResource(id = details.weatherCondition.icon),
+            contentDescription = "",
+            modifier = Modifier.size(24.dp)
         )
 
-        YAxisQuantityCanvas(
-            textStyle = textStyle,
-            textMeasurer = textMeasurer,
-            minQuantity = forecast.minPrecipitationQuantity,
-            maxQuantity = forecast.maxPrecipitationQuantity,
-            density = density
+        Text(
+            text = stringResource(
+                R.string.rain_probability,
+                details.precipitationProbability.toPercentage
+            ),
+            style = textStyle.copy(
+                color = Colors.White
+            )
+        )
+
+        Text(
+            text = stringResource(R.string.rain_quantity_mm, details.precipitation),
+            style = textStyle.copy(
+                color = Colors.White
+            )
+        )
+
+        Text(
+            text = stringResource(R.string.cloud_cover_colon, details.cloudCover),
+            style = textStyle.copy(
+                color = Colors.White
+            )
         )
     }
 }
@@ -129,7 +232,10 @@ private fun PrecipitationPointsCanvas(
     textStyle: TextStyle,
     scale: MutableFloatState,
     barWidth: MutableFloatState,
-    pointRects: SnapshotStateList<Rect>
+    pointRects: SnapshotStateList<Rect>,
+    showMoreDetails: MutableState<Boolean>,
+    showMoreForecastDetails: MutableState<HourlyForecastHourly?>,
+    showMoreDetailsOffset: MutableState<Offset>
 ) {
     val labelOffset = density.run {
         Offset(
@@ -177,6 +283,7 @@ private fun PrecipitationPointsCanvas(
                         val totalOffset = (newOffset * -1) + size.width
                         if (newOffset < 0 && (offsetEdge.floatValue + barWidth.floatValue / 2f) > totalOffset) {
                             xOffset.floatValue += dragAmount
+                            showMoreDetails.value = false
                         }
                     }
                 }
@@ -191,10 +298,15 @@ private fun PrecipitationPointsCanvas(
                                 val index = pointRects.indexOfFirst {
                                     it.contains(tapOffsetWithXOffset)
                                 }
+                                showMoreForecastDetails.value = forecast.hourlyForecast[index]
+                                showMoreDetailsOffset.value = tapOffset.copy(
+                                    y = 50f
+                                )
                                 isFound = true
                                 break
                             }
                         }
+                        showMoreDetails.value = isFound
                     }
                 }
                 .pointerInput(key1 = forecast) {
@@ -204,7 +316,7 @@ private fun PrecipitationPointsCanvas(
                             do {
                                 val event = awaitPointerEvent()
                                 scale.floatValue =
-                                    (scale.floatValue * event.calculateZoom()).coerceIn(0.3f, 2f)
+                                    (scale.floatValue * event.calculateZoom()).coerceIn(0.3f, 1f)
                                 barWidth.floatValue = QUANTITY_BAR_WIDTH * scale.floatValue
                             } while (event.changes.any { it.pressed })
                         }
@@ -241,7 +353,8 @@ fun xAxisLabels(
     scope: DrawScope,
     forecasts: List<HourlyForecastHourly>,
     textMeasurer: TextMeasurer,
-    textStyle: TextStyle, barWidth: Float
+    textStyle: TextStyle,
+    barWidth: Float
 ) {
     with(scope) {
         forecasts.forEachIndexed { index, forecast ->
@@ -469,6 +582,17 @@ private fun drawPrecipitationProbabilityYAxis(
             )
         }
     }
+}
+
+@Preview(showBackground = true, device = "id:pixel_2")
+@Composable
+private fun ShowMorePrecipitationDetailsPreview() {
+    ShowMorePrecipitationDetails(
+        modifier = Modifier
+            .padding(all = 16.dp),
+        details = HourlyForecastHourly.dummyData(),
+        textStyle = MaterialTheme.typography.bodyMedium
+    )
 }
 
 @Preview(showBackground = true, device = "id:pixel_2")
