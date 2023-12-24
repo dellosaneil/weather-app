@@ -63,13 +63,10 @@ fun ForecastWeatherPrecipitationGraph(
     val textStyle = MaterialTheme.typography.bodyMedium
 
     val xOffset = remember(key1 = forecast) { mutableFloatStateOf(0f) }
-    val offsetEdge = remember(key1 = forecast) { mutableFloatStateOf(0f) }
-
-
     val scale = remember(key1 = forecast) { mutableFloatStateOf(1f) }
+    val offsetEdge = remember(key1 = forecast, key2 = scale.floatValue) { mutableFloatStateOf(0f) }
 
     val barWidth = remember(key1 = forecast) { mutableFloatStateOf(QUANTITY_BAR_WIDTH) }
-
 
     Row(
         modifier = Modifier
@@ -135,7 +132,7 @@ private fun PrecipitationPointsCanvas(
             text = stringResource(id = R.string.hourly_precipitation_graph),
             style = textStyle.copy(
                 color = Colors.White
-            ),
+            )
         )
 
         Canvas(
@@ -151,7 +148,9 @@ private fun PrecipitationPointsCanvas(
                             scope = this@drawBehind,
                             forecasts = forecast.hourlyForecast,
                             textMeasurer = textMeasurer,
-                            textStyle = textStyle,
+                            textStyle = textStyle.copy(
+                                fontSize = textStyle.fontSize / scale.floatValue
+                            ),
                             barWidth = barWidth.floatValue
                         )
                     }
