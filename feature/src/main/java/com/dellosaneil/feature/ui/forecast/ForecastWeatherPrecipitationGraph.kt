@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -18,11 +19,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableFloatState
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.translate
@@ -61,12 +65,16 @@ fun ForecastWeatherPrecipitationGraph(
     val density = LocalDensity.current
     val textMeasurer = rememberTextMeasurer()
     val textStyle = MaterialTheme.typography.bodyMedium
-
-    val xOffset = remember(key1 = forecast) { mutableFloatStateOf(0f) }
     val scale = remember(key1 = forecast) { mutableFloatStateOf(1f) }
+
+    val xOffset = remember(key1 = forecast, key2 = scale.floatValue) { mutableFloatStateOf(0f) }
     val offsetEdge = remember(key1 = forecast, key2 = scale.floatValue) { mutableFloatStateOf(0f) }
 
     val barWidth = remember(key1 = forecast) { mutableFloatStateOf(QUANTITY_BAR_WIDTH) }
+
+    val pointRects = remember(key1 = forecast) {
+        mutableStateListOf<Rect>()
+    }
 
     Row(
         modifier = Modifier
@@ -96,7 +104,8 @@ fun ForecastWeatherPrecipitationGraph(
             density = density,
             textStyle = textStyle,
             scale = scale,
-            barWidth = barWidth
+            barWidth = barWidth,
+            pointRects = pointRects
         )
 
         YAxisQuantityCanvas(
@@ -119,7 +128,8 @@ private fun PrecipitationPointsCanvas(
     density: Density,
     textStyle: TextStyle,
     scale: MutableFloatState,
-    barWidth: MutableFloatState
+    barWidth: MutableFloatState,
+    pointRects: SnapshotStateList<Rect>
 ) {
     val labelOffset = density.run {
         Offset(
@@ -149,7 +159,7 @@ private fun PrecipitationPointsCanvas(
                             forecasts = forecast.hourlyForecast,
                             textMeasurer = textMeasurer,
                             textStyle = textStyle.copy(
-                                fontSize = textStyle.fontSize / scale.floatValue
+                                fontSize = textStyle.fontSize * scale.floatValue
                             ),
                             barWidth = barWidth.floatValue
                         )
@@ -170,15 +180,32 @@ private fun PrecipitationPointsCanvas(
                         }
                     }
                 }
-                .pointerInput(key1 = Unit) {
+                .pointerInput(key1 = forecast, key2 = barWidth.floatValue) {
+                    detectTapGestures { tapOffset ->
+                        var isFound = false
+                        for (rect in pointRects) {
+                            if (rect.contains(tapOffset)) {
+                                val tapOffsetWithXOffset = tapOffset.copy(
+                                    x = tapOffset.x + (xOffset.floatValue * -1)
+                                )
+                                val index = pointRects.indexOfFirst {
+                                    it.contains(tapOffsetWithXOffset)
+                                }
+                                isFound = true
+                                break
+                            }
+                        }
+                    }
+                }
+                .pointerInput(key1 = forecast) {
                     forEachGesture {
                         awaitPointerEventScope {
                             awaitFirstDown()
                             do {
                                 val event = awaitPointerEvent()
                                 scale.floatValue =
-                                    (scale.floatValue * event.calculateZoom()).coerceIn(1f, 5f)
-                                barWidth.floatValue = QUANTITY_BAR_WIDTH / scale.floatValue
+                                    (scale.floatValue * event.calculateZoom()).coerceIn(0.3f, 2f)
+                                barWidth.floatValue = QUANTITY_BAR_WIDTH * scale.floatValue
                             } while (event.changes.any { it.pressed })
                         }
                     }
@@ -194,7 +221,8 @@ private fun PrecipitationPointsCanvas(
                     quantity = forecast.hourlyForecast.map { it.precipitation },
                     highestQuantity = forecast.maxPrecipitationQuantity,
                     lowestQuantity = forecast.minPrecipitationQuantity,
-                    barWidth = barWidth.floatValue
+                    barWidth = barWidth.floatValue,
+                    pointRects = pointRects,
                 )
 
                 plotProbabilityPoints(
@@ -309,8 +337,11 @@ private fun plotQuantityBar(
     scope: DrawScope,
     quantity: List<Double>,
     lowestQuantity: Double,
-    highestQuantity: Double, barWidth: Float
+    highestQuantity: Double,
+    barWidth: Float,
+    pointRects: SnapshotStateList<Rect>,
 ) {
+    pointRects.clear()
     with(scope) {
         quantity.forEachIndexed { index, item ->
             val height = (size.height * (item / (highestQuantity - lowestQuantity))).toFloat()
@@ -323,6 +354,15 @@ private fun plotQuantityBar(
                 topLeft = Offset(
                     x = (barWidth * index),
                     y = size.height - height
+                )
+            )
+            pointRects.add(
+                Rect(
+                    offset = Offset(
+                        x = (barWidth * index),
+                        y = 0f
+                    ),
+                    size = Size(width = barWidth, height = size.height)
                 )
             )
         }
