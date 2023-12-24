@@ -17,9 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableFloatState
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -31,14 +29,13 @@ import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.dellosaneil.feature.R
 import com.dellosaneil.feature.model.dailyforecast.DailyForecastDaily
@@ -65,9 +62,6 @@ fun ForecastWeatherPrecipitationGraph(
     val textMeasurer = rememberTextMeasurer()
     val textStyle = MaterialTheme.typography.bodyMedium
 
-    val rightYAxisSize = remember { mutableStateOf(DpSize.Zero) }
-    val leftYAxisSize = remember { mutableStateOf(DpSize.Zero) }
-
     val xOffset = remember(key1 = forecast) { mutableFloatStateOf(0f) }
     val offsetEdge = remember(key1 = forecast) { mutableFloatStateOf(0f) }
 
@@ -92,10 +86,9 @@ fun ForecastWeatherPrecipitationGraph(
             )
     ) {
         YAxisPercentageCanvas(
-            width = leftYAxisSize.value.width,
             textMeasurer = textMeasurer,
             textStyle = textStyle,
-            axisSize = leftYAxisSize
+            density = density
         )
         PrecipitationPointsCanvas(
             rowScope = this,
@@ -110,11 +103,11 @@ fun ForecastWeatherPrecipitationGraph(
         )
 
         YAxisQuantityCanvas(
-            axisSize = rightYAxisSize,
             textStyle = textStyle,
             textMeasurer = textMeasurer,
             minQuantity = forecast.minPrecipitationQuantity,
-            maxQuantity = forecast.maxPrecipitationQuantity
+            maxQuantity = forecast.maxPrecipitationQuantity,
+            density = density
         )
     }
 }
@@ -184,7 +177,8 @@ private fun PrecipitationPointsCanvas(
                             awaitFirstDown()
                             do {
                                 val event = awaitPointerEvent()
-                                scale.floatValue = (scale.floatValue * event.calculateZoom()).coerceIn(1f, 5f)
+                                scale.floatValue =
+                                    (scale.floatValue * event.calculateZoom()).coerceIn(1f, 5f)
                                 barWidth.floatValue = QUANTITY_BAR_WIDTH / scale.floatValue
                             } while (event.changes.any { it.pressed })
                         }
@@ -243,12 +237,29 @@ fun xAxisLabels(
 
 @Composable
 private fun YAxisQuantityCanvas(
-    axisSize: MutableState<DpSize>,
     textStyle: TextStyle,
     textMeasurer: TextMeasurer,
     minQuantity: Double,
-    maxQuantity: Double
+    maxQuantity: Double,
+    density: Density
 ) {
+    val step = (maxQuantity - minQuantity) / Y_AXIS_STEP_COUNT.dec()
+    val measurements =
+        (0 until Y_AXIS_STEP_COUNT).map { minQuantity + it * step }.asReversed()
+    val measuredTexts = measurements.map {
+        textMeasurer.measure(
+            text = "${it.roundTwoDecimal} mm",
+            style = textStyle.copy(
+                color = Colors.StormGray
+            )
+        )
+    }
+    val widthInt = remember { measuredTexts.maxOf { it.size.width } }
+
+    val width = density.run {
+        widthInt.toDp()
+    }
+
     Canvas(
         modifier = Modifier
             .padding(
@@ -258,26 +269,25 @@ private fun YAxisQuantityCanvas(
                 end = 16.dp
             )
             .height(GRAPH_HEIGHT.dp)
-            .width(width = axisSize.value.width)
+            .width(width = width)
     ) {
         drawPrecipitationQuantityYAxis(
             scope = this,
-            textMeasurer = textMeasurer,
-            textStyle = textStyle,
-            quantityAxisSize = axisSize,
-            lowestQuantity = minQuantity,
-            highestQuantity = maxQuantity
+            measuredTexts = measuredTexts
         )
     }
 }
 
 @Composable
 private fun YAxisPercentageCanvas(
-    width: Dp,
     textMeasurer: TextMeasurer,
     textStyle: TextStyle,
-    axisSize: MutableState<DpSize>,
+    density: Density
 ) {
+    val widthInt = textMeasurer.measure(text = "100%").size.width
+    val width = density.run {
+        widthInt.toDp()
+    }
     Canvas(
         modifier = Modifier
             .padding(
@@ -291,8 +301,7 @@ private fun YAxisPercentageCanvas(
         drawPrecipitationProbabilityYAxis(
             scope = this,
             textMeasurer = textMeasurer,
-            textStyle = textStyle,
-            probabilityAxisSize = axisSize
+            textStyle = textStyle
         )
     }
 }
@@ -361,38 +370,17 @@ private fun plotProbabilityPoints(
 
 private fun drawPrecipitationQuantityYAxis(
     scope: DrawScope,
-    textMeasurer: TextMeasurer,
-    textStyle: TextStyle,
-    lowestQuantity: Double,
-    highestQuantity: Double,
-    quantityAxisSize: MutableState<DpSize>
+    measuredTexts: List<TextLayoutResult>
 ) {
-    val step = (highestQuantity - lowestQuantity) / Y_AXIS_STEP_COUNT.dec()
-
-    val measurements =
-        (0 until Y_AXIS_STEP_COUNT).map { lowestQuantity + it * step }.asReversed()
-
     with(scope) {
-        measurements.forEachIndexed { index, measurement ->
-            val measuredText = textMeasurer.measure(
-                text = "${measurement.roundTwoDecimal} mm",
-                style = textStyle.copy(
-                    color = Colors.StormGray
-                )
-            )
+        measuredTexts.forEachIndexed { index, measurement ->
             drawText(
-                textLayoutResult = measuredText,
+                textLayoutResult = measurement,
                 topLeft = Offset(
-                    y = (size.height * index / 10f) - measuredText.size.height / 2f,
+                    y = (size.height * index / 10f) - measurement.size.height / 2f,
                     x = 0f
                 )
             )
-            if (quantityAxisSize.value.width.toPx() < measuredText.size.width) {
-                quantityAxisSize.value = DpSize(
-                    width = measuredText.size.width.toDp(),
-                    height = measuredText.size.height.toDp()
-                )
-            }
         }
     }
 }
@@ -423,7 +411,6 @@ private fun drawPrecipitationProbabilityYAxis(
     scope: DrawScope,
     textMeasurer: TextMeasurer,
     textStyle: TextStyle,
-    probabilityAxisSize: MutableState<DpSize>,
 ) {
     val percentages = 100 downTo 0 step 10
     with(scope) {
@@ -441,12 +428,6 @@ private fun drawPrecipitationProbabilityYAxis(
                     x = 0f
                 ),
             )
-            if (probabilityAxisSize.value.width.toPx() < measuredText.size.width) {
-                probabilityAxisSize.value = DpSize(
-                    width = measuredText.size.width.toDp(),
-                    height = measuredText.size.height.toDp()
-                )
-            }
         }
     }
 }
