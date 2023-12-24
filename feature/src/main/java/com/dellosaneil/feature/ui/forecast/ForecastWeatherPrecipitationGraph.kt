@@ -91,7 +91,7 @@ fun ForecastWeatherPrecipitationGraph(
         mutableStateListOf<Rect>()
     }
 
-    val showMoreDetails = remember { mutableStateOf(false) }
+    val showMoreDetails = remember(key1 = forecast) { mutableStateOf(false) }
     val showMoreForecastDetails: MutableState<HourlyForecastHourly?> = remember {
         mutableStateOf(null)
     }
