@@ -32,9 +32,7 @@ fun DailyForecastDataSchema.toData(
                 temperature2mMin = temperature2mMin[index],
                 timeMillis = time[index].epochToMillis,
                 weatherCondition = run {
-                    val hour = millis.toDateString(pattern = DatePattern.HOURS).toInt()
-                    val isDay = hour in 6..18
-                    WeatherCondition.toWeatherCondition(id = weatherCode[index], isDay = isDay)
+                    WeatherCondition.toWeatherCondition(id = weatherCode[index], isDay = true)
                 },
                 hourlyForecast = filteredHourlyForecast,
                 minPrecipitationQuantity = filteredHourlyForecast.minOfOrNull { it.precipitation } ?: 0.0,

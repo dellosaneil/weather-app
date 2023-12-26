@@ -34,10 +34,9 @@ class ForecastWeatherViewModel @Inject constructor(
                 getHourlyForecast(latitude = LATITUDE, longitude = LONGITUDE)
             }
 
-            val daily = dailyForecast.await().getOrThrow()
-            val hourly = hourlyForecast.await().getOrThrow()
-
             try {
+                val daily = dailyForecast.await().getOrThrow()
+                val hourly = hourlyForecast.await().getOrThrow()
                 updateState { state ->
                     val forecast = daily.toData(hourlyForecastHourly = hourly.toData.hourly).daily
                     val firstForecast = forecast.first()

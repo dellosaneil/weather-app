@@ -79,7 +79,7 @@ fun ForecastWeatherDailySummary(
                         )
                         Spacer(modifier = Modifier)
                         Text(
-                            text = forecast.temperature2mMin.toCelcius,
+                            text = forecast.temperature2mMax.toCelcius,
                             style = MaterialTheme.typography.bodyMedium.copy(
                                 color = Colors.White,
                                 fontWeight = FontWeight.SemiBold
