@@ -11,7 +11,7 @@ import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -35,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawBehind
@@ -97,7 +98,7 @@ fun ForecastWeatherPrecipitationGraph(
     }
     val showMoreDetailsOffset = remember { mutableStateOf(Offset.Zero) }
 
-    Box(
+    BoxWithConstraints(
         modifier = Modifier
             .padding(
                 all = 16.dp
@@ -149,7 +150,7 @@ fun ForecastWeatherPrecipitationGraph(
             ShowMorePrecipitationDetails(
                 modifier = Modifier.offset {
                     IntOffset(
-                        x = showMoreDetailsOffset.value.x.toInt(),
+                        x = (maxWidth.value / 2f).toInt(),
                         y = showMoreDetailsOffset.value.y.toInt()
                     )
                 },
@@ -166,9 +167,9 @@ private fun ShowMorePrecipitationDetails(
     details: HourlyForecastHourly,
     textStyle: TextStyle,
 ) {
-
     Column(
         modifier = modifier
+            .alpha(alpha = 0.9f)
             .clip(
                 shape = RoundedCornerShape(size = 8.dp)
             )
