@@ -25,4 +25,6 @@
     <string name="rain_probability">Rain Probability: %1$s</string>
     <string name="rain_quantity_mm">Rain Quantity: %1$s mm</string>
     <string name="cloud_cover_colon">Cloud Cover: %1$s%%</string>
+    <string name="selected_coordinates">Selected Coordinates</string>
+    <string name="search_location">Search Location</string>
 </resources>

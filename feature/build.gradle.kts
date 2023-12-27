@@ -5,10 +5,11 @@ plugins {
     alias(libs.plugins.org.jetbrains.kotlin.android)
     id("com.google.dagger.hilt.android")
     id("kotlin-kapt")
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
 android {
-    namespace = "com.dellosaneil.feature"
+    namespace = "com.thelazybattley.feature"
     compileSdk = 34
 
     defaultConfig {
@@ -65,4 +66,6 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.landscapist.glide)
     kapt(libs.hiltCompiler)
+    implementation(libs.maps.compose)
+
 }

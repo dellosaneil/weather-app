@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "com.dellosaneil.domain"
+    namespace = "com.thelazybattley.domain"
     compileSdk = 34
 
     defaultConfig {
@@ -39,4 +39,5 @@ dependencies {
     implementation(libs.hilt.android)
     kapt(libs.hiltCompiler)
     implementation(libs.bundles.network)
+    implementation(libs.maps.compose)
 }
