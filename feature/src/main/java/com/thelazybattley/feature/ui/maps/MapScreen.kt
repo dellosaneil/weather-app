@@ -1,6 +1,8 @@
 package com.thelazybattley.feature.ui.maps
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -49,6 +51,7 @@ private const val SELECTED_ZOOM = 17f
 private const val DEFAULT_ZOOM = 11f
 private val DEFAULT_LAT_LNG = LatLng(37.3861, 122.0839)
 
+@OptIn(ExperimentalFoundationApi::class)
 @Destination
 @Composable
 fun MapsScreen(
@@ -195,6 +198,7 @@ fun MapsScreen(
                                     color = Colors.MidGray
                                 ),
                                 modifier = Modifier
+                                    .basicMarquee()
                                     .clickable {
                                         val coordinates = LatLng(
                                             it.latitude,
