@@ -3,6 +3,9 @@ package com.thelazybattley.feature.ui.maps
 import android.location.Address
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
+import com.thelazybattley.domain.local.model.userlocation.UserLocation
+import com.thelazybattley.domain.local.usecase.GetLocationUseCase
+import com.thelazybattley.domain.local.usecase.InsertLocationUseCase
 import com.thelazybattley.domain.usecase.GetAddress
 import com.thelazybattley.domain.usecase.SearchAddressList
 import com.thelazybattley.feature.base.BaseViewModel
@@ -18,24 +21,39 @@ import javax.inject.Inject
 class MapViewModel @Inject constructor(
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
     private val searchAddressList: SearchAddressList,
-    private val getAddress: GetAddress
+    private val getAddress: GetAddress,
+    private val insertLocationUseCase: InsertLocationUseCase,
+    private val getLocationUseCase: GetLocationUseCase
 ) : BaseViewModel<MapEvents, MapState>(), MapCallbacks {
-
 
     companion object {
         private const val MAX_RESULTS = 5
-
-
     }
 
     override fun initialState() = MapState.initialState()
 
     private var searchJob: Job? = null
 
+    init {
+        viewModelScope.launch(context = dispatcher) {
+            delay(250L)
+            getLocationUseCase().collect { userLocation ->
+                userLocation?.let {
+                    onCoordinatesSelected(
+                        coordinates = LatLng(
+                            it.latitude,
+                            it.longitude
+                        )
+                    )
+                }
+            }
+        }
+    }
+
 
     override fun onSearchBarChange(name: String) {
         searchJob?.cancel()
-        if(name.isEmpty()) {
+        if (name.isEmpty()) {
             updateState { state ->
                 state.copy(
                     isSearchLoading = false,
@@ -56,7 +74,6 @@ class MapViewModel @Inject constructor(
     }
 
     private suspend fun searchLocation(name: String) {
-
         searchAddressList(
             name = name, MAX_RESULTS
         ).fold(
@@ -97,7 +114,6 @@ class MapViewModel @Inject constructor(
                     updateState { state ->
                         state.copy(
                             throwable = null,
-                            selectedCoordinates = coordinates,
                             selectedAddress = it
                         )
                     }
@@ -113,10 +129,27 @@ class MapViewModel @Inject constructor(
         }
     }
 
-
+    override fun onSaveAddress() {
+        viewModelScope.launch(context = dispatcher) {
+            val currentState = getCurrentState()
+            if (currentState.selectedAddress == null && currentState.selectedCoordinates != null) {
+                return@launch
+            }
+            insertLocationUseCase(
+                userLocation = UserLocation(
+                    latitude = currentState.selectedCoordinates!!.latitude,
+                    longitude = currentState.selectedCoordinates.longitude,
+                    address = currentState.selectedAddress!!.getAddressLine(0)
+                )
+            )
+            emitEvent(event = MapEvents.OnLocationSaved)
+        }
+    }
 }
 
 sealed interface MapEvents {
+
+    data object OnLocationSaved : MapEvents
 
 }
 

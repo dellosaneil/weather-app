@@ -8,4 +8,6 @@ interface MapCallbacks {
 
     fun onCoordinatesSelected(coordinates: LatLng)
 
+    fun onSaveAddress()
+
 }

@@ -1,5 +1,6 @@
 package com.thelazybattley.feature.ui.maps
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
@@ -28,6 +30,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -44,6 +47,7 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.thelazybattley.feature.R
 import com.thelazybattley.feature.util.Colors
 
@@ -55,9 +59,11 @@ private val DEFAULT_LAT_LNG = LatLng(37.3861, 122.0839)
 @Destination
 @Composable
 fun MapsScreen(
-    viewModel: MapViewModel = hiltViewModel()
+    viewModel: MapViewModel = hiltViewModel(),
+    navigator: DestinationsNavigator
 ) {
     val viewState by viewModel.state.collectAsState()
+    val viewEffect by viewModel.events.collectAsState(initial = null)
 
     val searchText = remember { mutableStateOf("") }
 
@@ -72,6 +78,7 @@ fun MapsScreen(
                 /* zoom = */ DEFAULT_ZOOM
             )
     }
+
     LaunchedEffect(key1 = viewState.selectedCoordinates) {
         if (viewState.selectedCoordinates != null) {
             val latLng = LatLng(
@@ -87,7 +94,21 @@ fun MapsScreen(
             )
         }
     }
-    Box(modifier = Modifier.fillMaxSize()) {
+
+    LaunchedEffect(key1 = viewEffect) {
+        when(viewEffect) {
+            is MapEvents.OnLocationSaved -> {
+                navigator.popBackStack()
+            }
+            null -> {
+                // do nothing
+            }
+        }
+    }
+
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
         GoogleMap(
             modifier = Modifier.matchParentSize(),
             properties = MapProperties(mapType = MapType.HYBRID),
@@ -213,6 +234,26 @@ fun MapsScreen(
                         }
                     }
                 }
+            }
+        }
+
+        AnimatedVisibility(
+            visible = viewState.selectedAddress != null,
+            modifier = Modifier
+                .align(alignment = Alignment.BottomCenter)
+                .padding(bottom = 32.dp)
+        ) {
+            Button(
+                onClick = { viewModel.onSaveAddress() },
+                modifier = Modifier
+                    .alpha(0.9f)
+            ) {
+                Text(
+                    text = stringResource(R.string.save_location),
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = Colors.Black
+                    )
+                )
             }
         }
     }

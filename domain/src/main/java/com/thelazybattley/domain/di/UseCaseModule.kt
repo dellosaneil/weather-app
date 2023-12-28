@@ -1,5 +1,9 @@
 package com.thelazybattley.domain.di
 
+import com.thelazybattley.domain.local.usecase.GetLocationUseCase
+import com.thelazybattley.domain.local.usecase.InsertLocationUseCase
+import com.thelazybattley.domain.local.usecase.impl.GetLocationUseCaseImpl
+import com.thelazybattley.domain.local.usecase.impl.InsertLocationUseCaseImpl
 import com.thelazybattley.domain.network.usecase.GetCurrentWeather
 import com.thelazybattley.domain.network.usecase.GetDailyForecast
 import com.thelazybattley.domain.network.usecase.GetHourlyForecast
@@ -32,6 +36,12 @@ abstract class UseCaseModule {
     abstract fun bindsGetCoordinates(impl: SearchAddressListImpl): SearchAddressList
 
     @Binds
-    abstract fun bindsGetAddress(impl: GetAddressImpl) :GetAddress
+    abstract fun bindsGetAddress(impl: GetAddressImpl): GetAddress
+
+    @Binds
+    abstract fun bindsGetLocationUseCase(impl: GetLocationUseCaseImpl): GetLocationUseCase
+
+    @Binds
+    abstract fun bindsInsertLocationUseCase(impl: InsertLocationUseCaseImpl): InsertLocationUseCase
 
 }

@@ -49,4 +49,8 @@ dependencies {
     ksp(libs.compose.destination.ksp)
     implementation(libs.hilt.android)
     kapt(libs.hiltCompiler)
+    ksp(libs.room.compiler)
+    implementation(libs.androidx.room.runtime)
+    annotationProcessor(libs.room.compiler)
+    implementation(libs.androidx.room.ktx)
 }

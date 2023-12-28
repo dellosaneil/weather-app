@@ -1,15 +1,20 @@
 package com.thelazybattley.domain.repository.impl
 
+import com.thelazybattley.data.local.dao.UserLocationDao
+import com.thelazybattley.data.network.service.OpenMateoService
 import com.thelazybattley.domain.enums.WeatherParams
+import com.thelazybattley.domain.local.model.userlocation.UserLocation
 import com.thelazybattley.domain.mapper.toSchema
 import com.thelazybattley.domain.network.schema.current.CurrentWeatherDataSchema
 import com.thelazybattley.domain.network.schema.hourlyforecast.HourlyForecastDataSchema
 import com.thelazybattley.domain.repository.WeatherRepository
-import com.thelazybattley.data.network.service.OpenMateoService
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class WeatherRepositoryImpl @Inject constructor(
-    private val openMateoService: OpenMateoService
+    private val openMateoService: OpenMateoService,
+    private val userLocationDao: UserLocationDao
 ) : WeatherRepository {
 
     companion object {
@@ -67,5 +72,18 @@ class WeatherRepositoryImpl @Inject constructor(
         Result.success(schema)
     } catch (e: Exception) {
         Result.failure(e)
+    }
+
+    override suspend fun getLocation(): Flow<UserLocation?> {
+        return userLocationDao.getLocation().map {
+            if (it == null) {
+                return@map null
+            }
+            UserLocation.fromEntity(entity = it)
+        }
+    }
+
+    override suspend fun insertLocation(userLocation: UserLocation) {
+        userLocationDao.insertLocation(location = UserLocation.toEntity(location = userLocation))
     }
 }

@@ -27,4 +27,5 @@
     <string name="cloud_cover_colon">Cloud Cover: %1$s%%</string>
     <string name="selected_coordinates">Selected Coordinates</string>
     <string name="search_location">Search Location</string>
+    <string name="save_location">Save Location</string>
 </resources>
