@@ -11,6 +11,7 @@ interface OpenMateoArchiveService {
         @Query("longitude") longitude: String,
         @Query("start_date") startDate: String,
         @Query("end_date") endDate: String,
-        @Query("daily") params: String
+        @Query("daily") params: String,
+        @Query("timeformat") timeFormat: String
     ): HistoryDataResponse
 }

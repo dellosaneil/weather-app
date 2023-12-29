@@ -101,7 +101,8 @@ class WeatherRepositoryImpl @Inject constructor(
             longitude = longitude,
             startDate = startDate,
             endDate = endDate,
-            params = WeatherParams.historyParams()
+            params = WeatherParams.historyParams(),
+            timeFormat = TIME_FORMAT
         ).toSchema.run {
             Result.success(this)
         }

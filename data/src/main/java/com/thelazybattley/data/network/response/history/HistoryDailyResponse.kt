@@ -8,6 +8,6 @@ data class HistoryDailyResponse(
     @SerializedName("temperature_2m_max") val temperature2mMax: List<Double>,
     @SerializedName("temperature_2m_mean") val temperature2mMean: List<Double>,
     @SerializedName("temperature_2m_min") val temperature2mMin: List<Double>,
-    val time: List<String>,
+    val time: List<Int>,
     val weatherCode: List<Int>
 )
