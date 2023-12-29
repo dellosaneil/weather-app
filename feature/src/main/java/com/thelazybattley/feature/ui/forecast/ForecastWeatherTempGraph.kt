@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import com.thelazybattley.feature.R
 import com.thelazybattley.feature.model.hourlyforecast.HourlyForecastHourly
 import com.thelazybattley.feature.ui.common.CommonBackground
+import com.thelazybattley.feature.ui.compositionlocal.LocalWeatherTimeZone
 import com.thelazybattley.feature.util.Colors
 import com.thelazybattley.feature.util.DatePattern
 import com.thelazybattley.feature.util.roundTwoDecimal
@@ -186,6 +187,7 @@ private fun ShowMoreDetails(
     modifier: Modifier,
     details: HourlyForecastHourly,
 ) {
+    val timeZone = LocalWeatherTimeZone.current.timeZone
     Column(
         modifier = modifier
             .clip(
@@ -203,7 +205,10 @@ private fun ShowMoreDetails(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = details.timeMillis.toDateString(pattern = DatePattern.HOUR_MINUTES_MERIDIEM),
+            text = details.timeMillis.toDateString(
+                pattern = DatePattern.HOUR_MINUTES_MERIDIEM,
+                timeZone = timeZone
+            ),
             style = MaterialTheme.typography.bodyMedium.copy(
                 color = Colors.White
             )

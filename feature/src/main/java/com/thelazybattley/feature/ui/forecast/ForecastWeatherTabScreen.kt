@@ -3,6 +3,7 @@ package com.thelazybattley.feature.ui.forecast
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -13,6 +14,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.thelazybattley.feature.model.dailyforecast.DailyForecastDaily
 import com.thelazybattley.feature.ui.common.CommonBackground
+import com.thelazybattley.feature.ui.compositionlocal.LocalWeatherTimeZone
+import com.thelazybattley.feature.ui.compositionlocal.WeatherTimeZone
 
 @Composable
 fun ForecastWeatherTabScreen() {
@@ -21,11 +24,17 @@ fun ForecastWeatherTabScreen() {
     val viewState by viewModel.state.collectAsState()
     val events by viewModel.events.collectAsState(initial = null)
 
-    Screen(
-        viewState = viewState,
-        event = events,
-        callbacks = viewModel
-    )
+    CompositionLocalProvider(
+        LocalWeatherTimeZone provides WeatherTimeZone(
+            timeZone = viewState.timeZone
+        )
+    ) {
+        Screen(
+            viewState = viewState,
+            event = events,
+            callbacks = viewModel
+        )
+    }
 }
 
 @Composable

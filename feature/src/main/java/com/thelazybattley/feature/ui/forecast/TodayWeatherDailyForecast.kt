@@ -40,6 +40,7 @@ import com.thelazybattley.feature.R
 import com.thelazybattley.feature.model.dailyforecast.DailyForecastDaily
 import com.thelazybattley.feature.model.hourlyforecast.HourlyForecastHourly
 import com.thelazybattley.feature.ui.common.CommonBackground
+import com.thelazybattley.feature.ui.compositionlocal.LocalWeatherTimeZone
 import com.thelazybattley.feature.util.Colors
 import com.thelazybattley.feature.util.DatePattern
 import com.thelazybattley.feature.util.toCelcius
@@ -50,6 +51,7 @@ fun ForecastWeatherDaily(
     modifier: Modifier,
     dailyForecast: List<DailyForecastDaily>
 ) {
+    val timeZone = LocalWeatherTimeZone.current.timeZone
     val expandedForecast: MutableState<DailyForecastDaily?> =
         remember { mutableStateOf(null) }
 
@@ -109,7 +111,10 @@ fun ForecastWeatherDaily(
                             tint = Colors.White
                         )
                         Text(
-                            text = forecast.timeMillis.toDateString(pattern = DatePattern.DATE_MONTH),
+                            text = forecast.timeMillis.toDateString(
+                                pattern = DatePattern.DATE_MONTH,
+                                timeZone = timeZone
+                            ),
                             style = MaterialTheme.typography.bodySmall.copy(
                                 color = Colors.White,
                                 fontWeight = FontWeight.Medium
@@ -160,6 +165,7 @@ fun ForecastWeatherDaily(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DailyForecastPerHour(forecast: HourlyForecastHourly) {
+    val timeZone = LocalWeatherTimeZone.current.timeZone
     FilterChip(
         selected = false,
         onClick = { },
@@ -184,7 +190,10 @@ private fun DailyForecastPerHour(forecast: HourlyForecastHourly) {
                     )
                 )
                 Text(
-                    text = forecast.timeMillis.toDateString(pattern = DatePattern.HOUR_MINUTES_MERIDIEM),
+                    text = forecast.timeMillis.toDateString(
+                        pattern = DatePattern.HOUR_MINUTES_MERIDIEM,
+                        timeZone = timeZone
+                    ),
                     style = MaterialTheme.typography.bodyMedium.copy(
                         color = Colors.White,
                         fontSize = 12.sp

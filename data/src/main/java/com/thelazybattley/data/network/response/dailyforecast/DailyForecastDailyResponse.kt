@@ -7,8 +7,8 @@ data class DailyForecastDailyResponse(
     @SerializedName("temperature_2m_min") val temperature2mMin: List<Double>,
     val daylightDuration: List<Double>,
     val precipitationProbabilityMax: List<Int>,
-    val sunrise: List<Int>,
-    val sunset: List<Int>,
-    val time: List<Int>,
+    val sunrise: List<String>,
+    val sunset: List<String>,
+    val time: List<String>,
     val weatherCode: List<Int>
 )

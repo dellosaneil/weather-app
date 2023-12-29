@@ -8,9 +8,11 @@ import com.thelazybattley.feature.util.DatePattern
 import com.thelazybattley.feature.util.epochToMillis
 import com.thelazybattley.feature.util.toDateString
 import java.time.LocalTime
+import java.time.ZoneId
 
 val HourlyForecastDataSchema.toData
     get() = HourlyForecastData(
+        timeZone = timeZone,
         hourly = hourly.run {
             val hourly = mutableListOf<HourlyForecastHourly>()
             repeat(precipitationProbability.size) { index ->
@@ -20,7 +22,10 @@ val HourlyForecastDataSchema.toData
                     timeMillis = time[index].epochToMillis,
                     weatherCondition = run {
                         val hour =
-                            time[index].epochToMillis.toDateString(pattern = DatePattern.HOURS).toInt()
+                            time[index].epochToMillis.toDateString(
+                                pattern = DatePattern.HOURS,
+                                timeZone = timeZone
+                            ).toInt()
                         val isDay = hour in 6..18
                         WeatherCondition.toWeatherCondition(id = weatherCode[index], isDay = isDay)
                     },
@@ -39,15 +44,13 @@ val HourlyForecastDataSchema.toData
         }
     )
 
-val List<HourlyForecastHourly>.today
-    get() = run {
-        subList(fromIndex = LocalTime.now().hour, toIndex = 24)
-    }
+fun List<HourlyForecastHourly>.today(timeZone: String): List<HourlyForecastHourly> {
+    return subList(fromIndex = LocalTime.now(ZoneId.of(timeZone)).hour, toIndex = 24)
+}
 
-val HourlyForecastData.today
-    get() = run {
-        val startIndex = LocalTime.now().hour
-        copy(
-            hourly = hourly.subList(fromIndex = startIndex, toIndex = 24)
-        )
-    }
+fun HourlyForecastData.today(timeZone: String): HourlyForecastData {
+    val startIndex = LocalTime.now(ZoneId.of(timeZone)).hour
+    return copy(
+        hourly = hourly.subList(fromIndex = startIndex, toIndex = 24)
+    )
+}

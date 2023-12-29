@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -12,12 +13,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.ramcosta.composedestinations.annotation.Destination
 import com.thelazybattley.feature.model.currentweather.CurrentWeatherData
 import com.thelazybattley.feature.model.dailyforecast.DailyForecastData
 import com.thelazybattley.feature.ui.common.CommonBackground
 import com.thelazybattley.feature.ui.common.DashedDivider
+import com.thelazybattley.feature.ui.compositionlocal.LocalWeatherTimeZone
+import com.thelazybattley.feature.ui.compositionlocal.WeatherTimeZone
 import com.thelazybattley.feature.util.Colors
-import com.ramcosta.composedestinations.annotation.Destination
 
 @Destination
 @Composable
@@ -25,10 +28,16 @@ fun CurrentWeatherScreen() {
     val viewModel = hiltViewModel<TodayWeatherViewModel>()
     val viewState by viewModel.state.collectAsState()
     val events by viewModel.events.collectAsState(initial = null)
-    Screen(
-        viewState = viewState,
-        events = events
-    )
+    CompositionLocalProvider(
+        LocalWeatherTimeZone provides WeatherTimeZone(
+            viewState.dailyForecast?.timeZone ?: ""
+        )
+    ) {
+        Screen(
+            viewState = viewState,
+            events = events
+        )
+    }
 }
 
 @Composable
@@ -48,7 +57,7 @@ private fun Screen(
 
             viewState.currentWeatherData != null && viewState.dailyForecast != null -> {
                 val selectedWeather =
-                    remember { mutableStateOf(viewState.dailyForecast.daily.first().hourlyForecast.first()) }
+                    remember(key1 = viewState.dailyForecast) { mutableStateOf(viewState.dailyForecast.daily.first().hourlyForecast.first()) }
 
                 CurrentWeatherSummary(
                     modifier = Modifier.padding(all = 8.dp),

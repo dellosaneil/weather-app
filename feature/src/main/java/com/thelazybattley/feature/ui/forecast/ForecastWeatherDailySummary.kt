@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.thelazybattley.feature.model.dailyforecast.DailyForecastDaily
 import com.thelazybattley.feature.ui.common.CommonBackground
+import com.thelazybattley.feature.ui.compositionlocal.LocalWeatherTimeZone
 import com.thelazybattley.feature.util.Colors
 import com.thelazybattley.feature.util.DatePattern
 import com.thelazybattley.feature.util.toCelcius
@@ -37,6 +38,7 @@ fun ForecastWeatherDailySummary(
     selectedDailyForecast: DailyForecastDaily,
     onClick: (DailyForecastDaily) -> Unit
 ) {
+    val timeZone = LocalWeatherTimeZone.current.timeZone
     LazyRow(
         modifier = modifier,
         contentPadding = PaddingValues(all = 8.dp)
@@ -72,7 +74,10 @@ fun ForecastWeatherDailySummary(
                             contentDescription = ""
                         )
                         Text(
-                            text = forecast.timeMillis.toDateString(pattern = DatePattern.DATE_MONTH),
+                            text = forecast.timeMillis.toDateString(
+                                pattern = DatePattern.DATE_MONTH,
+                                timeZone = timeZone
+                            ),
                             style = MaterialTheme.typography.bodyMedium.copy(
                                 color = Colors.Manatee
                             )

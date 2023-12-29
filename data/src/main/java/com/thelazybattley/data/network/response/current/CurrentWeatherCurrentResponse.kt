@@ -10,7 +10,7 @@ data class CurrentWeatherCurrentResponse(
     val apparentTemperature: Double,
     val isDay: Int,
     val precipitation: Double,
-    val time: Int,
+    val time: String,
     val weatherCode: Int,
     val cloudCover: Int,
     val surfacePressure: Double

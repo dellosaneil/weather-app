@@ -15,17 +15,20 @@ import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootNavGraph
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.thelazybattley.feature.R
 import com.thelazybattley.feature.ui.destinations.MapsScreenDestination
 import com.thelazybattley.feature.ui.forecast.ForecastWeatherTabScreen
 import com.thelazybattley.feature.ui.today.CurrentWeatherScreen
 import com.thelazybattley.feature.util.Colors
-import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.annotation.RootNavGraph
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -33,8 +36,10 @@ import kotlinx.coroutines.launch
 @RootNavGraph(start = true)
 @Composable
 fun WeatherMainScreen(
-    navigator: DestinationsNavigator
+    navigator: DestinationsNavigator,
+    viewModel: WeatherMainViewModel = hiltViewModel()
 ) {
+    val viewState by viewModel.state.collectAsState()
 
     val pagerState = rememberPagerState(
         initialPage = 0,
@@ -47,7 +52,7 @@ fun WeatherMainScreen(
     Scaffold(
         topBar = {
             WeatherMainToolbar(
-                location = "Davao City, Philippines"
+                location = viewState.address
             ) {
                 navigator.navigate(MapsScreenDestination)
             }

@@ -32,6 +32,7 @@ import com.thelazybattley.feature.R
 import com.thelazybattley.feature.model.hourlyforecast.HourlyForecastData
 import com.thelazybattley.feature.model.hourlyforecast.HourlyForecastHourly
 import com.thelazybattley.feature.ui.common.CommonBackground
+import com.thelazybattley.feature.ui.compositionlocal.LocalWeatherTimeZone
 import com.thelazybattley.feature.util.Colors
 import com.thelazybattley.feature.util.DatePattern
 import com.thelazybattley.feature.util.toCelcius
@@ -44,6 +45,7 @@ fun CurrentWeatherSummary(
     selectedWeather: HourlyForecastHourly,
     columnScope: ColumnScope
 ) {
+    val timeZone = LocalWeatherTimeZone.current.timeZone
     columnScope.apply {
         FilterChip(
             selected = false,
@@ -52,7 +54,10 @@ fun CurrentWeatherSummary(
             },
             label = {
                 Text(
-                    text = selectedWeather.timeMillis.toDateString(pattern = DatePattern.DATE_MONTH_HOURS_MINUTES_MERIDIEM),
+                    text = selectedWeather.timeMillis.toDateString(
+                        pattern = DatePattern.DATE_MONTH_HOURS_MINUTES_MERIDIEM,
+                        timeZone = timeZone
+                    ),
                     style = MaterialTheme.typography.bodySmall,
                     color = Colors.SantasGray,
                     modifier = Modifier.padding(vertical = 8.dp)

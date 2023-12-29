@@ -44,6 +44,7 @@ import com.thelazybattley.feature.R
 import com.thelazybattley.feature.model.hourlyforecast.HourlyForecastData
 import com.thelazybattley.feature.model.hourlyforecast.HourlyForecastHourly
 import com.thelazybattley.feature.ui.common.CommonBackground
+import com.thelazybattley.feature.ui.compositionlocal.LocalWeatherTimeZone
 import com.thelazybattley.feature.util.Colors
 import com.thelazybattley.feature.util.DatePattern
 import com.thelazybattley.feature.util.toCelcius
@@ -59,7 +60,7 @@ fun TodayWeatherHourlyForecast(
     onFilterClicked: (HourlyForecastHourly) -> Unit
 ) {
     val selectedChip = remember { mutableStateOf(hourlyForecast.first()) }
-
+    val timeZone = LocalWeatherTimeZone.current.timeZone
     columnScope.apply {
         Spacer(modifier = Modifier.height(16.dp))
         Column(
@@ -116,11 +117,17 @@ fun TodayWeatherHourlyForecast(
         ) {
             items(
                 items = hourlyForecast,
-                key = { it.timeMillis.toDateString(pattern = DatePattern.HOURS) }
+                key = {
+                    it.timeMillis.toDateString(
+                        pattern = DatePattern.HOURS,
+                        timeZone = timeZone
+                    )
+                }
             ) { forecast ->
                 HourlyTimeChips(
                     isSelected = selectedChip.value == forecast,
-                    forecast = forecast
+                    forecast = forecast,
+                    timeZone = timeZone
                 ) {
                     selectedChip.value = forecast
                     onFilterClicked(selectedChip.value)
@@ -137,6 +144,7 @@ fun TodayWeatherHourlyForecast(
 private fun HourlyTimeChips(
     forecast: HourlyForecastHourly,
     isSelected: Boolean,
+    timeZone: String,
     onClick: () -> Unit
 ) {
 
@@ -152,7 +160,10 @@ private fun HourlyTimeChips(
                 modifier = Modifier.padding(vertical = 16.dp)
             ) {
                 Text(
-                    text = forecast.timeMillis.toDateString(pattern = DatePattern.HOUR_MINUTES_MERIDIEM),
+                    text = forecast.timeMillis.toDateString(
+                        pattern = DatePattern.HOUR_MINUTES_MERIDIEM,
+                        timeZone = timeZone
+                    ),
                     style = MaterialTheme.typography.bodySmall.copy(
                         color = Colors.White
                     )
@@ -163,7 +174,7 @@ private fun HourlyTimeChips(
                     contentDescription = ""
                 )
                 Text(
-                    text = forecast.apparentTemperature.toCelcius,
+                    text = forecast.temperature2m.toCelcius,
                     style = MaterialTheme.typography.bodySmall.copy(
                         color = Colors.White,
                         fontWeight = FontWeight.Medium

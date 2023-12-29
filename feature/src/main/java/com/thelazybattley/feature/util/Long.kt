@@ -15,10 +15,10 @@ enum class DatePattern(val pattern: String) {
     DATE_MONTH_HOURS_MINUTES_MERIDIEM("dd MMM h:mm a")
 }
 
-fun Long.toDateString(pattern: DatePattern): String {
+fun Long.toDateString(pattern: DatePattern, timeZone: String): String {
     val formatter = DateTimeFormatter.ofPattern(pattern.pattern)
     return Instant.ofEpochMilli(this)
-        .atZone(ZoneId.systemDefault())
+        .atZone(ZoneId.of(timeZone))
         .toLocalDateTime()
         .format(formatter)
 }

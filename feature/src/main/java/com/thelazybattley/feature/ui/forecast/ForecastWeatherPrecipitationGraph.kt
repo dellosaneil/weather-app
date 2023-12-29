@@ -61,6 +61,7 @@ import com.thelazybattley.feature.R
 import com.thelazybattley.feature.model.dailyforecast.DailyForecastDaily
 import com.thelazybattley.feature.model.hourlyforecast.HourlyForecastHourly
 import com.thelazybattley.feature.ui.common.CommonBackground
+import com.thelazybattley.feature.ui.compositionlocal.LocalWeatherTimeZone
 import com.thelazybattley.feature.util.Colors
 import com.thelazybattley.feature.util.DatePattern
 import com.thelazybattley.feature.util.roundTwoDecimal
@@ -165,8 +166,10 @@ fun ForecastWeatherPrecipitationGraph(
 private fun ShowMorePrecipitationDetails(
     modifier: Modifier,
     details: HourlyForecastHourly,
-    textStyle: TextStyle,
+    textStyle: TextStyle
 ) {
+
+    val timeZone = LocalWeatherTimeZone.current.timeZone
     Column(
         modifier = modifier
             .alpha(alpha = 0.9f)
@@ -185,7 +188,10 @@ private fun ShowMorePrecipitationDetails(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = details.timeMillis.toDateString(pattern = DatePattern.HOUR_MINUTES_MERIDIEM),
+            text = details.timeMillis.toDateString(
+                pattern = DatePattern.HOUR_MINUTES_MERIDIEM,
+                timeZone = timeZone
+            ),
             style = textStyle.copy(
                 color = Colors.White
             )
@@ -238,6 +244,7 @@ private fun PrecipitationPointsCanvas(
     showMoreForecastDetails: MutableState<HourlyForecastHourly?>,
     showMoreDetailsOffset: MutableState<Offset>
 ) {
+    val timeZone = LocalWeatherTimeZone.current.timeZone
     val labelOffset = density.run {
         Offset(
             y = 20.dp.toPx(),
@@ -268,7 +275,8 @@ private fun PrecipitationPointsCanvas(
                             textStyle = textStyle.copy(
                                 fontSize = textStyle.fontSize * scale.floatValue
                             ),
-                            barWidth = barWidth.floatValue
+                            barWidth = barWidth.floatValue,
+                            timeZone= timeZone
                         )
                     }
                 }
@@ -355,12 +363,16 @@ fun xAxisLabels(
     forecasts: List<HourlyForecastHourly>,
     textMeasurer: TextMeasurer,
     textStyle: TextStyle,
-    barWidth: Float
+    barWidth: Float,
+    timeZone: String
 ) {
     with(scope) {
         forecasts.forEachIndexed { index, forecast ->
             val measuredText = textMeasurer.measure(
-                text = forecast.timeMillis.toDateString(pattern = DatePattern.HOUR_MINUTES_MERIDIEM),
+                text = forecast.timeMillis.toDateString(
+                    pattern = DatePattern.HOUR_MINUTES_MERIDIEM,
+                    timeZone = timeZone
+                ),
                 style = textStyle.copy(
                     color = Colors.White
                 )

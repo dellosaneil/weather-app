@@ -6,7 +6,7 @@ import com.thelazybattley.data.local.entity.UserLocationEntity.Companion.TABLE_N
 
 @Entity(tableName = TABLE_NAME)
 data class UserLocationEntity(
-    @PrimaryKey val id : Int = 1,
+    @PrimaryKey val id: Int = 1,
     val latitude: Double,
     val longitude: Double,
     val address: String

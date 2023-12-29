@@ -30,7 +30,6 @@ class WeatherRepositoryImpl @Inject constructor(
             val schema = openMateoService.getCurrentWeather(
                 latitude = latitude,
                 longitude = longitude,
-                timeFormat = TIME_FORMAT,
                 timezone = TIME_ZONE,
                 params = WeatherParams.currentWeatherParams()
             ).toSchema
@@ -49,7 +48,6 @@ class WeatherRepositoryImpl @Inject constructor(
                 latitude = latitude,
                 longitude = longitude,
                 params = WeatherParams.hourlyWeatherForecast(),
-                timeFormat = TIME_FORMAT,
                 timezone = TIME_ZONE
             ).toSchema
             Result.success(schema)
@@ -66,7 +64,6 @@ class WeatherRepositoryImpl @Inject constructor(
             latitude = latitude,
             longitude = longitude,
             timezone = TIME_ZONE,
-            timeFormat = TIME_FORMAT,
             params = WeatherParams.dailyWeatherForecast()
         ).toSchema
         Result.success(schema)

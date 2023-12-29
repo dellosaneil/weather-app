@@ -1,6 +1,7 @@
 package com.thelazybattley.feature.ui.today
 
 import androidx.lifecycle.viewModelScope
+import com.thelazybattley.domain.local.usecase.GetLocationUseCase
 import com.thelazybattley.domain.network.usecase.GetCurrentWeather
 import com.thelazybattley.domain.network.usecase.GetDailyForecast
 import com.thelazybattley.domain.network.usecase.GetHourlyForecast
@@ -10,10 +11,10 @@ import com.thelazybattley.feature.mapper.toData
 import com.thelazybattley.feature.mapper.today
 import com.thelazybattley.feature.model.currentweather.CurrentWeatherData
 import com.thelazybattley.feature.model.dailyforecast.DailyForecastData
-import com.thelazybattley.feature.util.Coordinates
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,13 +22,27 @@ class TodayWeatherViewModel @Inject constructor(
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
     private val getCurrentWeather: GetCurrentWeather,
     private val getHourlyForecast: GetHourlyForecast,
-    private val getDailyForecast: GetDailyForecast
+    private val getDailyForecast: GetDailyForecast,
+    private val getLocationUseCase: GetLocationUseCase
 ) : BaseViewModel<CurrentWeatherEvents, CurrentWeatherViewState>() {
 
     init {
-        fetchCurrentWeather(longitude = Coordinates.LONGITUDE, latitude = Coordinates.LATITUDE)
-        fetchDailyForecast(latitude = Coordinates.LATITUDE, longitude = Coordinates.LONGITUDE)
-    }
+        viewModelScope.launch(context= dispatcher) {
+            getLocationUseCase().collect {location ->
+                if(location != null) {
+                    Timber.d("Test: ${location}")
+                    fetchCurrentWeather(
+                        longitude = location.longitude.toString(),
+                        latitude = location.latitude.toString()
+                    )
+                    fetchDailyForecast(
+                        latitude = location.latitude.toString(),
+                        longitude = location.longitude.toString()
+                    )
+                }
+            }
+        }
+     }
 
     override fun initialState() = CurrentWeatherViewState.initialState()
 
@@ -51,6 +66,7 @@ class TodayWeatherViewModel @Inject constructor(
                     }
                 },
                 onFailure = {
+                    it.printStackTrace()
                     updateState { state ->
                         state.copy(
                             throwable = it
@@ -75,7 +91,9 @@ class TodayWeatherViewModel @Inject constructor(
                         state.copy(
                             throwable = null,
                             dailyForecast = schema.toData(
-                                hourlyForecastHourly = hourly.toData.today.hourly
+                                hourlyForecast = hourly.toData.today(
+                                    timeZone = schema.timeZone
+                                ).hourly
                             )
                         )
                     }
