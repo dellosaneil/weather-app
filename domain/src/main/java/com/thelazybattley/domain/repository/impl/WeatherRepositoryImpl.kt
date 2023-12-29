@@ -1,6 +1,7 @@
 package com.thelazybattley.domain.repository.impl
 
 import com.thelazybattley.data.local.dao.UserLocationDao
+import com.thelazybattley.data.network.service.OpenMateoArchiveService
 import com.thelazybattley.data.network.service.OpenMateoService
 import com.thelazybattley.domain.enums.WeatherParams
 import com.thelazybattley.domain.local.model.userlocation.UserLocation
@@ -15,7 +16,8 @@ import javax.inject.Inject
 
 class WeatherRepositoryImpl @Inject constructor(
     private val openMateoService: OpenMateoService,
-    private val userLocationDao: UserLocationDao
+    private val userLocationDao: UserLocationDao,
+    private val openMateoArchiveService: OpenMateoArchiveService
 ) : WeatherRepository {
 
     companion object {
@@ -94,7 +96,7 @@ class WeatherRepositoryImpl @Inject constructor(
         startDate: String,
         endDate: String
     ): Result<HistoryDataSchema> = try {
-        openMateoService.getHistory(
+        openMateoArchiveService.getHistory(
             latitude = latitude,
             longitude = longitude,
             startDate = startDate,

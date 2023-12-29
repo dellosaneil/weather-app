@@ -14,7 +14,6 @@ import com.thelazybattley.feature.model.dailyforecast.DailyForecastData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,7 +29,6 @@ class TodayWeatherViewModel @Inject constructor(
         viewModelScope.launch(context= dispatcher) {
             getLocationUseCase().collect {location ->
                 if(location != null) {
-                    Timber.d("Test: ${location}")
                     fetchCurrentWeather(
                         longitude = location.longitude.toString(),
                         latitude = location.latitude.toString()
