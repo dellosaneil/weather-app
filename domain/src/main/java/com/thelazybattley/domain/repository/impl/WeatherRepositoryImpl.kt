@@ -31,7 +31,8 @@ class WeatherRepositoryImpl @Inject constructor(
                 latitude = latitude,
                 longitude = longitude,
                 timezone = TIME_ZONE,
-                params = WeatherParams.currentWeatherParams()
+                params = WeatherParams.currentWeatherParams(),
+                timeFormat = TIME_FORMAT
             ).toSchema
             Result.success(schema)
         } catch (e: Exception) {
@@ -48,7 +49,8 @@ class WeatherRepositoryImpl @Inject constructor(
                 latitude = latitude,
                 longitude = longitude,
                 params = WeatherParams.hourlyWeatherForecast(),
-                timezone = TIME_ZONE
+                timezone = TIME_ZONE,
+                timeFormat = TIME_FORMAT
             ).toSchema
             Result.success(schema)
         } catch (e: Exception) {
@@ -64,7 +66,8 @@ class WeatherRepositoryImpl @Inject constructor(
             latitude = latitude,
             longitude = longitude,
             timezone = TIME_ZONE,
-            params = WeatherParams.dailyWeatherForecast()
+            params = WeatherParams.dailyWeatherForecast(),
+            timeFormat = TIME_FORMAT
         ).toSchema
         Result.success(schema)
     } catch (e: Exception) {

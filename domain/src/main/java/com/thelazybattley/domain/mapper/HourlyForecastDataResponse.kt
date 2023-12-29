@@ -3,7 +3,6 @@ package com.thelazybattley.domain.mapper
 import com.thelazybattley.data.network.response.hourlyforecast.HourlyForecastDataResponse
 import com.thelazybattley.domain.network.schema.hourlyforecast.HourlyForecastDataSchema
 import com.thelazybattley.domain.network.schema.hourlyforecast.HourlyForecastHourlySchema
-import com.thelazybattley.domain.util.toEpoch
 
 val HourlyForecastDataResponse.toSchema
     get() = run {
@@ -14,9 +13,7 @@ val HourlyForecastDataResponse.toSchema
                 HourlyForecastHourlySchema(
                     precipitationProbability = precipitationProbability,
                     temperature2m = temperature2m,
-                    time = time.map {
-                        it.toEpoch(timeZone = timeZone)
-                    },
+                    time = time,
                     weatherCode = weatherCode,
                     surfacePressure = surfacePressure,
                     cloudCover = cloudCover,

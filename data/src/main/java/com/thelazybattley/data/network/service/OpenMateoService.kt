@@ -13,7 +13,8 @@ interface OpenMateoService {
         @Query("latitude") latitude: String,
         @Query("longitude") longitude: String,
         @Query("current") params: String,
-        @Query("timezone") timezone: String
+        @Query("timezone") timezone: String,
+        @Query("timeformat") timeFormat: String
     ): CurrentWeatherDataResponse
 
     @GET("forecast")
@@ -21,7 +22,8 @@ interface OpenMateoService {
         @Query("latitude") latitude: String,
         @Query("longitude") longitude: String,
         @Query("daily") params: String,
-        @Query("timezone") timezone: String
+        @Query("timezone") timezone: String,
+        @Query("timeformat") timeFormat: String
     ): DailyForecastDataResponse
 
     @GET("forecast")
@@ -29,7 +31,8 @@ interface OpenMateoService {
         @Query("latitude") latitude: String,
         @Query("longitude") longitude: String,
         @Query("hourly") params: String,
-        @Query("timezone") timezone: String
+        @Query("timezone") timezone: String,
+        @Query("timeformat") timeFormat: String
     ): HourlyForecastDataResponse
 
 }

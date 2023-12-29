@@ -3,7 +3,6 @@ package com.thelazybattley.domain.mapper
 import com.thelazybattley.data.network.response.current.CurrentWeatherDataResponse
 import com.thelazybattley.domain.network.schema.current.CurrentWeatherCurrentSchema
 import com.thelazybattley.domain.network.schema.current.CurrentWeatherDataSchema
-import com.thelazybattley.domain.util.toEpoch
 
 val CurrentWeatherDataResponse.toSchema
     get() = run {
@@ -16,9 +15,7 @@ val CurrentWeatherDataResponse.toSchema
                     isDay = isDay,
                     precipitation = precipitation,
                     temperature2m = temperature2m,
-                    time = time.toEpoch(
-                        timeZone = timeZone
-                    ),
+                    time = time,
                     weatherCode = weatherCode,
                     windDirection10m = windDirection10m,
                     windSpeed10m = windSpeed10m,

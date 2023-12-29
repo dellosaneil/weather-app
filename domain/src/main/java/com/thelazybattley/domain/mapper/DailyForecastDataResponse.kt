@@ -3,7 +3,6 @@ package com.thelazybattley.domain.mapper
 import com.thelazybattley.data.network.response.dailyforecast.DailyForecastDataResponse
 import com.thelazybattley.domain.network.schema.dailyforecast.DailyForecastDailySchema
 import com.thelazybattley.domain.network.schema.dailyforecast.DailyForecastDataSchema
-import com.thelazybattley.domain.util.toEpoch
 
 val DailyForecastDataResponse.toSchema
     get() = run {
@@ -14,23 +13,11 @@ val DailyForecastDataResponse.toSchema
                 DailyForecastDailySchema(
                     daylightDuration = daylightDuration,
                     precipitationProbabilityMax = precipitationProbabilityMax,
-                    sunrise = sunrise.map {
-                        it.toEpoch(
-                            timeZone = timeZone
-                        )
-                    },
-                    sunset = sunset.map {
-                        it.toEpoch(
-                            timeZone = timeZone
-                        )
-                    },
+                    sunrise = sunrise,
+                    sunset = sunset,
                     temperature2mMax = temperature2mMax,
                     temperature2mMin = temperature2mMin,
-                    time = time.map {
-                        it.toEpoch(
-                            timeZone = timeZone
-                        )
-                    },
+                    time = time,
                     weatherCode = weatherCode
                 )
             }

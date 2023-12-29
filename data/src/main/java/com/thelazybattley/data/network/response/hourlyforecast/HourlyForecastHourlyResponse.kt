@@ -8,7 +8,7 @@ data class HourlyForecastHourlyResponse(
     @SerializedName("wind_speed_10m") val windSpeed10m: List<Double>,
     @SerializedName("wind_direction_10m") val windDirection10m: List<Int>,
     val precipitationProbability: List<Int>,
-    val time: List<String>,
+    val time: List<Int>,
     val weatherCode: List<Int>,
     val surfacePressure: List<Double>,
     val cloudCover: List<Int>,

@@ -96,10 +96,11 @@ fun MapsScreen(
     }
 
     LaunchedEffect(key1 = viewEffect) {
-        when(viewEffect) {
+        when (viewEffect) {
             is MapEvents.OnLocationSaved -> {
                 navigator.popBackStack()
             }
+
             null -> {
                 // do nothing
             }
@@ -213,13 +214,8 @@ fun MapsScreen(
                         items(
                             items = viewState.searchResults
                         ) {
-                            Text(
-                                text = it.getAddressLine(0),
-                                style = MaterialTheme.typography.bodyMedium.copy(
-                                    color = Colors.MidGray
-                                ),
+                            Box(
                                 modifier = Modifier
-                                    .basicMarquee()
                                     .clickable {
                                         val coordinates = LatLng(
                                             it.latitude,
@@ -227,10 +223,21 @@ fun MapsScreen(
                                         )
                                         viewModel.onCoordinatesSelected(coordinates = coordinates)
                                     }
-                                    .padding(all = 8.dp)
-                                    .fillMaxWidth(),
-                                maxLines = 1
-                            )
+                                    .fillMaxWidth()
+                            ) {
+                                Text(
+                                    text = it.getAddressLine(0),
+                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                        color = Colors.MidGray
+                                    ),
+                                    modifier = Modifier
+                                        .basicMarquee()
+                                        .padding(all = 8.dp)
+                                        .fillMaxWidth(),
+                                    maxLines = 1
+                                )
+                            }
+
                         }
                     }
                 }
