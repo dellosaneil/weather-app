@@ -2,9 +2,9 @@ package com.thelazybattley.feature.ui.today
 
 import androidx.lifecycle.viewModelScope
 import com.thelazybattley.domain.local.usecase.GetLocationUseCase
-import com.thelazybattley.domain.network.usecase.GetCurrentWeather
-import com.thelazybattley.domain.network.usecase.GetDailyForecast
-import com.thelazybattley.domain.network.usecase.GetHourlyForecast
+import com.thelazybattley.domain.network.usecase.GetCurrentWeatherUseCase
+import com.thelazybattley.domain.network.usecase.GetDailyForecastUseCase
+import com.thelazybattley.domain.network.usecase.GetHourlyForecastUseCase
 import com.thelazybattley.feature.base.BaseViewModel
 import com.thelazybattley.feature.di.IoDispatcher
 import com.thelazybattley.feature.mapper.toData
@@ -20,9 +20,9 @@ import javax.inject.Inject
 @HiltViewModel
 class TodayWeatherViewModel @Inject constructor(
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
-    private val getCurrentWeather: GetCurrentWeather,
-    private val getHourlyForecast: GetHourlyForecast,
-    private val getDailyForecast: GetDailyForecast,
+    private val getCurrentWeatherUseCase: GetCurrentWeatherUseCase,
+    private val getHourlyForecastUseCase: GetHourlyForecastUseCase,
+    private val getDailyForecastUseCase: GetDailyForecastUseCase,
     private val getLocationUseCase: GetLocationUseCase
 ) : BaseViewModel<CurrentWeatherEvents, CurrentWeatherViewState>() {
 
@@ -53,7 +53,7 @@ class TodayWeatherViewModel @Inject constructor(
                     isLoading = true
                 )
             }
-            getCurrentWeather(
+            getCurrentWeatherUseCase(
                 latitude = latitude,
                 longitude = longitude
             ).fold(
@@ -84,8 +84,8 @@ class TodayWeatherViewModel @Inject constructor(
 
     private fun fetchDailyForecast(latitude: String, longitude: String) {
         viewModelScope.launch(context = dispatcher) {
-            val hourly = getHourlyForecast(latitude = latitude, longitude = longitude).getOrNull() ?: return@launch
-            getDailyForecast(latitude = latitude, longitude = longitude).fold(
+            val hourly = getHourlyForecastUseCase(latitude = latitude, longitude = longitude).getOrNull() ?: return@launch
+            getDailyForecastUseCase(latitude = latitude, longitude = longitude).fold(
                 onSuccess = { schema ->
                     updateState { state ->
                         state.copy(

@@ -92,7 +92,6 @@ fun WeatherMainScreen(
                             coroutineScope.launch {
                                 pagerState.animateScrollToPage(page = index)
                             }
-
                         },
                     )
                 }
@@ -110,7 +109,7 @@ fun WeatherMainScreen(
                         ForecastWeatherTabScreen()
                     }
 
-                    WeatherTabs.PRECIPITATION.index -> {
+                    WeatherTabs.HISTORY.index -> {
 
                     }
                 }
@@ -122,5 +121,5 @@ fun WeatherMainScreen(
 private enum class WeatherTabs(@StringRes val textRes: Int, val index: Int) {
     TODAY(textRes = (R.string.today), index = 0),
     FORECAST(textRes = R.string.forecast, index = 1),
-    PRECIPITATION(textRes = R.string.precipitation, index = 2)
+    HISTORY(textRes = R.string.history, index = 2)
 }

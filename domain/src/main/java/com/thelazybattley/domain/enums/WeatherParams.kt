@@ -18,7 +18,10 @@ enum class WeatherParams {
     DAYLIGHT_DURATION,
     PRECIPITATION_PROBABILITY_MAX,
     PRECIPITATION_PROBABILITY,
-    VISIBILITY
+    VISIBILITY,
+    TEMPERATURE_2M_MEAN,
+    PRECIPITATION_SUM,
+    PRECIPITATION_HOURS
     ;
 
     companion object {
@@ -57,6 +60,16 @@ enum class WeatherParams {
             CLOUD_COVER,
             SURFACE_PRESSURE,
             PRECIPITATION
+        ).joinToString(separator = ",")
+
+
+        fun historyParams() = listOf(
+            WEATHER_CODE,
+            TEMPERATURE_2M_MAX,
+            TEMPERATURE_2M_MIN,
+            TEMPERATURE_2M_MEAN,
+            PRECIPITATION_SUM,
+            PRECIPITATION_HOURS
         ).joinToString(separator = ",")
     }
 

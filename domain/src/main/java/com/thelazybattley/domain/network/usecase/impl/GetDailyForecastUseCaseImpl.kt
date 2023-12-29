@@ -1,12 +1,12 @@
 package com.thelazybattley.domain.network.usecase.impl
 
-import com.thelazybattley.domain.network.usecase.GetDailyForecast
+import com.thelazybattley.domain.network.usecase.GetDailyForecastUseCase
 import com.thelazybattley.domain.repository.WeatherRepository
 import javax.inject.Inject
 
-class GetDailyForecastImpl @Inject constructor(
+class GetDailyForecastUseCaseImpl @Inject constructor(
     private val repository: WeatherRepository
-) : GetDailyForecast {
+) : GetDailyForecastUseCase {
 
     override suspend fun invoke(
         latitude: String,

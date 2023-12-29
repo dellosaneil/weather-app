@@ -4,12 +4,14 @@ import com.thelazybattley.domain.local.usecase.GetLocationUseCase
 import com.thelazybattley.domain.local.usecase.InsertLocationUseCase
 import com.thelazybattley.domain.local.usecase.impl.GetLocationUseCaseImpl
 import com.thelazybattley.domain.local.usecase.impl.InsertLocationUseCaseImpl
-import com.thelazybattley.domain.network.usecase.GetCurrentWeather
-import com.thelazybattley.domain.network.usecase.GetDailyForecast
-import com.thelazybattley.domain.network.usecase.GetHourlyForecast
-import com.thelazybattley.domain.network.usecase.impl.GetCurrentWeatherImpl
-import com.thelazybattley.domain.network.usecase.impl.GetDailyForecastImpl
-import com.thelazybattley.domain.network.usecase.impl.GetHourlyForecastImpl
+import com.thelazybattley.domain.network.usecase.GetCurrentWeatherUseCase
+import com.thelazybattley.domain.network.usecase.GetDailyForecastUseCase
+import com.thelazybattley.domain.network.usecase.GetHistoryUseCase
+import com.thelazybattley.domain.network.usecase.GetHourlyForecastUseCase
+import com.thelazybattley.domain.network.usecase.impl.GetCurrentWeatherUseCaseImpl
+import com.thelazybattley.domain.network.usecase.impl.GetDailyForecastUseCaseImpl
+import com.thelazybattley.domain.network.usecase.impl.GetHistoryUseCaseImpl
+import com.thelazybattley.domain.network.usecase.impl.GetHourlyForecastUseCaseImpl
 import com.thelazybattley.domain.usecase.GetAddress
 import com.thelazybattley.domain.usecase.SearchAddressList
 import com.thelazybattley.domain.usecase.impl.GetAddressImpl
@@ -24,13 +26,13 @@ import dagger.hilt.android.components.ViewModelComponent
 abstract class UseCaseModule {
 
     @Binds
-    abstract fun bindsGetCurrentWeather(impl: GetCurrentWeatherImpl): GetCurrentWeather
+    abstract fun bindsGetCurrentWeather(impl: GetCurrentWeatherUseCaseImpl): GetCurrentWeatherUseCase
 
     @Binds
-    abstract fun bindsGetHourlyForecast(impl: GetHourlyForecastImpl): GetHourlyForecast
+    abstract fun bindsGetHourlyForecast(impl: GetHourlyForecastUseCaseImpl): GetHourlyForecastUseCase
 
     @Binds
-    abstract fun bindsGetDailyForecast(impl: GetDailyForecastImpl): GetDailyForecast
+    abstract fun bindsGetDailyForecast(impl: GetDailyForecastUseCaseImpl): GetDailyForecastUseCase
 
     @Binds
     abstract fun bindsGetCoordinates(impl: SearchAddressListImpl): SearchAddressList
@@ -43,5 +45,8 @@ abstract class UseCaseModule {
 
     @Binds
     abstract fun bindsInsertLocationUseCase(impl: InsertLocationUseCaseImpl): InsertLocationUseCase
+
+    @Binds
+    abstract fun bindsGetHistoryUseCase(impl: GetHistoryUseCaseImpl): GetHistoryUseCase
 
 }

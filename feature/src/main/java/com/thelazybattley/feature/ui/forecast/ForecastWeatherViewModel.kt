@@ -2,8 +2,8 @@ package com.thelazybattley.feature.ui.forecast
 
 import androidx.lifecycle.viewModelScope
 import com.thelazybattley.domain.local.usecase.GetLocationUseCase
-import com.thelazybattley.domain.network.usecase.GetDailyForecast
-import com.thelazybattley.domain.network.usecase.GetHourlyForecast
+import com.thelazybattley.domain.network.usecase.GetDailyForecastUseCase
+import com.thelazybattley.domain.network.usecase.GetHourlyForecastUseCase
 import com.thelazybattley.feature.base.BaseViewModel
 import com.thelazybattley.feature.di.IoDispatcher
 import com.thelazybattley.feature.mapper.toData
@@ -19,8 +19,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ForecastWeatherViewModel @Inject constructor(
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
-    private val getDailyForecast: GetDailyForecast,
-    private val getHourlyForecast: GetHourlyForecast,
+    private val getDailyForecastUseCase: GetDailyForecastUseCase,
+    private val getHourlyForecastUseCase: GetHourlyForecastUseCase,
     private val getLocationUseCase: GetLocationUseCase
 ) : BaseViewModel<ForecastWeatherEvents, ForecastWeatherState>(), ForecastWeatherCallbacks {
 
@@ -49,13 +49,13 @@ class ForecastWeatherViewModel @Inject constructor(
     ) {
         with(coroutineScope) {
             val dailyForecast = async {
-                getDailyForecast(
+                getDailyForecastUseCase(
                     latitude = latitude,
                     longitude = longitude
                 )
             }
             val hourlyForecast = async {
-                getHourlyForecast(
+                getHourlyForecastUseCase(
                     latitude = latitude,
                     longitude = longitude
                 )

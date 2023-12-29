@@ -6,6 +6,7 @@ import com.thelazybattley.domain.enums.WeatherParams
 import com.thelazybattley.domain.local.model.userlocation.UserLocation
 import com.thelazybattley.domain.mapper.toSchema
 import com.thelazybattley.domain.network.schema.current.CurrentWeatherDataSchema
+import com.thelazybattley.domain.network.schema.history.HistoryDataSchema
 import com.thelazybattley.domain.network.schema.hourlyforecast.HourlyForecastDataSchema
 import com.thelazybattley.domain.repository.WeatherRepository
 import kotlinx.coroutines.flow.Flow
@@ -85,5 +86,24 @@ class WeatherRepositoryImpl @Inject constructor(
 
     override suspend fun insertLocation(userLocation: UserLocation) {
         userLocationDao.insertLocation(location = UserLocation.toEntity(location = userLocation))
+    }
+
+    override suspend fun getHistory(
+        latitude: String,
+        longitude: String,
+        startDate: String,
+        endDate: String
+    ): Result<HistoryDataSchema> = try {
+        openMateoService.getHistory(
+            latitude = latitude,
+            longitude = longitude,
+            startDate = startDate,
+            endDate = endDate,
+            params = WeatherParams.historyParams()
+        ).toSchema.run {
+            Result.success(this)
+        }
+    } catch (e: Exception) {
+        Result.failure(e)
     }
 }
