@@ -13,8 +13,10 @@ import com.thelazybattley.domain.network.usecase.impl.GetDailyForecastUseCaseImp
 import com.thelazybattley.domain.network.usecase.impl.GetHistoryUseCaseImpl
 import com.thelazybattley.domain.network.usecase.impl.GetHourlyForecastUseCaseImpl
 import com.thelazybattley.domain.usecase.GetAddress
+import com.thelazybattley.domain.usecase.LocalDateFormatterUseCase
 import com.thelazybattley.domain.usecase.SearchAddressList
 import com.thelazybattley.domain.usecase.impl.GetAddressImpl
+import com.thelazybattley.domain.usecase.impl.LocalDateFormatterUseCaseImpl
 import com.thelazybattley.domain.usecase.impl.SearchAddressListImpl
 import dagger.Binds
 import dagger.Module
@@ -48,5 +50,8 @@ abstract class UseCaseModule {
 
     @Binds
     abstract fun bindsGetHistoryUseCase(impl: GetHistoryUseCaseImpl): GetHistoryUseCase
+
+    @Binds
+    abstract fun bindsLocalDateFormatterUseCase(impl: LocalDateFormatterUseCaseImpl): LocalDateFormatterUseCase
 
 }

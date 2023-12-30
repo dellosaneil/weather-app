@@ -27,6 +27,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.thelazybattley.feature.R
 import com.thelazybattley.feature.ui.destinations.MapsScreenDestination
 import com.thelazybattley.feature.ui.forecast.ForecastWeatherTabScreen
+import com.thelazybattley.feature.ui.history.HistoryTabScreen
 import com.thelazybattley.feature.ui.today.CurrentWeatherScreen
 import com.thelazybattley.feature.util.Colors
 import kotlinx.coroutines.launch
@@ -110,7 +111,7 @@ fun WeatherMainScreen(
                     }
 
                     WeatherTabs.HISTORY.index -> {
-
+                        HistoryTabScreen()
                     }
                 }
             }

@@ -1,11 +1,13 @@
 package com.thelazybattley.feature.model.history
 
+import com.thelazybattley.feature.model.currentweather.WeatherCondition
+
 data class HistoryDaily(
-    val precipitationHours: List<Double>,
-    val precipitationSum: List<Double>,
-    val temperature2mMax: List<Double>,
-    val temperature2mMean: List<Double>,
-    val temperature2mMin: List<Double>,
-    val time: List<Long>,
-    val weatherCode: List<Int>
+    val precipitationHours: Double,
+    val precipitationSum: Double,
+    val temperature2mMax: Double,
+    val temperature2mMean: Double,
+    val temperature2mMin: Double,
+    val time: Long,
+    val weatherCode: WeatherCondition
 )
