@@ -22,6 +22,8 @@ object Colors {
     val Crimson = Color(0xffdc143c)
     val StormGray = Color(0xff73767F)
     val Black = Color(0xff000000)
+    val Green = Color(0xff00FF00)
+    val Yellow = Color(0xffFFFF00)
 }
 
 
