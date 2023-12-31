@@ -28,8 +28,8 @@
     <string name="selected_coordinates">Selected Coordinates</string>
     <string name="search_location">Search Location</string>
     <string name="save_location">Save Location</string>
-    <string name="mean_temperature">Mean Temperature</string>
-    <string name="min_temperature">Min. Temperature</string>
-    <string name="max_temperature">Max Temperature</string>
-    <string name="precipitation_sum">Precipitation Sum</string>
+    <string name="mean_temperature">Avg. Temp</string>
+    <string name="min_temperature">Min. Temp</string>
+    <string name="max_temperature">Max Temp</string>
+    <string name="precipitation_sum">Rain Quantity</string>
 </resources>

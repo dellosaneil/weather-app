@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,7 +25,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextLayoutResult
@@ -38,15 +41,25 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.thelazybattley.feature.R
 import com.thelazybattley.feature.ui.common.CommonBackground
 import com.thelazybattley.feature.util.Colors
+import com.thelazybattley.feature.util.roundTwoDecimal
 
-private const val STEP_COUNT = 10
+private const val STEP_COUNT = 12
 
-private const val LEGEND_HEIGHT = 60
+private const val LEGEND_HEIGHT = 80
 private const val CHART_HEIGHT = 250
-private const val TOTAL_CHART_HEIGHT = LEGEND_HEIGHT + CHART_HEIGHT
+private const val LABEL_HEIGHT = 60
+private const val CHART_LEGEND_PADDING = 20
+
+private const val TOTAL_CHART_HEIGHT =
+    LEGEND_HEIGHT + CHART_HEIGHT + LABEL_HEIGHT + CHART_LEGEND_PADDING
 private const val LEGEND_DIVIDER_STROKE_WIDTH = 4f
 private const val LEGEND_SYMBOL_STROKE_WIDTH = 6f
 private const val LEGEND_SYMBOL_WIDTH = 50f
+
+private const val DATA_STROKE_WIDTH = 3f
+
+private const val DUMMY_HIGHEST = 10.0
+private const val DUMMY_LOWEST = 0.0
 
 
 @Composable
@@ -75,6 +88,7 @@ private fun HistoryTabScreen(
     )
 
     val legendRects = remember { mutableStateListOf<Rect>() }
+    val yAxisWidth = remember { mutableFloatStateOf(0f) }
 
     val context = LocalContext.current
     CommonBackground(modifier = Modifier.fillMaxSize()) {
@@ -87,7 +101,7 @@ private fun HistoryTabScreen(
                     border = BorderStroke(width = 2.dp, color = Colors.DarkGray),
                     shape = RoundedCornerShape(size = 8.dp)
                 )
-                .pointerInput(legendRects) {
+                .pointerInput(key1 = legendRects) {
                     detectTapGestures { tapOffset ->
                         for (rect in legendRects) {
                             if (rect.contains(tapOffset)) {
@@ -107,6 +121,121 @@ private fun HistoryTabScreen(
                 drawScope = this,
                 context = context,
                 legendRects = legendRects
+            )
+            drawChartYAxisIndicator(
+                drawScope = this,
+                yAxisWidth = yAxisWidth.floatValue
+            )
+
+            drawYAxis(
+                drawScope = this,
+                textMeasurer = textMeasurer,
+                textStyle = textStyle
+            ) {
+                yAxisWidth.floatValue = it
+            }
+            drawChartData(
+                drawScope = this,
+                yAxisWidth = yAxisWidth.floatValue
+            )
+        }
+    }
+}
+
+fun drawChartData(drawScope: DrawScope, yAxisWidth: Float) {
+    val measurements = listOf(
+        0.0,
+        2.0,
+        0.83,
+        3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0,
+        8.33, 5.83, 9.17
+    )
+    val range = DUMMY_HIGHEST - DUMMY_LOWEST
+    with(drawScope) {
+        val widthPerPoint = (size.width - yAxisWidth) / measurements.size
+
+        val points = measurements.mapIndexed { index, point ->
+            Offset(
+                x = index * widthPerPoint,
+                y = (CHART_HEIGHT.dp.toPx() + LABEL_HEIGHT.dp.toPx()) - (point / range * CHART_HEIGHT.dp.toPx()).toFloat()
+            )
+        }
+        drawPoints(
+            points = points,
+            color = Colors.Green,
+            pointMode = PointMode.Polygon,
+            strokeWidth = DATA_STROKE_WIDTH
+        )
+    }
+}
+
+fun drawYAxis(
+    drawScope: DrawScope, textStyle: TextStyle, textMeasurer: TextMeasurer,
+    yAxisWidth: (Float) -> Unit
+) {
+    val step = (DUMMY_HIGHEST - DUMMY_LOWEST) / STEP_COUNT
+    val measuredTexts = run {
+        val list = mutableListOf<TextLayoutResult>()
+        repeat(STEP_COUNT.inc()) { index ->
+            textMeasurer.measure(
+                text = "${(DUMMY_HIGHEST - (step * index)).roundTwoDecimal}",
+                style = textStyle
+            ).also {
+                list.add(it)
+            }
+        }
+        list.toList()
+    }
+    val yAxisLabel = textMeasurer.measure(
+        text = "millimeters",
+        style = textStyle
+    )
+
+    val width = measuredTexts.maxOf { it.size.width.toFloat() } + 10f + yAxisLabel.size.height
+    yAxisWidth(width)
+    with(drawScope) {
+        measuredTexts.forEachIndexed { index, text ->
+            drawText(
+                textLayoutResult = text,
+                topLeft = Offset(
+                    x = size.width - width,
+                    y = LABEL_HEIGHT.dp.toPx() + (CHART_HEIGHT.dp.toPx() * (index.toFloat() / STEP_COUNT)) - text.size.height / 2
+                )
+            )
+        }
+        rotate(
+            degrees = 90f,
+            pivot = Offset(
+                x = size.width,
+                y = (LABEL_HEIGHT.dp.toPx() + (CHART_HEIGHT.dp.toPx()) / 2f)
+            )
+        ) {
+            drawText(
+                textLayoutResult = yAxisLabel,
+                topLeft = Offset(
+                    x = size.width - (yAxisLabel.size.width / 2f),
+                    y = (LABEL_HEIGHT.dp.toPx() + (CHART_HEIGHT.dp.toPx()) / 2f)
+                )
+            )
+        }
+    }
+}
+
+fun drawChartYAxisIndicator(drawScope: DrawScope, yAxisWidth: Float) {
+    with(drawScope) {
+        repeat(STEP_COUNT.inc()) { index ->
+            val yOffset =
+                CHART_HEIGHT.dp.toPx() * (index.toFloat() / STEP_COUNT) + LABEL_HEIGHT.dp.toPx()
+            drawLine(
+                color = Colors.Abbey,
+                start = Offset(
+                    x = 0f,
+                    y = yOffset
+                ),
+                end = Offset(
+                    x = size.width - yAxisWidth,
+                    y = yOffset
+                )
             )
         }
     }
@@ -140,7 +269,8 @@ private fun drawChartLegends(
     )
 
     with(drawScope) {
-        val topOffset = CHART_HEIGHT.dp.toPx()
+        val topOffset =
+            CHART_HEIGHT.dp.toPx() + LABEL_HEIGHT.dp.toPx() + CHART_LEGEND_PADDING.dp.toPx()
         val legendHeight = LEGEND_HEIGHT.dp.toPx()
         val firstRowYOffset = topOffset + (legendHeight / 4f)
         val secondRowYOffset = topOffset + legendHeight - legendHeight / 4f
@@ -303,13 +433,12 @@ private fun drawLegend(
 
 private enum class HistoryLegend(
     val color: Color,
-    @StringRes val textRes: Int,
-    val index: Int
+    @StringRes val textRes: Int
 ) {
-    MEAN_TEMPERATURE(color = Colors.Green, textRes = R.string.mean_temperature, index = 0),
-    MAX_TEMPERATURE(color = Colors.Crimson, textRes = R.string.max_temperature, index = 1),
-    PRECIPITATION_SUM(color = Colors.Yellow, textRes = R.string.precipitation_sum, index = 2),
-    MIN_TEMPERATURE(color = Colors.RoyalBlue, textRes = R.string.min_temperature, index = 3),
+    MEAN_TEMPERATURE(color = Colors.Green, textRes = R.string.mean_temperature),
+    MAX_TEMPERATURE(color = Colors.Crimson, textRes = R.string.max_temperature),
+    PRECIPITATION_SUM(color = Colors.Yellow, textRes = R.string.precipitation_sum),
+    MIN_TEMPERATURE(color = Colors.RoyalBlue, textRes = R.string.min_temperature),
 }
 
 
