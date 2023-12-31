@@ -9,22 +9,20 @@ import com.thelazybattley.feature.util.epochToMillis
 val HistoryDataSchema.toData
     get() = HistoryData(
         daily = daily.run {
-            val history = mutableListOf<HistoryDaily>()
-            repeat(time.size) { index ->
-                HistoryDaily(
-                    precipitationHours = precipitationHours[index],
-                    precipitationSum = precipitationSum[index],
-                    temperature2mMax = temperature2mMax[index],
-                    temperature2mMean = temperature2mMean[index],
-                    temperature2mMin = temperature2mMin[index],
-                    time = time.map { it.epochToMillis }[index],
-                    weatherCode = WeatherCondition.toWeatherCondition(
-                        id = weatherCode[index],
+            HistoryDaily(
+                precipitationHours = precipitationHours,
+                precipitationSum = precipitationSum,
+                temperature2mMax = temperature2mMax,
+                temperature2mMean = temperature2mMean,
+                weatherCode = weatherCode.map {
+                    WeatherCondition.toWeatherCondition(
+                        id = it,
                         isDay = true
                     )
-                )
-            }
-            history
+                },
+                temperature2mMin = temperature2mMin,
+                time = time.map { it.epochToMillis }
+            )
         },
         timezone = timezone
     )

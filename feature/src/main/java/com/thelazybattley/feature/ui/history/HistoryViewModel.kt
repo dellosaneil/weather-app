@@ -56,6 +56,7 @@ class HistoryViewModel @Inject constructor(
                             }
                         },
                         onFailure = {
+                            it.printStackTrace()
                             updateState { state ->
                                 state.copy(
                                     throwable = it

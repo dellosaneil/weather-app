@@ -39,6 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.thelazybattley.feature.R
+import com.thelazybattley.feature.model.history.HistoryData
 import com.thelazybattley.feature.ui.common.CommonBackground
 import com.thelazybattley.feature.util.Colors
 import com.thelazybattley.feature.util.roundTwoDecimal
@@ -57,9 +58,6 @@ private const val LEGEND_SYMBOL_STROKE_WIDTH = 6f
 private const val LEGEND_SYMBOL_WIDTH = 50f
 
 private const val DATA_STROKE_WIDTH = 3f
-
-private const val DUMMY_HIGHEST = 10.0
-private const val DUMMY_LOWEST = 0.0
 
 
 @Composable
@@ -91,6 +89,14 @@ private fun HistoryTabScreen(
     val yAxisWidth = remember { mutableFloatStateOf(0f) }
 
     val context = LocalContext.current
+
+    if (viewState.historyData == null) {
+        return
+    }
+
+    val max = viewState.historyData.daily.temperature2mMax.maxOf { it }
+    val min = viewState.historyData.daily.temperature2mMax.minOf { it }
+
     CommonBackground(modifier = Modifier.fillMaxSize()) {
         Canvas(
             modifier = Modifier
@@ -130,34 +136,41 @@ private fun HistoryTabScreen(
             drawYAxis(
                 drawScope = this,
                 textMeasurer = textMeasurer,
-                textStyle = textStyle
+                textStyle = textStyle,
+                historyData = viewState.historyData,
+                max = max,
+                min = min
             ) {
                 yAxisWidth.floatValue = it
             }
             drawChartData(
                 drawScope = this,
-                yAxisWidth = yAxisWidth.floatValue
+                yAxisWidth = yAxisWidth.floatValue,
+                historyData = viewState.historyData,
+                max = max,
+                min = min
             )
         }
     }
 }
 
-fun drawChartData(drawScope: DrawScope, yAxisWidth: Float) {
-    val measurements = listOf(
-        0.0,
-        2.0,
-        0.83,
-        3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0,
-        8.33, 5.83, 9.17
-    )
-    val range = DUMMY_HIGHEST - DUMMY_LOWEST
+fun drawChartData(
+    drawScope: DrawScope, yAxisWidth: Float,
+    historyData: HistoryData,
+    max: Double,
+    min: Double
+) {
+    val measurements = historyData.daily.temperature2mMax
+    val range = max - min
     with(drawScope) {
-        val widthPerPoint = (size.width - yAxisWidth) / measurements.size
+        val widthPerPoint =
+            (size.width - yAxisWidth) / measurements.size
+        val chartHeightWithLabel = (CHART_HEIGHT.dp.toPx() + LABEL_HEIGHT.dp.toPx())
 
         val points = measurements.mapIndexed { index, point ->
             Offset(
                 x = index * widthPerPoint,
-                y = (CHART_HEIGHT.dp.toPx() + LABEL_HEIGHT.dp.toPx()) - (point / range * CHART_HEIGHT.dp.toPx()).toFloat()
+                y = chartHeightWithLabel - ((point - min) / range * CHART_HEIGHT.dp.toPx()).toFloat()
             )
         }
         drawPoints(
@@ -170,15 +183,20 @@ fun drawChartData(drawScope: DrawScope, yAxisWidth: Float) {
 }
 
 fun drawYAxis(
-    drawScope: DrawScope, textStyle: TextStyle, textMeasurer: TextMeasurer,
+    drawScope: DrawScope,
+    textStyle: TextStyle,
+    textMeasurer: TextMeasurer,
+    historyData: HistoryData,
+    max: Double,
+    min: Double,
     yAxisWidth: (Float) -> Unit
 ) {
-    val step = (DUMMY_HIGHEST - DUMMY_LOWEST) / STEP_COUNT
+    val step = (max - min) / STEP_COUNT
     val measuredTexts = run {
         val list = mutableListOf<TextLayoutResult>()
         repeat(STEP_COUNT.inc()) { index ->
             textMeasurer.measure(
-                text = "${(DUMMY_HIGHEST - (step * index)).roundTwoDecimal}",
+                text = "${(historyData.daily.temperature2mMax.maxOf { it } - (step * index)).roundTwoDecimal}",
                 style = textStyle
             ).also {
                 list.add(it)
@@ -187,7 +205,7 @@ fun drawYAxis(
         list.toList()
     }
     val yAxisLabel = textMeasurer.measure(
-        text = "millimeters",
+        text = "Celsius",
         style = textStyle
     )
 
@@ -446,7 +464,9 @@ private enum class HistoryLegend(
 @Composable
 private fun PreviewHistoryTabScreen() {
     HistoryTabScreen(
-        viewState = HistoryState(),
+        viewState = HistoryState(
+            historyData = HistoryData.createDummy()
+        ),
         event = null
     )
 }
