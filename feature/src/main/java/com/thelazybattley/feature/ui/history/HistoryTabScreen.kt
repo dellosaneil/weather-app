@@ -94,9 +94,25 @@ private fun HistoryTabScreen(
         return
     }
 
-    val max = viewState.historyData.daily.temperature2mMax.maxOf { it }
-    val min = viewState.historyData.daily.temperature2mMax.minOf { it }
+    val max = when (selectedLegend.value) {
+        HistoryLegend.MEAN_TEMPERATURE -> viewState.historyData.daily.temperature2mMean.maxOf { it }
+        HistoryLegend.MAX_TEMPERATURE -> viewState.historyData.daily.temperature2mMax.maxOf { it }
+        HistoryLegend.PRECIPITATION_SUM -> viewState.historyData.daily.precipitationSum.maxOf { it }
+        HistoryLegend.MIN_TEMPERATURE -> viewState.historyData.daily.temperature2mMin.maxOf { it }
+    }
 
+    val min = when (selectedLegend.value) {
+        HistoryLegend.MEAN_TEMPERATURE -> viewState.historyData.daily.temperature2mMean.minOf { it }
+        HistoryLegend.MAX_TEMPERATURE -> viewState.historyData.daily.temperature2mMax.minOf { it }
+        HistoryLegend.PRECIPITATION_SUM -> viewState.historyData.daily.precipitationSum.minOf { it }
+        HistoryLegend.MIN_TEMPERATURE -> viewState.historyData.daily.temperature2mMin.minOf { it }
+    }
+    val measurements = when (selectedLegend.value) {
+        HistoryLegend.MEAN_TEMPERATURE -> viewState.historyData.daily.temperature2mMean
+        HistoryLegend.MAX_TEMPERATURE -> viewState.historyData.daily.temperature2mMax
+        HistoryLegend.PRECIPITATION_SUM -> viewState.historyData.daily.precipitationSum
+        HistoryLegend.MIN_TEMPERATURE -> viewState.historyData.daily.temperature2mMin
+    }
     CommonBackground(modifier = Modifier.fillMaxSize()) {
         Canvas(
             modifier = Modifier
@@ -146,9 +162,10 @@ private fun HistoryTabScreen(
             drawChartData(
                 drawScope = this,
                 yAxisWidth = yAxisWidth.floatValue,
-                historyData = viewState.historyData,
+                measurements = measurements,
                 max = max,
-                min = min
+                min = min,
+                selectedLegend = selectedLegend.value
             )
         }
     }
@@ -156,11 +173,11 @@ private fun HistoryTabScreen(
 
 fun drawChartData(
     drawScope: DrawScope, yAxisWidth: Float,
-    historyData: HistoryData,
     max: Double,
-    min: Double
+    min: Double,
+    selectedLegend: HistoryLegend,
+    measurements: List<Double>
 ) {
-    val measurements = historyData.daily.temperature2mMax
     val range = max - min
     with(drawScope) {
         val widthPerPoint =
@@ -173,9 +190,10 @@ fun drawChartData(
                 y = chartHeightWithLabel - ((point - min) / range * CHART_HEIGHT.dp.toPx()).toFloat()
             )
         }
+
         drawPoints(
             points = points,
-            color = Colors.Green,
+            color = selectedLegend.color,
             pointMode = PointMode.Polygon,
             strokeWidth = DATA_STROKE_WIDTH
         )
@@ -319,10 +337,13 @@ private fun drawChartLegends(
             isSelected = selectedLegend.value == HistoryLegend.MEAN_TEMPERATURE
         ) {
             val rect = Rect(
-                topLeft = Offset(x = 0f, y = CHART_HEIGHT.dp.toPx()),
+                topLeft = Offset(
+                    x = 0f,
+                    y = CHART_HEIGHT.dp.toPx() + LABEL_HEIGHT.dp.toPx() + CHART_LEGEND_PADDING.dp.toPx()
+                ),
                 bottomRight = Offset(
                     x = size.width / 2f,
-                    y = CHART_HEIGHT.dp.toPx() + (LEGEND_HEIGHT.dp.toPx() / 2f)
+                    y = CHART_HEIGHT.dp.toPx() + (LEGEND_HEIGHT.dp.toPx() / 2f) + LABEL_HEIGHT.dp.toPx() + CHART_LEGEND_PADDING.dp.toPx()
                 )
             )
             legendRects.add(rect)
@@ -349,11 +370,11 @@ private fun drawChartLegends(
             val rect = Rect(
                 topLeft = Offset(
                     x = 0f,
-                    y = CHART_HEIGHT.dp.toPx() + (LEGEND_HEIGHT.dp.toPx() / 2f)
+                    y = CHART_HEIGHT.dp.toPx() + (LEGEND_HEIGHT.dp.toPx() / 2f) + LABEL_HEIGHT.dp.toPx() + CHART_LEGEND_PADDING.dp.toPx()
                 ),
                 bottomRight = Offset(
                     x = size.width / 2f,
-                    y = CHART_HEIGHT.dp.toPx() + LEGEND_HEIGHT.dp.toPx()
+                    y = CHART_HEIGHT.dp.toPx() + LEGEND_HEIGHT.dp.toPx() + LABEL_HEIGHT.dp.toPx() + CHART_LEGEND_PADDING.dp.toPx()
                 )
             )
             legendRects.add(rect)
@@ -380,11 +401,11 @@ private fun drawChartLegends(
             val rect = Rect(
                 topLeft = Offset(
                     x = size.width / 2f,
-                    y = CHART_HEIGHT.dp.toPx() + (LEGEND_HEIGHT.dp.toPx() / 2f)
+                    y = CHART_HEIGHT.dp.toPx() + (LEGEND_HEIGHT.dp.toPx() / 2f) + LABEL_HEIGHT.dp.toPx() + CHART_LEGEND_PADDING.dp.toPx()
                 ),
                 bottomRight = Offset(
                     x = size.width,
-                    y = CHART_HEIGHT.dp.toPx() + LEGEND_HEIGHT.dp.toPx()
+                    y = CHART_HEIGHT.dp.toPx() + LEGEND_HEIGHT.dp.toPx() + LABEL_HEIGHT.dp.toPx() + CHART_LEGEND_PADDING.dp.toPx()
                 )
             )
             legendRects.add(rect)
@@ -409,10 +430,13 @@ private fun drawChartLegends(
             isSelected = selectedLegend.value == HistoryLegend.MIN_TEMPERATURE
         ) {
             val rect = Rect(
-                topLeft = Offset(x = size.width / 2f, y = CHART_HEIGHT.dp.toPx()),
+                topLeft = Offset(
+                    x = size.width / 2f,
+                    y = CHART_HEIGHT.dp.toPx() + LABEL_HEIGHT.dp.toPx() + CHART_LEGEND_PADDING.dp.toPx()
+                ),
                 bottomRight = Offset(
                     x = size.width,
-                    y = CHART_HEIGHT.dp.toPx() + (LEGEND_HEIGHT.dp.toPx() / 2f)
+                    y = CHART_HEIGHT.dp.toPx() + (LEGEND_HEIGHT.dp.toPx() / 2f) + LABEL_HEIGHT.dp.toPx() + CHART_LEGEND_PADDING.dp.toPx()
                 )
             )
             legendRects.add(rect)
@@ -449,7 +473,7 @@ private fun drawLegend(
     }
 }
 
-private enum class HistoryLegend(
+enum class HistoryLegend(
     val color: Color,
     @StringRes val textRes: Int
 ) {
