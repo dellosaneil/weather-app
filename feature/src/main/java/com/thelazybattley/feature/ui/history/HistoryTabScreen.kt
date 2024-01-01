@@ -84,7 +84,7 @@ private fun HistoryTabScreen(
     viewState: HistoryState,
     event: HistoryEvents?
 ) {
-    val highlightStartOffset = remember { mutableStateOf(Offset.Zero) }
+    val highlightStartXOffset = remember { mutableFloatStateOf(0f) }
     val highlightWidth = remember { mutableFloatStateOf(0f) }
 
 
@@ -158,7 +158,9 @@ private fun HistoryTabScreen(
         HistoryLegend.PRECIPITATION_SUM -> viewState.historyData.daily.precipitationSum
         HistoryLegend.MIN_TEMPERATURE -> viewState.historyData.daily.temperature2mMin
     }
-    CommonBackground(modifier = Modifier.fillMaxSize()) {
+    CommonBackground(
+        modifier = Modifier.fillMaxSize()
+    ) {
         Canvas(
             modifier = Modifier
                 .padding(16.dp)
@@ -183,10 +185,15 @@ private fun HistoryTabScreen(
                 .pointerInput(key1 = Unit) {
                     detectDragGesturesAfterLongPress(
                         onDragStart = {
-                            highlightStartOffset.value = it
+                            highlightStartXOffset.floatValue = it.x
                         },
                         onDrag = { _, dragAmount ->
-                            highlightWidth.floatValue += dragAmount.x
+                            val chartWidth = size.width - yAxisWidth.floatValue
+                            val rightBorder =
+                                highlightWidth.floatValue + highlightStartXOffset.floatValue
+                            if (rightBorder in 0f..chartWidth) {
+                                highlightWidth.floatValue += dragAmount.x
+                            }
                         },
                         onDragCancel = {
                             highlightWidth.floatValue = 0f
@@ -231,20 +238,20 @@ private fun HistoryTabScreen(
             )
             drawHighlightedArea(
                 drawScope = this,
-                startOffset = highlightStartOffset.value,
+                startXOffset = highlightStartXOffset.floatValue,
                 xOffset = highlightWidth.floatValue
             )
         }
     }
 }
 
-fun drawHighlightedArea(drawScope: DrawScope, startOffset: Offset, xOffset: Float) {
+fun drawHighlightedArea(drawScope: DrawScope, startXOffset: Float, xOffset: Float) {
     with(drawScope) {
         drawRect(
             color = Colors.Tuna,
             alpha = 0.9f,
             topLeft = Offset(
-                x = startOffset.x,
+                x = startXOffset,
                 y = LEGEND_HEIGHT.dp.toPx() - CHART_LEGEND_PADDING.dp.toPx()
             ),
             size = Size(
