@@ -32,4 +32,6 @@
     <string name="min_temperature">Min. Temp</string>
     <string name="max_temperature">Max Temp</string>
     <string name="precipitation_sum">Rain Quantity</string>
+    <string name="celcius">Celcius</string>
+    <string name="millimeter">Millimeter</string>
 </resources>

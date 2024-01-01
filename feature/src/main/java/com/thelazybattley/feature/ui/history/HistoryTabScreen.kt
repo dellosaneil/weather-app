@@ -153,9 +153,9 @@ private fun HistoryTabScreen(
                 drawScope = this,
                 textMeasurer = textMeasurer,
                 textStyle = textStyle,
-                historyData = viewState.historyData,
                 max = max,
-                min = min
+                min = min,
+                label = context.getString(selectedLegend.value.labelRes)
             ) {
                 yAxisWidth.floatValue = it
             }
@@ -204,9 +204,9 @@ fun drawYAxis(
     drawScope: DrawScope,
     textStyle: TextStyle,
     textMeasurer: TextMeasurer,
-    historyData: HistoryData,
     max: Double,
     min: Double,
+    label: String,
     yAxisWidth: (Float) -> Unit
 ) {
     val step = (max - min) / STEP_COUNT
@@ -214,7 +214,7 @@ fun drawYAxis(
         val list = mutableListOf<TextLayoutResult>()
         repeat(STEP_COUNT.inc()) { index ->
             textMeasurer.measure(
-                text = "${(historyData.daily.temperature2mMax.maxOf { it } - (step * index)).roundTwoDecimal}",
+                text = "${(max - (step * index)).roundTwoDecimal}",
                 style = textStyle
             ).also {
                 list.add(it)
@@ -223,7 +223,7 @@ fun drawYAxis(
         list.toList()
     }
     val yAxisLabel = textMeasurer.measure(
-        text = "Celsius",
+        text = label,
         style = textStyle
     )
 
@@ -475,12 +475,25 @@ private fun drawLegend(
 
 enum class HistoryLegend(
     val color: Color,
-    @StringRes val textRes: Int
+    @StringRes val textRes: Int,
+    @StringRes val labelRes: Int
 ) {
-    MEAN_TEMPERATURE(color = Colors.Green, textRes = R.string.mean_temperature),
-    MAX_TEMPERATURE(color = Colors.Crimson, textRes = R.string.max_temperature),
-    PRECIPITATION_SUM(color = Colors.Yellow, textRes = R.string.precipitation_sum),
-    MIN_TEMPERATURE(color = Colors.RoyalBlue, textRes = R.string.min_temperature),
+    MEAN_TEMPERATURE(
+        color = Colors.Green, textRes = R.string.mean_temperature,
+        labelRes = R.string.celcius
+    ),
+    MAX_TEMPERATURE(
+        color = Colors.Crimson, textRes = R.string.max_temperature,
+        labelRes = R.string.celcius
+    ),
+    PRECIPITATION_SUM(
+        color = Colors.Yellow, textRes = R.string.precipitation_sum,
+        labelRes = R.string.millimeter
+    ),
+    MIN_TEMPERATURE(
+        color = Colors.RoyalBlue, textRes = R.string.min_temperature,
+        labelRes = R.string.celcius
+    ),
 }
 
 
