@@ -2,6 +2,8 @@ package com.thelazybattley.feature.ui.history
 
 import android.content.Context
 import androidx.annotation.StringRes
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.border
@@ -13,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -89,10 +92,46 @@ private fun HistoryTabScreen(
     val yAxisWidth = remember { mutableFloatStateOf(0f) }
 
     val context = LocalContext.current
+    val resetAnimation = remember { mutableStateOf(false) }
+
+    val animatedProgress = remember { mutableStateOf(Animatable(0f)) }
+
+    LaunchedEffect(key1 = resetAnimation.value) {
+        if (resetAnimation.value) {
+            animatedProgress.value.animateTo(
+                targetValue = 0f,
+                animationSpec = tween(durationMillis = 0)
+            )
+            animatedProgress.value.animateTo(
+                targetValue = 1f,
+                animationSpec = tween(durationMillis = 3000)
+            )
+            resetAnimation.value = false
+        }
+
+    }
+    LaunchedEffect(key1 = selectedLegend.value) {
+        animatedProgress.value.animateTo(
+            targetValue = 0f,
+            animationSpec = tween(durationMillis = 0)
+        )
+        animatedProgress.value.animateTo(
+            targetValue = 1f,
+            animationSpec = tween(durationMillis = 3000)
+        )
+        resetAnimation.value = false
+    }
+
+    LaunchedEffect(key1 = viewState.isLoading) {
+        if (!viewState.isLoading) {
+            resetAnimation.value = true
+        }
+    }
 
     if (viewState.historyData == null) {
         return
     }
+
 
     val max = when (selectedLegend.value) {
         HistoryLegend.MEAN_TEMPERATURE -> viewState.historyData.daily.temperature2mMean.maxOf { it }
@@ -165,7 +204,8 @@ private fun HistoryTabScreen(
                 measurements = measurements,
                 max = max,
                 min = min,
-                selectedLegend = selectedLegend.value
+                selectedLegend = selectedLegend.value,
+                animatedState = animatedProgress.value.value
             )
         }
     }
@@ -176,7 +216,8 @@ fun drawChartData(
     max: Double,
     min: Double,
     selectedLegend: HistoryLegend,
-    measurements: List<Double>
+    measurements: List<Double>,
+    animatedState: Float
 ) {
     val range = max - min
     with(drawScope) {
@@ -191,8 +232,10 @@ fun drawChartData(
             )
         }
 
+        val animatedPoints = points.take(n = (animatedState * points.size).toInt())
+
         drawPoints(
-            points = points,
+            points = animatedPoints,
             color = selectedLegend.color,
             pointMode = PointMode.Polygon,
             strokeWidth = DATA_STROKE_WIDTH
