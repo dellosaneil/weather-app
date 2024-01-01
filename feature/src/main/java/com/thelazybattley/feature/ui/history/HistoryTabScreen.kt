@@ -7,6 +7,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,6 +28,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.graphics.drawscope.DrawScope
@@ -82,6 +84,10 @@ private fun HistoryTabScreen(
     viewState: HistoryState,
     event: HistoryEvents?
 ) {
+    val highlightStartOffset = remember { mutableStateOf(Offset.Zero) }
+    val highlightWidth = remember { mutableFloatStateOf(0f) }
+
+
     val selectedLegend = remember { mutableStateOf(HistoryLegend.MEAN_TEMPERATURE) }
     val textMeasurer = rememberTextMeasurer()
     val textStyle = MaterialTheme.typography.bodyMedium.copy(
@@ -174,6 +180,22 @@ private fun HistoryTabScreen(
                         }
                     }
                 }
+                .pointerInput(key1 = Unit) {
+                    detectDragGesturesAfterLongPress(
+                        onDragStart = {
+                            highlightStartOffset.value = it
+                        },
+                        onDrag = { _, dragAmount ->
+                            highlightWidth.floatValue += dragAmount.x
+                        },
+                        onDragCancel = {
+                            highlightWidth.floatValue = 0f
+                        },
+                        onDragEnd = {
+                            highlightWidth.floatValue = 0f
+                        }
+                    )
+                }
         ) {
             drawChartLegends(
                 selectedLegend = selectedLegend,
@@ -207,7 +229,29 @@ private fun HistoryTabScreen(
                 selectedLegend = selectedLegend.value,
                 animatedState = animatedProgress.value.value
             )
+            drawHighlightedArea(
+                drawScope = this,
+                startOffset = highlightStartOffset.value,
+                xOffset = highlightWidth.floatValue
+            )
         }
+    }
+}
+
+fun drawHighlightedArea(drawScope: DrawScope, startOffset: Offset, xOffset: Float) {
+    with(drawScope) {
+        drawRect(
+            color = Colors.Tuna,
+            alpha = 0.9f,
+            topLeft = Offset(
+                x = startOffset.x,
+                y = LEGEND_HEIGHT.dp.toPx() - CHART_LEGEND_PADDING.dp.toPx()
+            ),
+            size = Size(
+                width = xOffset,
+                height = CHART_HEIGHT.dp.toPx()
+            )
+        )
     }
 }
 
