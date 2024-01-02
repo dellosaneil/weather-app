@@ -17,7 +17,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -26,6 +25,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
@@ -48,6 +48,7 @@ import com.thelazybattley.feature.model.history.HistoryData
 import com.thelazybattley.feature.ui.common.CommonBackground
 import com.thelazybattley.feature.util.Colors
 import com.thelazybattley.feature.util.roundTwoDecimal
+import kotlin.math.roundToInt
 
 private const val STEP_COUNT = 12
 
@@ -74,7 +75,8 @@ fun HistoryTabScreen(
 
     HistoryTabScreen(
         viewState = viewState,
-        event = events
+        event = events,
+        callbacks = viewModel
     )
 
 }
@@ -82,13 +84,12 @@ fun HistoryTabScreen(
 @Composable
 private fun HistoryTabScreen(
     viewState: HistoryState,
-    event: HistoryEvents?
+    event: HistoryEvents?,
+    callbacks: HistoryCallbacks
 ) {
     val highlightStartXOffset = remember { mutableFloatStateOf(0f) }
     val highlightWidth = remember { mutableFloatStateOf(0f) }
 
-
-    val selectedLegend = remember { mutableStateOf(HistoryLegend.MEAN_TEMPERATURE) }
     val textMeasurer = rememberTextMeasurer()
     val textStyle = MaterialTheme.typography.bodyMedium.copy(
         color = Colors.White
@@ -110,20 +111,20 @@ private fun HistoryTabScreen(
             )
             animatedProgress.value.animateTo(
                 targetValue = 1f,
-                animationSpec = tween(durationMillis = 3000)
+                animationSpec = tween(durationMillis = 1000)
             )
             resetAnimation.value = false
         }
 
     }
-    LaunchedEffect(key1 = selectedLegend.value) {
+    LaunchedEffect(key1 = viewState.selectedLegend) {
         animatedProgress.value.animateTo(
             targetValue = 0f,
             animationSpec = tween(durationMillis = 0)
         )
         animatedProgress.value.animateTo(
             targetValue = 1f,
-            animationSpec = tween(durationMillis = 3000)
+            animationSpec = tween(durationMillis = 1000)
         )
         resetAnimation.value = false
     }
@@ -138,26 +139,6 @@ private fun HistoryTabScreen(
         return
     }
 
-
-    val max = when (selectedLegend.value) {
-        HistoryLegend.MEAN_TEMPERATURE -> viewState.historyData.daily.temperature2mMean.maxOf { it }
-        HistoryLegend.MAX_TEMPERATURE -> viewState.historyData.daily.temperature2mMax.maxOf { it }
-        HistoryLegend.PRECIPITATION_SUM -> viewState.historyData.daily.precipitationSum.maxOf { it }
-        HistoryLegend.MIN_TEMPERATURE -> viewState.historyData.daily.temperature2mMin.maxOf { it }
-    }
-
-    val min = when (selectedLegend.value) {
-        HistoryLegend.MEAN_TEMPERATURE -> viewState.historyData.daily.temperature2mMean.minOf { it }
-        HistoryLegend.MAX_TEMPERATURE -> viewState.historyData.daily.temperature2mMax.minOf { it }
-        HistoryLegend.PRECIPITATION_SUM -> viewState.historyData.daily.precipitationSum.minOf { it }
-        HistoryLegend.MIN_TEMPERATURE -> viewState.historyData.daily.temperature2mMin.minOf { it }
-    }
-    val measurements = when (selectedLegend.value) {
-        HistoryLegend.MEAN_TEMPERATURE -> viewState.historyData.daily.temperature2mMean
-        HistoryLegend.MAX_TEMPERATURE -> viewState.historyData.daily.temperature2mMax
-        HistoryLegend.PRECIPITATION_SUM -> viewState.historyData.daily.precipitationSum
-        HistoryLegend.MIN_TEMPERATURE -> viewState.historyData.daily.temperature2mMin
-    }
     CommonBackground(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -177,7 +158,7 @@ private fun HistoryTabScreen(
                                 val index = legendRects.indexOfFirst {
                                     it.contains(tapOffset)
                                 }
-                                selectedLegend.value = HistoryLegend.entries[index]
+                                callbacks.selectLegend(legend = HistoryLegend.entries[index])
                             }
                         }
                     }
@@ -199,16 +180,22 @@ private fun HistoryTabScreen(
                             highlightWidth.floatValue = 0f
                         },
                         onDragEnd = {
+                            callbacks.highlightData(
+                                xStartOffset = highlightStartXOffset.floatValue,
+                                xEndOffset = highlightWidth.floatValue,
+                                chartWidth = size.width - yAxisWidth.floatValue
+                            )
                             highlightWidth.floatValue = 0f
                         }
                     )
                 }
+                .clipToBounds()
         ) {
             drawChartLegends(
-                selectedLegend = selectedLegend,
+                selectedLegend = viewState.selectedLegend,
+                drawScope = this,
                 textStyle = textStyle,
                 textMeasurer = textMeasurer,
-                drawScope = this,
                 context = context,
                 legendRects = legendRects
             )
@@ -221,19 +208,16 @@ private fun HistoryTabScreen(
                 drawScope = this,
                 textMeasurer = textMeasurer,
                 textStyle = textStyle,
-                max = max,
-                min = min,
-                label = context.getString(selectedLegend.value.labelRes)
+                max = viewState.yAxisMaxValue,
+                min = viewState.yAxisMinValue,
+                label = context.getString(viewState.selectedLegend.labelRes)
             ) {
                 yAxisWidth.floatValue = it
             }
             drawChartData(
                 drawScope = this,
                 yAxisWidth = yAxisWidth.floatValue,
-                measurements = measurements,
-                max = max,
-                min = min,
-                selectedLegend = selectedLegend.value,
+                viewState = viewState,
                 animatedState = animatedProgress.value.value
             )
             drawHighlightedArea(
@@ -245,7 +229,9 @@ private fun HistoryTabScreen(
     }
 }
 
-fun drawHighlightedArea(drawScope: DrawScope, startXOffset: Float, xOffset: Float) {
+fun drawHighlightedArea(
+    drawScope: DrawScope, startXOffset: Float, xOffset: Float
+) {
     with(drawScope) {
         drawRect(
             color = Colors.Tuna,
@@ -263,31 +249,31 @@ fun drawHighlightedArea(drawScope: DrawScope, startXOffset: Float, xOffset: Floa
 }
 
 fun drawChartData(
-    drawScope: DrawScope, yAxisWidth: Float,
-    max: Double,
-    min: Double,
-    selectedLegend: HistoryLegend,
-    measurements: List<Double>,
+    drawScope: DrawScope,
+    yAxisWidth: Float,
+    viewState: HistoryState,
     animatedState: Float
 ) {
-    val range = max - min
+    val range = viewState.yAxisMaxValue - viewState.yAxisMinValue
     with(drawScope) {
         val widthPerPoint =
-            (size.width - yAxisWidth) / measurements.size
+            (size.width - yAxisWidth) / viewState.selectedData.size
         val chartHeightWithLabel = (CHART_HEIGHT.dp.toPx() + LABEL_HEIGHT.dp.toPx())
 
-        val points = measurements.mapIndexed { index, point ->
-            Offset(
-                x = index * widthPerPoint,
-                y = chartHeightWithLabel - ((point - min) / range * CHART_HEIGHT.dp.toPx()).toFloat()
-            )
-        }
+        val points = viewState.selectedData
+            .mapIndexed { index, point ->
+                Offset(
+                    x = index * widthPerPoint,
+                    y = chartHeightWithLabel - ((point - viewState.yAxisMinValue) / range * CHART_HEIGHT.dp.toPx()).toFloat()
+                )
+            }
 
-        val animatedPoints = points.take(n = (animatedState * points.size).toInt())
+        val animatedPoints = points
+            .take(n = (animatedState * points.size).roundToInt())
 
         drawPoints(
             points = animatedPoints,
-            color = selectedLegend.color,
+            color = viewState.selectedLegend.color,
             pointMode = PointMode.Polygon,
             strokeWidth = DATA_STROKE_WIDTH
         )
@@ -372,7 +358,7 @@ fun drawChartYAxisIndicator(drawScope: DrawScope, yAxisWidth: Float) {
 }
 
 private fun drawChartLegends(
-    selectedLegend: MutableState<HistoryLegend>,
+    selectedLegend: HistoryLegend,
     drawScope: DrawScope,
     textStyle: TextStyle,
     textMeasurer: TextMeasurer,
@@ -428,7 +414,7 @@ private fun drawChartLegends(
                 y = firstRowYOffset - (meanTemp.size.height / 2f)
             ),
             legend = HistoryLegend.MEAN_TEMPERATURE,
-            isSelected = selectedLegend.value == HistoryLegend.MEAN_TEMPERATURE
+            isSelected = selectedLegend == HistoryLegend.MEAN_TEMPERATURE
         ) {
             val rect = Rect(
                 topLeft = Offset(
@@ -459,7 +445,7 @@ private fun drawChartLegends(
                 y = secondRowYOffset - (maxTemp.size.height / 2f)
             ),
             legend = HistoryLegend.MAX_TEMPERATURE,
-            isSelected = selectedLegend.value == HistoryLegend.MAX_TEMPERATURE
+            isSelected = selectedLegend == HistoryLegend.MAX_TEMPERATURE
         ) {
             val rect = Rect(
                 topLeft = Offset(
@@ -490,7 +476,7 @@ private fun drawChartLegends(
                 y = secondRowYOffset - (maxTemp.size.height / 2f)
             ),
             legend = HistoryLegend.PRECIPITATION_SUM,
-            isSelected = selectedLegend.value == HistoryLegend.PRECIPITATION_SUM
+            isSelected = selectedLegend == HistoryLegend.PRECIPITATION_SUM
         ) {
             val rect = Rect(
                 topLeft = Offset(
@@ -521,7 +507,7 @@ private fun drawChartLegends(
                 y = firstRowYOffset - (minTemp.size.height / 2f)
             ),
             legend = HistoryLegend.MIN_TEMPERATURE,
-            isSelected = selectedLegend.value == HistoryLegend.MIN_TEMPERATURE
+            isSelected = selectedLegend == HistoryLegend.MIN_TEMPERATURE
         ) {
             val rect = Rect(
                 topLeft = Offset(
@@ -598,6 +584,16 @@ private fun PreviewHistoryTabScreen() {
         viewState = HistoryState(
             historyData = HistoryData.createDummy()
         ),
-        event = null
+        event = null,
+        callbacks = object : HistoryCallbacks {
+            override fun selectLegend(legend: HistoryLegend) {
+                TODO("Not yet implemented")
+            }
+
+            override fun highlightData(xStartOffset: Float, xEndOffset: Float, chartWidth: Float) {
+                TODO("Not yet implemented")
+            }
+        }
     )
 }
+
