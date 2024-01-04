@@ -9,6 +9,7 @@ import com.thelazybattley.feature.base.BaseViewModel
 import com.thelazybattley.feature.di.IoDispatcher
 import com.thelazybattley.feature.mapper.toData
 import com.thelazybattley.feature.model.history.HistoryData
+import com.thelazybattley.feature.model.history.HistoryDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -67,13 +68,18 @@ class HistoryViewModel @Inject constructor(
             onSuccess = { schema ->
                 updateState { state ->
                     val data = schema.toData
-                    val selectedData = data.daily.temperature2mMean
+                    val selectedData = data.daily.temperature2mMean.mapIndexed { index, item ->
+                        HistoryDate(
+                            data = item,
+                            millis = data.daily.time[index]
+                        )
+                    }
                     state.copy(
                         throwable = null,
                         historyData = data,
                         selectedData = selectedData,
-                        yAxisMinValue = selectedData.minOf { it },
-                        yAxisMaxValue = selectedData.maxOf { it },
+                        yAxisMinValue = selectedData.minOf { it.data },
+                        yAxisMaxValue = selectedData.maxOf { it.data },
                         startHighlightedIndex = 0,
                         endHighlightedIndex = selectedData.size
                     )
@@ -97,6 +103,11 @@ class HistoryViewModel @Inject constructor(
                 HistoryLegend.MAX_TEMPERATURE -> historyData.temperature2mMax
                 HistoryLegend.PRECIPITATION_SUM -> historyData.precipitationSum
                 HistoryLegend.MIN_TEMPERATURE -> historyData.temperature2mMin
+            }.mapIndexed { index, item ->
+                HistoryDate(
+                    data = item,
+                    millis = historyData.time[index]
+                )
             }
 
             updateState { state ->
@@ -106,8 +117,8 @@ class HistoryViewModel @Inject constructor(
                         fromIndex = state.startHighlightedIndex,
                         toIndex = state.endHighlightedIndex
                     ),
-                    yAxisMaxValue = selectedData.maxOf { it },
-                    yAxisMinValue = selectedData.minOf { it }
+                    yAxisMaxValue = selectedData.maxOf { it.data },
+                    yAxisMinValue = selectedData.minOf { it.data }
                 )
             }
         }
@@ -173,7 +184,7 @@ data class HistoryState(
     val startDate: LocalDate = LocalDate.now().minusWeeks(10),
     val endDate: LocalDate = LocalDate.now().minusDays(1),
     val throwable: Throwable? = null,
-    val selectedData: List<Double> = emptyList(),
+    val selectedData: List<HistoryDate> = emptyList(),
     val selectedLegend: HistoryLegend = HistoryLegend.MEAN_TEMPERATURE,
     val yAxisMaxValue: Double = Double.MAX_VALUE,
     val yAxisMinValue: Double = Double.MIN_VALUE,

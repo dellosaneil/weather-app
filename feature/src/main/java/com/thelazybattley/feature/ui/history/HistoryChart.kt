@@ -1,5 +1,6 @@
 package com.thelazybattley.feature.ui.history
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.annotation.StringRes
 import androidx.compose.animation.core.Animatable
@@ -16,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -30,8 +32,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.VectorPainter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
@@ -42,7 +49,9 @@ import androidx.compose.ui.unit.dp
 import com.thelazybattley.feature.R
 import com.thelazybattley.feature.model.history.HistoryData
 import com.thelazybattley.feature.util.Colors
+import com.thelazybattley.feature.util.DatePattern
 import com.thelazybattley.feature.util.roundTwoDecimal
+import com.thelazybattley.feature.util.toDateString
 import kotlin.math.roundToInt
 
 private const val STEP_COUNT = 12
@@ -65,7 +74,8 @@ private const val DATA_STROKE_WIDTH = 3f
 fun HistoryChart(
     modifier: Modifier,
     viewState: HistoryState,
-    callbacks: HistoryCallbacks
+    callbacks: HistoryCallbacks,
+    showDateRangePicker: MutableState<Boolean>
 ) {
     val highlightStartXOffset = remember { mutableFloatStateOf(0f) }
     val highlightWidth = remember { mutableFloatStateOf(0f) }
@@ -77,11 +87,15 @@ fun HistoryChart(
 
     val legendRects = remember { mutableStateListOf<Rect>() }
     val yAxisWidth = remember { mutableFloatStateOf(0f) }
+    val editDateRect = remember { mutableStateOf(Rect(Offset.Zero, Offset.Zero)) }
 
     val context = LocalContext.current
     val resetAnimation = remember { mutableStateOf(false) }
 
     val animatedProgress = remember { mutableStateOf(Animatable(0f)) }
+
+    val editDateVector = ImageVector.vectorResource(id = R.drawable.ic_edit)
+    val editDatePainter = rememberVectorPainter(image = editDateVector)
 
     LaunchedEffect(key1 = resetAnimation.value) {
         if (resetAnimation.value) {
@@ -137,6 +151,9 @@ fun HistoryChart(
                             callbacks.selectLegend(legend = HistoryLegend.entries[index])
                         }
                     }
+                    if (editDateRect.value.contains(tapOffset)) {
+                        showDateRangePicker.value = true
+                    }
                 }
             }
             .pointerInput(key1 = Unit) {
@@ -167,6 +184,24 @@ fun HistoryChart(
             }
             .clipToBounds()
     ) {
+        if (viewState.selectedData.isNotEmpty()) {
+            drawLabel(
+                drawScope = this,
+                startDate = viewState.selectedData.first().millis.toDateString(
+                    pattern = DatePattern.DATE_MONTH_YEAR,
+                    timeZone = viewState.historyData.timezone
+                ),
+                endDate = viewState.selectedData.last().millis.toDateString(
+                    pattern = DatePattern.DATE_MONTH_YEAR,
+                    timeZone = viewState.historyData.timezone
+                ),
+                textMeasurer = textMeasurer,
+                textStyle = textStyle,
+                editDatePainter = editDatePainter,
+                editDateRect = editDateRect
+            )
+        }
+
         drawChartLegends(
             selectedLegend = viewState.selectedLegend,
             drawScope = this,
@@ -204,6 +239,59 @@ fun HistoryChart(
     }
 }
 
+private fun drawLabel(
+    drawScope: DrawScope,
+    startDate: String,
+    endDate: String,
+    textMeasurer: TextMeasurer,
+    textStyle: TextStyle,
+    editDatePainter: VectorPainter,
+    editDateRect: MutableState<Rect>
+) {
+
+    val textStartPadding = 50f
+    val textEndPadding = 20f
+    val textLayoutResult = textMeasurer.measure(
+        text = "$startDate - $endDate",
+        style = textStyle
+    )
+
+    with(drawScope) {
+        val yOffset = (LABEL_HEIGHT.dp.toPx() / 2f) - (textLayoutResult.size.height / 2f)
+        drawText(
+            textLayoutResult = textLayoutResult,
+            topLeft = Offset(
+                x = textStartPadding,
+                y = yOffset
+            )
+        )
+
+        translate(
+            top = yOffset,
+            left = textStartPadding + textLayoutResult.size.width + textEndPadding
+        ) {
+            with(editDatePainter) {
+                draw(
+                    size = Size(
+                        width = 24.dp.toPx(),
+                        height = 24.dp.toPx()
+                    )
+                )
+            }
+            editDateRect.value = Rect(
+                topLeft = Offset(
+                    x = textStartPadding + textLayoutResult.size.width + textEndPadding,
+                    y = yOffset
+                ),
+                bottomRight = Offset(
+                    x = textStartPadding + textLayoutResult.size.width + textEndPadding + 24.dp.toPx(),
+                    y = yOffset + 24.dp.toPx()
+                )
+            )
+        }
+    }
+}
+
 
 private fun drawHighlightedArea(
     drawScope: DrawScope, startXOffset: Float, xOffset: Float
@@ -237,6 +325,7 @@ private fun drawChartData(
         val chartHeightWithLabel = (CHART_HEIGHT.dp.toPx() + LABEL_HEIGHT.dp.toPx())
 
         val points = viewState.selectedData
+            .map { it.data }
             .mapIndexed { index, point ->
                 Offset(
                     x = index * widthPerPoint,
@@ -553,6 +642,7 @@ enum class HistoryLegend(
 }
 
 
+@SuppressLint("UnrememberedMutableState")
 @Preview(showBackground = true, device = "id:pixel_2")
 @Composable
 private fun PreviewHistoryTabScreen() {
@@ -561,6 +651,7 @@ private fun PreviewHistoryTabScreen() {
         viewState = HistoryState(
             historyData = HistoryData.createDummy()
         ),
+        showDateRangePicker = mutableStateOf(false),
         callbacks = object : HistoryCallbacks {
             override fun selectLegend(legend: HistoryLegend) {
                 TODO("Not yet implemented")

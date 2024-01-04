@@ -8,7 +8,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.thelazybattley.feature.ui.common.CommonBackground
@@ -37,12 +36,12 @@ private fun HistoryTabScreen(
     event: HistoryEvents?,
     callbacks: HistoryCallbacks
 ) {
-    var showDateRangePicker by remember { mutableStateOf(true) }
+    val showDateRangePicker = remember { mutableStateOf(false) }
 
     CommonBackground(
         modifier = Modifier.fillMaxSize()
     ) { _ ->
-        if (showDateRangePicker) {
+        if (showDateRangePicker.value) {
             CommonDatePicker(
                 yearRange = IntRange(start = 2022, endInclusive = 2024),
                 initialSelectedStartDateMillis = viewState.startDate.toMillis,
@@ -52,7 +51,7 @@ private fun HistoryTabScreen(
                     LocalDate.now().toMillis > it
                 },
                 onDismiss = {
-                    showDateRangePicker = false
+                    showDateRangePicker.value = false
                 }
             ) { startMillis, endMillis ->
                 callbacks.selectDateRange(startMillis = startMillis, endMillis = endMillis)
@@ -62,6 +61,7 @@ private fun HistoryTabScreen(
             modifier = Modifier,
             viewState = viewState,
             callbacks = callbacks,
+            showDateRangePicker = showDateRangePicker
         )
     }
 }
