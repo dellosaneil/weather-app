@@ -12,7 +12,9 @@ import com.thelazybattley.feature.model.history.HistoryData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
+import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
@@ -33,44 +35,12 @@ class HistoryViewModel @Inject constructor(
                     updateState { state ->
                         state.copy(
                             throwable = null,
-                            isLoading = true
+                            isLoading = true,
+                            latitude = loc.latitude.toString(),
+                            longitude = loc.longitude.toString()
                         )
                     }
-                    getHistoryUseCase(
-                        latitude = loc.latitude.toString(),
-                        longitude = loc.longitude.toString(),
-                        startDate = localDateFormatterUseCase(
-                            date = getCurrentState().startDate,
-                            pattern = YEAR_MONTH_DAY
-                        ),
-                        endDate = localDateFormatterUseCase(
-                            date = getCurrentState().endDate,
-                            pattern = YEAR_MONTH_DAY
-                        )
-                    ).fold(
-                        onSuccess = { schema ->
-                            updateState { state ->
-                                val data = schema.toData
-                                val selectedData = data.daily.temperature2mMean
-                                state.copy(
-                                    throwable = null,
-                                    historyData = data,
-                                    selectedData = selectedData,
-                                    yAxisMinValue = selectedData.minOf { it },
-                                    yAxisMaxValue = selectedData.maxOf { it },
-                                    startHighlightedIndex = 0,
-                                    endHighlightedIndex = selectedData.size
-                                )
-                            }
-                        },
-                        onFailure = {
-                            updateState { state ->
-                                state.copy(
-                                    throwable = it
-                                )
-                            }
-                        }
-                    )
+                    getHistory()
                     updateState { state ->
                         state.copy(
                             isLoading = false
@@ -79,6 +49,44 @@ class HistoryViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private suspend fun getHistory() {
+        getHistoryUseCase(
+            latitude = getCurrentState().latitude,
+            longitude = getCurrentState().longitude,
+            startDate = localDateFormatterUseCase(
+                date = getCurrentState().startDate,
+                pattern = YEAR_MONTH_DAY
+            ),
+            endDate = localDateFormatterUseCase(
+                date = getCurrentState().endDate,
+                pattern = YEAR_MONTH_DAY
+            )
+        ).fold(
+            onSuccess = { schema ->
+                updateState { state ->
+                    val data = schema.toData
+                    val selectedData = data.daily.temperature2mMean
+                    state.copy(
+                        throwable = null,
+                        historyData = data,
+                        selectedData = selectedData,
+                        yAxisMinValue = selectedData.minOf { it },
+                        yAxisMaxValue = selectedData.maxOf { it },
+                        startHighlightedIndex = 0,
+                        endHighlightedIndex = selectedData.size
+                    )
+                }
+            },
+            onFailure = {
+                updateState { state ->
+                    state.copy(
+                        throwable = it
+                    )
+                }
+            }
+        )
     }
 
     override fun selectLegend(legend: HistoryLegend) {
@@ -116,7 +124,10 @@ class HistoryViewModel @Inject constructor(
 
         val (start, end) = when {
             startIndex == 0 && endIndex == 0 -> 0 to itemCount
-            (startIndex < endIndex) -> startIndex.coerceAtLeast(minimumValue = 0) to endIndex.coerceAtMost(maximumValue = itemCount)
+            (startIndex < endIndex) -> startIndex.coerceAtLeast(minimumValue = 0) to endIndex.coerceAtMost(
+                maximumValue = itemCount
+            )
+
             else -> endIndex.coerceAtLeast(minimumValue = 0) to startIndex.coerceAtMost(maximumValue = itemCount)
         }
         viewModelScope.launch(context = dispatcher) {
@@ -132,6 +143,22 @@ class HistoryViewModel @Inject constructor(
                         )
                 )
             }
+        }
+    }
+
+    override fun selectDateRange(startMillis: Long, endMillis: Long) {
+        viewModelScope.launch(context = dispatcher) {
+            updateState { state ->
+                val startDate =
+                    Instant.ofEpochMilli(startMillis).atZone(ZoneId.systemDefault()).toLocalDate()
+                val endDate =
+                    Instant.ofEpochMilli(endMillis).atZone(ZoneId.systemDefault()).toLocalDate()
+                state.copy(
+                    startDate = startDate,
+                    endDate = endDate
+                )
+            }
+            getHistory()
         }
     }
 }
@@ -151,5 +178,7 @@ data class HistoryState(
     val yAxisMaxValue: Double = Double.MAX_VALUE,
     val yAxisMinValue: Double = Double.MIN_VALUE,
     val startHighlightedIndex: Int = 0,
-    val endHighlightedIndex: Int = 0
+    val endHighlightedIndex: Int = 0,
+    val latitude: String = "",
+    val longitude: String = ""
 )

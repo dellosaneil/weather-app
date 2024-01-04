@@ -34,4 +34,5 @@
     <string name="precipitation_sum">Rain Quantity</string>
     <string name="celcius">Celcius</string>
     <string name="millimeter">Millimeter</string>
+    <string name="select_date">Select Date</string>
 </resources>
