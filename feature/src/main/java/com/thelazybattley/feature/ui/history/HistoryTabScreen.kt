@@ -3,7 +3,9 @@ package com.thelazybattley.feature.ui.history
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,16 +39,28 @@ private fun HistoryTabScreen(
     callbacks: HistoryCallbacks
 ) {
     val showDateRangePicker = remember { mutableStateOf(false) }
+    val state = rememberDateRangePickerState(
+        initialDisplayMode = DisplayMode.Input,
+        initialSelectedStartDateMillis = viewState.startDate.toMillis,
+        initialSelectedEndDateMillis = viewState.endDate.toMillis,
+        yearRange = IntRange(start = 2022, endInclusive = 2024)
+    )
+
+    LaunchedEffect(key1 = viewState.startHighlightedIndex, key2 = viewState.endHighlightedIndex) {
+        if (viewState.selectedData.isNotEmpty()) {
+            state.setSelection(
+                startDateMillis = viewState.selectedData.first().millis,
+                endDateMillis = viewState.selectedData.last().millis
+            )
+        }
+    }
 
     CommonBackground(
         modifier = Modifier.fillMaxSize()
     ) { _ ->
         if (showDateRangePicker.value) {
             CommonDatePicker(
-                yearRange = IntRange(start = 2022, endInclusive = 2024),
-                initialSelectedStartDateMillis = viewState.startDate.toMillis,
-                initialSelectedEndDateMillis = viewState.endDate.toMillis,
-                initialDisplayMode = DisplayMode.Input,
+                state = state,
                 dateValidator = {
                     LocalDate.now().toMillis > it
                 },
