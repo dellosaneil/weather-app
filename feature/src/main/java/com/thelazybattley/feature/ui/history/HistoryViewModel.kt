@@ -143,7 +143,7 @@ sealed interface HistoryEvents {
 data class HistoryState(
     val isLoading: Boolean = false,
     val historyData: HistoryData? = null,
-    val startDate: LocalDate = LocalDate.now().minusDays(10),
+    val startDate: LocalDate = LocalDate.now().minusWeeks(10),
     val endDate: LocalDate = LocalDate.now().minusDays(1),
     val throwable: Throwable? = null,
     val selectedData: List<Double> = emptyList(),

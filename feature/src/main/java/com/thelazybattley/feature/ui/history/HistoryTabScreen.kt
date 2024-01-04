@@ -257,7 +257,7 @@ fun drawChartData(
     val range = viewState.yAxisMaxValue - viewState.yAxisMinValue
     with(drawScope) {
         val widthPerPoint =
-            (size.width - yAxisWidth) / viewState.selectedData.size
+            (size.width - yAxisWidth) / viewState.selectedData.size.dec()
         val chartHeightWithLabel = (CHART_HEIGHT.dp.toPx() + LABEL_HEIGHT.dp.toPx())
 
         val points = viewState.selectedData
@@ -307,7 +307,7 @@ fun drawYAxis(
         style = textStyle
     )
 
-    val width = measuredTexts.maxOf { it.size.width.toFloat() } + 10f + yAxisLabel.size.height
+    val width = measuredTexts.maxOf { it.size.width.toFloat() } + yAxisLabel.size.height
     yAxisWidth(width)
     with(drawScope) {
         measuredTexts.forEachIndexed { index, text ->
