@@ -22,6 +22,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -52,6 +53,7 @@ import com.thelazybattley.feature.util.Colors
 import com.thelazybattley.feature.util.DatePattern
 import com.thelazybattley.feature.util.roundTwoDecimal
 import com.thelazybattley.feature.util.toDateString
+import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 private const val STEP_COUNT = 12
@@ -85,6 +87,8 @@ fun HistoryChart(
         color = Colors.White
     )
 
+    val coroutineScope = rememberCoroutineScope()
+
     val legendRects = remember { mutableStateListOf<Rect>() }
     val yAxisWidth = remember { mutableFloatStateOf(0f) }
     val editDateRect = remember { mutableStateOf(Rect(Offset.Zero, Offset.Zero)) }
@@ -111,11 +115,8 @@ fun HistoryChart(
         }
 
     }
+
     LaunchedEffect(key1 = viewState.selectedLegend) {
-        animatedProgress.value.animateTo(
-            targetValue = 0f,
-            animationSpec = tween(durationMillis = 0)
-        )
         animatedProgress.value.animateTo(
             targetValue = 1f,
             animationSpec = tween(durationMillis = 1000)
@@ -147,6 +148,12 @@ fun HistoryChart(
                         if (rect.contains(tapOffset)) {
                             val index = legendRects.indexOfFirst {
                                 it.contains(tapOffset)
+                            }
+                            coroutineScope.launch {
+                                animatedProgress.value.animateTo(
+                                    targetValue = 0f,
+                                    animationSpec = tween(durationMillis = 0)
+                                )
                             }
                             callbacks.selectLegend(legend = HistoryLegend.entries[index])
                         }
