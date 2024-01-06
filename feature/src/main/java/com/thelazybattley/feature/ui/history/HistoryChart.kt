@@ -70,7 +70,7 @@ private const val LEGEND_SYMBOL_STROKE_WIDTH = 6f
 private const val LEGEND_SYMBOL_WIDTH = 50f
 
 private const val DATA_STROKE_WIDTH = 3f
-
+private const val DATA_RADIUS = 5f
 
 @Composable
 fun HistoryChart(
@@ -327,7 +327,7 @@ private fun drawChartData(
 ) {
     val range = viewState.yAxisMaxValue - viewState.yAxisMinValue
     with(drawScope) {
-        val widthPerPoint =
+        val widthPerData =
             (size.width - yAxisWidth) / viewState.selectedData.size.dec()
         val chartHeightWithLabel = (CHART_HEIGHT.dp.toPx() + LABEL_HEIGHT.dp.toPx())
 
@@ -335,7 +335,7 @@ private fun drawChartData(
             .map { it.data }
             .mapIndexed { index, point ->
                 Offset(
-                    x = index * widthPerPoint,
+                    x = index * widthPerData,
                     y = chartHeightWithLabel - ((point - viewState.yAxisMinValue) / range * CHART_HEIGHT.dp.toPx()).toFloat()
                 )
             }
@@ -349,6 +349,17 @@ private fun drawChartData(
             pointMode = PointMode.Polygon,
             strokeWidth = DATA_STROKE_WIDTH
         )
+
+        animatedPoints.forEach { point ->
+            drawCircle(
+                color = viewState.selectedLegend.color,
+                center = Offset(
+                    x = point.x,
+                    y = point.y
+                ),
+                radius = DATA_RADIUS
+            )
+        }
     }
 }
 
