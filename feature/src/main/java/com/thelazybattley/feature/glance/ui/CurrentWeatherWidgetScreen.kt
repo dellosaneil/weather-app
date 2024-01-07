@@ -25,13 +25,16 @@ import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
 import com.thelazybattley.feature.R
+import com.thelazybattley.feature.model.hourlyforecast.HourlyForecastData
 import com.thelazybattley.feature.util.Colors
 import com.thelazybattley.feature.util.DatePattern
 import com.thelazybattley.feature.util.toCelcius
 import com.thelazybattley.feature.util.toDateString
 
 @Composable
-fun CurrentWeatherWidgetScreen() {
+fun CurrentWeatherWidgetScreen(forecast: HourlyForecastData, location: String) {
+    val currentWeather = forecast.hourly.firstOrNull() ?: return
+
     Column(
         modifier = GlanceModifier
             .padding(all = 16.dp)
@@ -41,7 +44,7 @@ fun CurrentWeatherWidgetScreen() {
             .fillMaxSize()
     ) {
         Text(
-            text = "Davao City, Philippines",
+            text = location,
             style = TextStyle(
                 color = ColorProvider(Colors.HavelockBlue),
                 fontSize = 24.sp,
@@ -56,7 +59,7 @@ fun CurrentWeatherWidgetScreen() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = (33.2).toCelcius,
+                text = currentWeather.temperature2m.toCelcius,
                 style = TextStyle(
                     color = ColorProvider(color = Colors.HavelockBlue),
                     fontSize = 24.sp
@@ -73,7 +76,7 @@ fun CurrentWeatherWidgetScreen() {
                         modifier = GlanceModifier.size(size = 56.dp)
                     )
                     Text(
-                        text = "Light Rain",
+                        text = currentWeather.weatherCondition.description,
                         style = TextStyle(
                             color = ColorProvider(color = Colors.HavelockBlue),
                             fontSize = 12.sp
@@ -94,7 +97,7 @@ fun CurrentWeatherWidgetScreen() {
                     )
                     Spacer(modifier = GlanceModifier.width(width = 8.dp))
                     Text(
-                        text = (30.0).toCelcius,
+                        text = currentWeather.apparentTemperature.toCelcius,
                         style = TextStyle(
                             color = ColorProvider(color = Colors.HavelockBlue),
                             fontSize = 16.sp
@@ -107,12 +110,13 @@ fun CurrentWeatherWidgetScreen() {
         Spacer(modifier = GlanceModifier.height(height = 16.dp))
 
         Row(modifier = GlanceModifier.wrapContentWidth()) {
-            WidgetForecast(
-                iconRes = R.drawable.img_light_rain, temperature = 32.3, time = 1704596940502L
-            )
-            WidgetForecast(
-                iconRes = R.drawable.img_light_rain, temperature = 32.3, time = 1704596940502L
-            )
+            forecast.hourly.forEach {
+                WidgetForecast(
+                    iconRes = it.weatherCondition.icon,
+                    temperature = it.temperature2m,
+                    time = it.timeMillis
+                )
+            }
         }
     }
 }
