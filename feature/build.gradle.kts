@@ -67,5 +67,8 @@ dependencies {
     implementation(libs.landscapist.glide)
     kapt(libs.hiltCompiler)
     implementation(libs.maps.compose)
+    implementation(libs.glance.appwidget)
+    implementation(libs.androidx.glance.material3)
+    implementation( libs.appwidget.host)
 
 }

@@ -66,4 +66,7 @@ dependencies {
     kapt(libs.hiltCompiler)
     implementation(libs.ui.text.google.fonts)
 
+    implementation(libs.glance.appwidget)
+    implementation(libs.androidx.glance.material3)
+
 }

@@ -24,6 +24,10 @@ object Colors {
     val Black = Color(0xff000000)
     val Green = Color(0xff00FF00)
     val Yellow = Color(0xffFFFF00)
+    val Perano = Color(0xff9FBCF2)
+    val HavelockBlue = Color(0xff5686DF)
+    val HavelockBlue60 = Color(0x995686DF)
+
 }
 
 
