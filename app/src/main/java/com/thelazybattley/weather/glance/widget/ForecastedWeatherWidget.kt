@@ -9,10 +9,11 @@ import androidx.glance.currentState
 import androidx.glance.state.GlanceStateDefinition
 import androidx.glance.state.PreferencesGlanceStateDefinition
 import com.thelazybattley.weather.glance.ui.CurrentWeatherWidgetScreen
-import com.thelazybattley.weather.glance.utils.getAddress
-import com.thelazybattley.weather.glance.utils.getForecastedWeather
+import com.thelazybattley.weather.glance.util.getAddress
+import com.thelazybattley.weather.glance.util.getForecastedWeather
+import com.thelazybattley.weather.glance.util.getIsLoading
 
-class WeatherWidget : GlanceAppWidget() {
+class ForecastedWeatherWidget : GlanceAppWidget() {
 
     override val stateDefinition: GlanceStateDefinition<*> = PreferencesGlanceStateDefinition
 
@@ -21,10 +22,12 @@ class WeatherWidget : GlanceAppWidget() {
             val prefs = currentState<Preferences>()
             val forecastedWeather = prefs.getForecastedWeather()
             val address = prefs.getAddress()
+            val isLoading = prefs.getIsLoading()
             CurrentWeatherWidgetScreen(
                 forecast = forecastedWeather,
                 location = address,
                 context = context,
+                isLoading = isLoading
             )
         }
     }

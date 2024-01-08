@@ -36,24 +36,33 @@ import com.thelazybattley.feature.util.toCelcius
 import com.thelazybattley.feature.util.toDateString
 import com.thelazybattley.feature.util.toPercentage
 import com.thelazybattley.weather.MainActivity
-import com.thelazybattley.weather.glance.utils.EMPTY_ADDRESS
+import com.thelazybattley.weather.glance.util.EMPTY_ADDRESS
 
 @Composable
 fun CurrentWeatherWidgetScreen(
     forecast: HourlyForecastData,
     location: String,
-    context: Context
+    context: Context,
+    isLoading: Boolean
 ) {
-
     Column(
         modifier = GlanceModifier
             .padding(all = 16.dp)
             .background(
                 ImageProvider(R.drawable.rounded_corner_background)
             )
-            .fillMaxSize()
+            .fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
         when {
+            isLoading -> {
+                CircularProgressIndicator(
+                    modifier = GlanceModifier.defaultWeight(),
+                    color = ColorProvider(color = Colors.HavelockBlue)
+                )
+            }
+
             location == EMPTY_ADDRESS -> {
                 Text(
                     text = context.getString(R.string.click_here_to_open_application),

@@ -1,7 +1,8 @@
-package com.thelazybattley.weather.glance.utils
+package com.thelazybattley.weather.glance.util
 
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.google.gson.Gson
 import com.thelazybattley.feature.model.hourlyforecast.HourlyForecastData
@@ -9,6 +10,7 @@ import java.time.ZoneId
 
 const val KEY_FORECASTED_WEATHER = "weather_forecast"
 const val KEY_ADDRESS = "address"
+const val KEY_IS_LOADING = "is_loading"
 const val EMPTY_ADDRESS = "No Address"
 
 fun Preferences.getAddress(): String {
@@ -32,3 +34,12 @@ fun MutablePreferences.setForecastedWeather(forecast: HourlyForecastData) {
     val jsonStr = Gson().toJson(forecast).toString()
     this[stringPreferencesKey(KEY_FORECASTED_WEATHER)] = jsonStr
 }
+
+fun Preferences.getIsLoading(): Boolean {
+    return this[booleanPreferencesKey(KEY_IS_LOADING)] ?: true
+}
+
+fun MutablePreferences.setIsLoading(isLoading: Boolean) {
+    this[booleanPreferencesKey(KEY_IS_LOADING)] = isLoading
+}
+
