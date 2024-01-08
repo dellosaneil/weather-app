@@ -28,13 +28,13 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
-import com.thelazybattley.feature.R
-import com.thelazybattley.feature.model.hourlyforecast.HourlyForecastData
-import com.thelazybattley.feature.util.Colors
-import com.thelazybattley.feature.util.DatePattern
-import com.thelazybattley.feature.util.toCelcius
-import com.thelazybattley.feature.util.toDateString
-import com.thelazybattley.feature.util.toPercentage
+import com.thelazybattley.common.R
+import com.thelazybattley.common.model.hourlyforecast.HourlyForecastData
+import com.thelazybattley.common.util.Colors
+import com.thelazybattley.common.util.DatePattern
+import com.thelazybattley.common.util.toCelcius
+import com.thelazybattley.common.util.toDateString
+import com.thelazybattley.common.util.toPercentage
 import com.thelazybattley.weather.MainActivity
 import com.thelazybattley.weather.glance.util.EMPTY_ADDRESS
 

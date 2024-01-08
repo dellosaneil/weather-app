@@ -5,7 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.google.gson.Gson
-import com.thelazybattley.feature.model.hourlyforecast.HourlyForecastData
+import com.thelazybattley.common.model.hourlyforecast.HourlyForecastData
 import java.time.ZoneId
 
 const val KEY_FORECASTED_WEATHER = "weather_forecast"

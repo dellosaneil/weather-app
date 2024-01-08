@@ -55,12 +55,17 @@ android {
 }
 
 dependencies {
-    implementation(project(":feature"))
+    implementation(project(":feature:archive"))
+    implementation(project(":feature:forecast"))
+    implementation(project(":feature:current"))
+    implementation(project(":feature:maps"))
     implementation(project(":domain"))
+    implementation(project(":common"))
     implementation(libs.core.ktx)
     implementation(libs.lifecycle.runtime.ktx)
     implementation(libs.hilt.android)
     implementation(libs.bundles.compose)
+    implementation(libs.hilt.navigation.compose)
     implementation(libs.compose.destination.core)
     implementation(libs.timber)
     ksp(libs.compose.destination.ksp)

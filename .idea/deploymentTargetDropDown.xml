@@ -27,6 +27,21 @@
           <timeTargetWasSelectedWithDropDown value="2024-01-07T11:09:50.085775Z" />
         </State>
       </entry>
+      <entry key="common">
+        <State />
+      </entry>
+      <entry key="feature.archive">
+        <State />
+      </entry>
+      <entry key="feature.current">
+        <State />
+      </entry>
+      <entry key="feature.forecast">
+        <State />
+      </entry>
+      <entry key="feature.maps">
+        <State />
+      </entry>
     </value>
   </component>
 </project>

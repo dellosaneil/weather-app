@@ -10,10 +10,10 @@ import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import com.thelazybattley.common.mapper.toData
+import com.thelazybattley.common.mapper.today
+import com.thelazybattley.common.model.hourlyforecast.HourlyForecastData
 import com.thelazybattley.domain.repository.WeatherRepository
-import com.thelazybattley.feature.mapper.toData
-import com.thelazybattley.feature.mapper.today
-import com.thelazybattley.feature.model.hourlyforecast.HourlyForecastData
 import com.thelazybattley.weather.glance.util.setAddress
 import com.thelazybattley.weather.glance.util.setForecastedWeather
 import com.thelazybattley.weather.glance.util.setIsLoading
