@@ -10,6 +10,7 @@ import androidx.glance.GlanceModifier
 import androidx.glance.Image
 import androidx.glance.ImageProvider
 import androidx.glance.action.actionStartActivity
+import androidx.glance.action.clickable
 import androidx.glance.appwidget.CircularProgressIndicator
 import androidx.glance.background
 import androidx.glance.layout.Alignment
@@ -18,7 +19,6 @@ import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
-import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.size
 import androidx.glance.layout.width
@@ -73,7 +73,6 @@ fun CurrentWeatherWidgetScreen(
                         textAlign = TextAlign.Center
                     )
                 )
-                Spacer(modifier = GlanceModifier.height(24.dp))
 
                 Button(
                     text = context.getString(R.string.set_address),
@@ -84,7 +83,9 @@ fun CurrentWeatherWidgetScreen(
                         textAlign = TextAlign.Center
                     ),
                     onClick = actionStartActivity<MainActivity>(),
-                    modifier = GlanceModifier.fillMaxWidth()
+                    modifier = GlanceModifier
+                        .padding(top = 16.dp)
+                        .fillMaxWidth()
                 )
             }
 
@@ -115,7 +116,8 @@ private fun WidgetForecast(
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = GlanceModifier.padding(end = 16.dp)
+        modifier = GlanceModifier
+            .padding(horizontal = 8.dp)
     ) {
         Text(
             text = temperature.toCelcius,
@@ -171,7 +173,9 @@ private fun ShowWidget(
         modifier = GlanceModifier.fillMaxWidth()
     )
     Row(
-        modifier = GlanceModifier.fillMaxWidth(),
+        modifier = GlanceModifier
+            .clickable(actionStartActivity<MainActivity>())
+            .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
@@ -224,7 +228,11 @@ private fun ShowWidget(
         }
     }
 
-    Row(modifier = GlanceModifier.wrapContentWidth()) {
+    Row(
+        modifier = GlanceModifier
+            .clickable(actionStartActivity<MainActivity>())
+            .wrapContentWidth()
+    ) {
         forecast.hourly.forEach {
             WidgetForecast(
                 iconRes = it.weatherCondition.icon,
