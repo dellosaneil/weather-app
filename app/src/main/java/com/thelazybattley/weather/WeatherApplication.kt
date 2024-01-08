@@ -13,5 +13,4 @@ class WeatherApplication : Application() {
             Timber.plant(tree = Timber.DebugTree())
         }
     }
-
 }

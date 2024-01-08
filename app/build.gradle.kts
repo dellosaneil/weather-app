@@ -56,6 +56,7 @@ android {
 
 dependencies {
     implementation(project(":feature"))
+    implementation(project(":domain"))
     implementation(libs.core.ktx)
     implementation(libs.lifecycle.runtime.ktx)
     implementation(libs.hilt.android)
@@ -68,5 +69,7 @@ dependencies {
 
     implementation(libs.glance.appwidget)
     implementation(libs.androidx.glance.material3)
+    implementation(libs.gson)
+    implementation(libs.androidx.work.runtime.ktx)
 
 }
