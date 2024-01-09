@@ -38,4 +38,5 @@
     <string name="rain">Rain: %1$s</string>
     <string name="click_here_to_open_application">Click the button to set the address</string>
     <string name="set_address">Set Address</string>
+    <string name="last_updated_x">Last Updated: %s</string>
 </resources>

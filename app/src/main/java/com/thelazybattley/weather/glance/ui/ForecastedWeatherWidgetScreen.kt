@@ -37,6 +37,7 @@ import com.thelazybattley.common.util.toDateString
 import com.thelazybattley.common.util.toPercentage
 import com.thelazybattley.weather.MainActivity
 import com.thelazybattley.weather.glance.util.EMPTY_ADDRESS
+import java.time.ZoneId
 
 @Composable
 fun CurrentWeatherWidgetScreen(
@@ -244,4 +245,23 @@ private fun ShowWidget(
             )
         }
     }
+
+    Row(modifier = GlanceModifier.fillMaxWidth()) {
+        Spacer(modifier = GlanceModifier.defaultWeight())
+        Text(
+            modifier = GlanceModifier,
+            text = context.getString(
+                R.string.last_updated_x,
+                System.currentTimeMillis().toDateString(
+                    pattern = DatePattern.HOUR_MINUTES_MERIDIEM,
+                    timeZone = ZoneId.systemDefault().id
+                )
+            ),
+            style = TextStyle(
+                color = ColorProvider(Colors.HavelockBlue),
+                fontSize = 12.sp
+            )
+        )
+    }
+
 }
