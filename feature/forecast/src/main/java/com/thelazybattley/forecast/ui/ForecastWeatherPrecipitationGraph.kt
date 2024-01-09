@@ -169,7 +169,7 @@ private fun ShowMorePrecipitationDetails(
     textStyle: TextStyle
 ) {
 
-    val timeZone = LocalWeatherTimeZone.current.timeZone
+    val timeZone = LocalWeatherTimeZone.current
     Column(
         modifier = modifier
             .alpha(alpha = 0.9f)
@@ -244,7 +244,7 @@ private fun PrecipitationPointsCanvas(
     showMoreForecastDetails: MutableState<HourlyForecastHourly?>,
     showMoreDetailsOffset: MutableState<Offset>
 ) {
-    val timeZone = LocalWeatherTimeZone.current.timeZone
+    val timeZone = LocalWeatherTimeZone.current
     val labelOffset = density.run {
         Offset(
             y = 20.dp.toPx(),

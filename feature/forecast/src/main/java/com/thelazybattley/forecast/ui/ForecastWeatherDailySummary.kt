@@ -38,7 +38,7 @@ fun ForecastWeatherDailySummary(
     selectedDailyForecast: DailyForecastDaily,
     onClick: (DailyForecastDaily) -> Unit
 ) {
-    val timeZone = LocalWeatherTimeZone.current.timeZone
+    val timeZone = LocalWeatherTimeZone.current
     LazyRow(
         modifier = modifier,
         contentPadding = PaddingValues(all = 8.dp)

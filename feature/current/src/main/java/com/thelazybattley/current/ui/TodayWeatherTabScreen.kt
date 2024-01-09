@@ -14,7 +14,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.thelazybattley.common.compositionlocal.LocalWeatherTimeZone
-import com.thelazybattley.common.compositionlocal.WeatherTimeZone
 import com.thelazybattley.common.ui.CommonBackground
 import com.thelazybattley.common.ui.DashedDivider
 import com.thelazybattley.common.util.Colors
@@ -27,9 +26,7 @@ fun CurrentWeatherScreen() {
     val viewState by viewModel.state.collectAsState()
     val events by viewModel.events.collectAsState(initial = null)
     CompositionLocalProvider(
-        LocalWeatherTimeZone provides WeatherTimeZone(
-            viewState.dailyForecast?.timeZone ?: ""
-        )
+        LocalWeatherTimeZone provides (viewState.dailyForecast?.timeZone ?: "")
     ) {
         Screen(
             viewState = viewState,

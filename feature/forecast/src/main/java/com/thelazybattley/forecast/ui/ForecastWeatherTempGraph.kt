@@ -187,7 +187,7 @@ private fun ShowMoreDetails(
     modifier: Modifier,
     details: HourlyForecastHourly,
 ) {
-    val timeZone = LocalWeatherTimeZone.current.timeZone
+    val timeZone = LocalWeatherTimeZone.current
     Column(
         modifier = modifier
             .clip(

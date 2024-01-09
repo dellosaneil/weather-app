@@ -51,7 +51,7 @@ fun ForecastWeatherDaily(
     modifier: Modifier,
     dailyForecast: List<DailyForecastDaily>
 ) {
-    val timeZone = LocalWeatherTimeZone.current.timeZone
+    val timeZone = LocalWeatherTimeZone.current
     val expandedForecast: MutableState<DailyForecastDaily?> =
         remember { mutableStateOf(null) }
 
@@ -165,7 +165,7 @@ fun ForecastWeatherDaily(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DailyForecastPerHour(forecast: HourlyForecastHourly) {
-    val timeZone = LocalWeatherTimeZone.current.timeZone
+    val timeZone = LocalWeatherTimeZone.current
     FilterChip(
         selected = false,
         onClick = { },

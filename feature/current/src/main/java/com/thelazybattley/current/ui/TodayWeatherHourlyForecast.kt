@@ -61,7 +61,7 @@ fun TodayWeatherHourlyForecast(
     onFilterClicked: (HourlyForecastHourly) -> Unit
 ) {
     val selectedChip = remember { mutableStateOf(hourlyForecast.first()) }
-    val timeZone = LocalWeatherTimeZone.current.timeZone
+    val timeZone = LocalWeatherTimeZone.current
     columnScope.apply {
         Spacer(modifier = Modifier.height(16.dp))
         Column(

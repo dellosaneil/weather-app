@@ -45,7 +45,7 @@ fun CurrentWeatherSummary(
     selectedWeather: HourlyForecastHourly,
     columnScope: ColumnScope
 ) {
-    val timeZone = LocalWeatherTimeZone.current.timeZone
+    val timeZone = LocalWeatherTimeZone.current
     columnScope.apply {
         FilterChip(
             selected = false,
