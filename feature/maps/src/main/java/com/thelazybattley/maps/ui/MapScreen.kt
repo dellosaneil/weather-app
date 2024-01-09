@@ -46,10 +46,8 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.annotation.RootNavGraph
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.thelazybattley.common.R
+import com.thelazybattley.common.compositionlocal.LocalNavController
 import com.thelazybattley.common.util.Colors
 
 private const val SELECTED_ZOOM = 17f
@@ -57,15 +55,14 @@ private const val DEFAULT_ZOOM = 11f
 private val DEFAULT_LAT_LNG = LatLng(37.3861, 122.0839)
 
 @OptIn(ExperimentalFoundationApi::class)
-@Destination
 @Composable
-@RootNavGraph(start = true)
 fun MapsScreen(
-    viewModel: MapViewModel = hiltViewModel(),
-    navigator: DestinationsNavigator
+    viewModel: MapViewModel = hiltViewModel()
 ) {
     val viewState by viewModel.state.collectAsState()
     val viewEffect by viewModel.events.collectAsState(initial = null)
+
+    val navController = LocalNavController.current
 
     val searchText = remember { mutableStateOf("") }
 
@@ -100,7 +97,7 @@ fun MapsScreen(
     LaunchedEffect(key1 = viewEffect) {
         when (viewEffect) {
             is MapEvents.OnLocationSaved -> {
-                navigator.popBackStack()
+                navController.popBackStack()
             }
 
             null -> {

@@ -66,11 +66,11 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.bundles.compose)
     implementation(libs.hilt.navigation.compose)
-    implementation(libs.compose.destination.core)
     implementation(libs.timber)
-    ksp(libs.compose.destination.ksp)
+    implementation(project(":feature:main"))
     kapt(libs.hiltCompiler)
     implementation(libs.ui.text.google.fonts)
+    implementation(libs.navigation.compose)
 
     implementation(libs.glance.appwidget)
     implementation(libs.androidx.glance.material3)

@@ -13,8 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.thelazybattley.common.compositionlocal.LocalWeatherTimeZone
 import com.thelazybattley.common.compositionlocal.WeatherTimeZone
 import com.thelazybattley.common.ui.CommonBackground
@@ -23,8 +21,6 @@ import com.thelazybattley.common.util.Colors
 import com.thelazybattley.current.model.current.CurrentWeatherData
 import com.thelazybattley.current.model.dailyforecast.DailyForecastData
 
-@Destination
-@RootNavGraph(start = true)
 @Composable
 fun CurrentWeatherScreen() {
     val viewModel = hiltViewModel<TodayWeatherViewModel>()

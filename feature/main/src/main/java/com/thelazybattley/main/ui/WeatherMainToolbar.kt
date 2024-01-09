@@ -1,4 +1,4 @@
-package com.thelazybattley.weather.mainscreen
+package com.thelazybattley.main.ui
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.thelazybattley.common.R
+import com.thelazybattley.common.util.Colors
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -41,7 +42,7 @@ fun WeatherMainToolbar(
                 Text(
                     text = location,
                     style = MaterialTheme.typography.bodyMedium.copy(
-                        color = com.thelazybattley.common.util.Colors.White,
+                        color = Colors.White,
                         fontWeight = FontWeight.Medium
                     ),
                     maxLines = 1,
@@ -64,7 +65,7 @@ fun WeatherMainToolbar(
 
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = com.thelazybattley.common.util.Colors.MidGray
+            containerColor = Colors.MidGray
         )
     )
 }

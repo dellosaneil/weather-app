@@ -45,8 +45,6 @@ android {
 dependencies {
     implementation(libs.bundles.network)
     testImplementation(libs.junit)
-
-    ksp(libs.compose.destination.ksp)
     implementation(libs.hilt.android)
     kapt(libs.hiltCompiler)
     ksp(libs.room.compiler)

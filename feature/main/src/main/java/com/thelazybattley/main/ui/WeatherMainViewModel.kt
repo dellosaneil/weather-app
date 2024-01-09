@@ -1,7 +1,8 @@
-package com.thelazybattley.weather.mainscreen
+package com.thelazybattley.main.ui
 
 import androidx.lifecycle.viewModelScope
 import com.thelazybattley.common.base.BaseViewModel
+import com.thelazybattley.common.di.IoDispatcher
 import com.thelazybattley.domain.local.usecase.GetLocationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -10,7 +11,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class WeatherMainViewModel @Inject constructor(
-    @com.thelazybattley.common.di.IoDispatcher private val dispatcher: CoroutineDispatcher,
+    @IoDispatcher private val dispatcher: CoroutineDispatcher,
     private val getLocationUseCase: GetLocationUseCase
 ) : BaseViewModel<WeatherMainEvent, WeatherMainState>() {
 

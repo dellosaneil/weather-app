@@ -1,4 +1,4 @@
-package com.thelazybattley.weather.mainscreen
+package com.thelazybattley.main.ui
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -21,25 +21,22 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.annotation.RootNavGraph
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.thelazybattley.archive.ui.HistoryTabScreen
 import com.thelazybattley.common.R
+import com.thelazybattley.common.compositionlocal.LocalNavController
+import com.thelazybattley.common.util.Colors
 import com.thelazybattley.current.ui.CurrentWeatherScreen
 import com.thelazybattley.forecast.ui.ForecastWeatherTabScreen
-import com.thelazybattley.maps.ui.destinations.MapsScreenDestination
+import com.thelazybattley.main.Screens
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
-@RootNavGraph(start = true)
-@Destination
 @Composable
 fun WeatherMainScreen(
-    navigator: DestinationsNavigator,
     viewModel: WeatherMainViewModel = hiltViewModel()
 ) {
     val viewState by viewModel.state.collectAsState()
+    val navController = LocalNavController.current
 
     val pagerState = rememberPagerState(
         initialPage = 0,
@@ -54,7 +51,7 @@ fun WeatherMainScreen(
             WeatherMainToolbar(
                 location = viewState.address
             ) {
-                navigator.navigate(MapsScreenDestination)
+                navController.navigate(Screens.MapScreen.route)
             }
         }
     ) {
@@ -65,14 +62,14 @@ fun WeatherMainScreen(
         ) {
             TabRow(
                 selectedTabIndex = pagerState.currentPage,
-                containerColor = com.thelazybattley.common.util.Colors.MidGray,
+                containerColor = Colors.MidGray,
                 modifier = Modifier.fillMaxWidth(),
-                contentColor = com.thelazybattley.common.util.Colors.Trout,
+                contentColor = Colors.Trout,
                 indicator = { tabPositions ->
                     if (pagerState.currentPage < tabPositions.size) {
                         TabRowDefaults.Indicator(
                             modifier = Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage]),
-                            color = com.thelazybattley.common.util.Colors.White
+                            color = Colors.White
                         )
                     }
                 }
@@ -83,7 +80,7 @@ fun WeatherMainScreen(
                             Text(
                                 text = stringResource(id = tab.textRes),
                                 style = MaterialTheme.typography.bodyMedium.copy(
-                                    color = com.thelazybattley.common.util.Colors.White
+                                    color = Colors.White
                                 )
                             )
                         },

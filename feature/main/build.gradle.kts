@@ -9,13 +9,12 @@ plugins {
 }
 
 android {
-    namespace = "com.thelazybattley.common"
+    namespace = "com.thelazybattley.feature.main"
     compileSdk = 34
 
     defaultConfig {
         minSdk = 26
     }
-
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -25,7 +24,6 @@ android {
             )
         }
     }
-
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -49,6 +47,11 @@ android {
 dependencies {
 
     implementation(project(":domain"))
+    implementation(project(":common"))
+    implementation(project(":feature:archive"))
+    implementation(project(":common"))
+    implementation(project(":feature:current"))
+    implementation(project(":feature:forecast"))
 
     implementation(libs.core.ktx)
     implementation(libs.lifecycle.runtime.ktx)
@@ -58,5 +61,6 @@ dependencies {
     implementation(libs.hilt.navigation.compose)
     implementation(libs.hilt.android)
     kapt(libs.hiltCompiler)
+    implementation(libs.navigation.compose)
 
 }

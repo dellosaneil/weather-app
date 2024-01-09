@@ -39,6 +39,9 @@
       <entry key="feature.forecast">
         <State />
       </entry>
+      <entry key="feature.main">
+        <State />
+      </entry>
       <entry key="feature.maps">
         <State />
       </entry>

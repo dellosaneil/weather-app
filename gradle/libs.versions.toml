@@ -19,7 +19,6 @@ androidx-test-ext-junit = "1.1.5"
 espresso-core = "3.5.1"
 appcompat = "1.6.1"
 material = "1.10.0"
-compose-destinations = "1.9.55"
 room-ktx = "2.6.1"
 room-runtime = "2.6.1"
 secrets-gradle-plugin = "2.0.1"
@@ -31,6 +30,7 @@ ui-text-google-fonts = "1.5.4"
 constraintlayout-compose = "1.0.1"
 work-runtime-ktx = "2.9.0"
 firebase-crashlytics-buildtools = "2.9.9"
+navigation-compose = "2.7.6"
 
 [libraries]
 androidx-glance-material3 = { module = "androidx.glance:glance-material3", version.ref = "androidx-glance-appwidget" }
@@ -64,8 +64,6 @@ material = { group = "com.google.android.material", name = "material", version.r
 ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
-compose-destination-core = { group = "io.github.raamcosta.compose-destinations", name = "core", version.ref = "compose-destinations" }
-compose-destination-ksp = { group = "io.github.raamcosta.compose-destinations", name = "ksp", version.ref = "compose-destinations" }
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hilt-navigation-compose" }
 landscapist-glide = { group = "com.github.skydoves", name = "landscapist-glide", version.ref = "landscapist-glide" }
@@ -73,7 +71,7 @@ ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-f
 constraintlayout-compose = {group = "androidx.constraintlayout", name = "constraintlayout-compose", version.ref = "constraintlayout-compose"}
 androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "work-runtime-ktx" }
 firebase-crashlytics-buildtools = { group = "com.google.firebase", name = "firebase-crashlytics-buildtools", version.ref = "firebase-crashlytics-buildtools" }
-
+navigation-compose = {group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation-compose"}
 
 [bundles]
 compose = [

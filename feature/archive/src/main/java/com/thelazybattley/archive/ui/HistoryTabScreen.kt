@@ -12,14 +12,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.thelazybattley.common.ui.CommonBackground
 import com.thelazybattley.common.ui.CommonDatePicker
 import com.thelazybattley.common.util.toMillis
 import java.time.LocalDate
 
 @Composable
-@RootNavGraph(start = true)
 fun HistoryTabScreen(
     viewModel: HistoryViewModel = hiltViewModel()
 ) {

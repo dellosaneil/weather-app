@@ -12,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.thelazybattley.common.compositionlocal.LocalWeatherTimeZone
 import com.thelazybattley.common.compositionlocal.WeatherTimeZone
 import com.thelazybattley.common.ui.CommonBackground
@@ -21,7 +20,6 @@ import ui.ForecastWeatherPrecipitationGraph
 import ui.ForecastWeatherTempGraph
 
 @Composable
-@RootNavGraph(start = true)
 fun ForecastWeatherTabScreen() {
 
     val viewModel = hiltViewModel<ForecastWeatherViewModel>()

@@ -17,6 +17,7 @@
             <option value="$PROJECT_DIR$/feature/archive" />
             <option value="$PROJECT_DIR$/feature/current" />
             <option value="$PROJECT_DIR$/feature/forecast" />
+            <option value="$PROJECT_DIR$/feature/main" />
             <option value="$PROJECT_DIR$/feature/maps" />
           </set>
         </option>
