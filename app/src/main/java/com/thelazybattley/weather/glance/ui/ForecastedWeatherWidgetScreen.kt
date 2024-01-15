@@ -15,6 +15,7 @@ import androidx.glance.appwidget.CircularProgressIndicator
 import androidx.glance.background
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Column
+import androidx.glance.layout.ColumnScope
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxSize
@@ -92,7 +93,10 @@ fun CurrentWeatherWidgetScreen(
 
             forecast.hourly.isNotEmpty() -> {
                 ShowWidget(
-                    forecast = forecast, location = location, context = context
+                    forecast = forecast,
+                    location = location,
+                    context = context,
+                    scope = this
                 )
             }
 
@@ -159,109 +163,113 @@ private fun WidgetForecast(
 private fun ShowWidget(
     forecast: HourlyForecastData,
     location: String,
-    context: Context
+    context: Context,
+    scope: ColumnScope
 ) {
     val currentWeather = forecast.hourly.first()
-    Text(
-        text = location,
-        style = TextStyle(
-            color = ColorProvider(Colors.HavelockBlue),
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Medium,
-            textAlign = TextAlign.Center
-        ),
-        maxLines = 1,
-        modifier = GlanceModifier.fillMaxWidth()
-    )
-    Row(
-        modifier = GlanceModifier
-            .clickable(actionStartActivity<MainActivity>())
-            .fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
+    with(scope) {
         Text(
-            text = currentWeather.temperature2m.toCelcius,
-            style = TextStyle(
-                color = ColorProvider(color = Colors.HavelockBlue),
-                fontSize = 24.sp
-            ),
-            modifier = GlanceModifier.defaultWeight()
-        )
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Image(
-                    provider = ImageProvider(currentWeather.weatherCondition.icon),
-                    contentDescription = null,
-                    modifier = GlanceModifier.size(size = 56.dp)
-                )
-                Text(
-                    text = currentWeather.weatherCondition.description,
-                    style = TextStyle(
-                        color = ColorProvider(color = Colors.HavelockBlue),
-                        fontSize = 12.sp
-                    )
-                )
-            }
-
-            Row(
-                modifier = GlanceModifier,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = context.getString(R.string.feels_like_colon),
-                    style = TextStyle(
-                        color = ColorProvider(color = Colors.Perano),
-                        fontSize = 16.sp
-                    )
-                )
-                Spacer(modifier = GlanceModifier.width(width = 8.dp))
-                Text(
-                    text = currentWeather.apparentTemperature.toCelcius,
-                    style = TextStyle(
-                        color = ColorProvider(color = Colors.HavelockBlue),
-                        fontSize = 16.sp
-                    ),
-                    modifier = GlanceModifier
-                )
-            }
-        }
-    }
-
-    Row(
-        modifier = GlanceModifier
-            .clickable(actionStartActivity<MainActivity>())
-            .wrapContentWidth()
-    ) {
-        forecast.hourly.forEach {
-            WidgetForecast(
-                iconRes = it.weatherCondition.icon,
-                temperature = it.temperature2m,
-                time = it.timeMillis,
-                timeZone = forecast.timeZone,
-                probability = it.precipitationProbability,
-                context = context
-            )
-        }
-    }
-
-    Row(modifier = GlanceModifier.fillMaxWidth()) {
-        Spacer(modifier = GlanceModifier.defaultWeight())
-        Text(
-            modifier = GlanceModifier,
-            text = context.getString(
-                R.string.last_updated_x,
-                System.currentTimeMillis().toDateString(
-                    pattern = DatePattern.HOUR_MINUTES_MERIDIEM,
-                    timeZone = ZoneId.systemDefault().id
-                )
-            ),
+            text = location,
             style = TextStyle(
                 color = ColorProvider(Colors.HavelockBlue),
-                fontSize = 12.sp
-            )
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Medium,
+                textAlign = TextAlign.Center
+            ),
+            maxLines = 1,
+            modifier = GlanceModifier.fillMaxWidth()
         )
-    }
+        Row(
+            modifier = GlanceModifier
+                .clickable(actionStartActivity<MainActivity>())
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = currentWeather.temperature2m.toCelcius,
+                style = TextStyle(
+                    color = ColorProvider(color = Colors.HavelockBlue),
+                    fontSize = 24.sp
+                ),
+                modifier = GlanceModifier.defaultWeight()
+            )
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Image(
+                        provider = ImageProvider(currentWeather.weatherCondition.icon),
+                        contentDescription = null,
+                        modifier = GlanceModifier.size(size = 56.dp)
+                    )
+                    Text(
+                        text = currentWeather.weatherCondition.description,
+                        style = TextStyle(
+                            color = ColorProvider(color = Colors.HavelockBlue),
+                            fontSize = 12.sp
+                        )
+                    )
+                }
 
+                Row(
+                    modifier = GlanceModifier,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = context.getString(R.string.feels_like_colon),
+                        style = TextStyle(
+                            color = ColorProvider(color = Colors.Perano),
+                            fontSize = 16.sp
+                        )
+                    )
+                    Spacer(modifier = GlanceModifier.width(width = 8.dp))
+                    Text(
+                        text = currentWeather.apparentTemperature.toCelcius,
+                        style = TextStyle(
+                            color = ColorProvider(color = Colors.HavelockBlue),
+                            fontSize = 16.sp
+                        ),
+                        modifier = GlanceModifier
+                    )
+                }
+            }
+        }
+
+        Row(
+            modifier = GlanceModifier
+                .clickable(actionStartActivity<MainActivity>())
+                .wrapContentWidth()
+        ) {
+            forecast.hourly.forEach {
+                WidgetForecast(
+                    iconRes = it.weatherCondition.icon,
+                    temperature = it.temperature2m,
+                    time = it.timeMillis,
+                    timeZone = forecast.timeZone,
+                    probability = it.precipitationProbability,
+                    context = context
+                )
+            }
+        }
+
+        Spacer(modifier = GlanceModifier.defaultWeight())
+
+        Row(modifier = GlanceModifier.fillMaxWidth()) {
+            Spacer(modifier = GlanceModifier.defaultWeight())
+            Text(
+                modifier = GlanceModifier,
+                text = context.getString(
+                    R.string.last_updated_x,
+                    System.currentTimeMillis().toDateString(
+                        pattern = DatePattern.HOUR_MINUTES_MERIDIEM,
+                        timeZone = ZoneId.systemDefault().id
+                    )
+                ),
+                style = TextStyle(
+                    color = ColorProvider(Colors.HavelockBlue),
+                    fontSize = 12.sp
+                )
+            )
+        }
+    }
 }
